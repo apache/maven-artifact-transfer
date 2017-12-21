@@ -106,6 +106,7 @@
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
+        <version>0.12</version>
         <configuration>
           <excludes combine.children="append">
             <exclude>dependency-reduced-pom.xml</exclude>
@@ -153,6 +154,7 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
 
@@ -243,6 +245,7 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
@@ -264,4 +267,75 @@
     </pluginRepository>
   </pluginRepositories>
 
+  <profiles>
+    <profile>
+      <id>run-its</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <version>3.0.1</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>2.4.10</version>
+              </dependency>
+              <dependency>
+                <groupId>org.codehaus.gmaven.runtime</groupId>
+                <artifactId>gmaven-runtime-2.0</artifactId>
+                <version>1.5</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <addTestClassPath>true</addTestClassPath>
+              <debug>false</debug>
+              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+              <projectsDirectory>src/it</projectsDirectory>
+              <showVersion>false</showVersion>
+              <pomIncludes>
+                <pomInclude>*/pom.xml</pomInclude>
+              </pomIncludes>
+              <preBuildHookScript>setup</preBuildHookScript>
+              <postBuildHookScript>verify</postBuildHookScript>
+              <settingsFile>src/it/settings.xml</settingsFile>
+              <!-- Currently working with more than one thread does not work, cause
+                it is not guaranteed that the setup-config project is build at first. see
+                also http://jira.codehaus.org/browse/MINVOKER-147 -->
+              <parallelThreads>1</parallelThreads>
+              <filterProperties>
+                <repository.proxy.url>${repository.proxy.url}</repository.proxy.url>
+                <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+              </filterProperties>
+              <extraArtifacts>
+                <extraArtifact>org.apache.maven:apache-maven:3.0.5:tar.gz:bin</extraArtifact>
+                <extraArtifact>org.apache.maven:apache-maven:3.1.1:tar.gz:bin</extraArtifact>
+                <extraArtifact>org.apache.maven:apache-maven:3.2.5:tar.gz:bin</extraArtifact>
+                <extraArtifact>org.apache.maven:apache-maven:3.3.1:tar.gz:bin</extraArtifact>
+                <extraArtifact>org.apache.maven:apache-maven:3.3.9:tar.gz:bin</extraArtifact>
+                <extraArtifact>org.apache.maven:apache-maven:3.5.0:tar.gz:bin</extraArtifact>
+              </extraArtifacts>
+            </configuration>
+            <executions>
+              <execution>
+                <id>pre-integration-tests</id>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>integration-tests</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+      </build>
+    </profile>
+  </profiles>
 </project>

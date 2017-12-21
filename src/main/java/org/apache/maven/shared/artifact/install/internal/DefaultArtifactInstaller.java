@@ -49,7 +49,6 @@ class DefaultArtifactInstaller
         throws ArtifactInstallerException, IllegalArgumentException
     {
         validateParameters( request, mavenArtifacts );
-
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";

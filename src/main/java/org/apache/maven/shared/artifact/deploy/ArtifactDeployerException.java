@@ -20,6 +20,7 @@ package org.apache.maven.shared.artifact.deploy;
  */
 
 /**
+ * An artifact could not correctly being deployed.
  * 
  */
 public class ArtifactDeployerException
