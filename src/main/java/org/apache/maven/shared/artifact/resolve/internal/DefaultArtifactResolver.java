@@ -44,8 +44,9 @@ public class DefaultArtifactResolver
 
     @Override
     public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest, Artifact mavenArtifact )
-        throws ArtifactResolverException
+        throws ArtifactResolverException, IllegalArgumentException
     {
+        validateParameters( buildingRequest, mavenArtifact );
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";
@@ -62,8 +63,9 @@ public class DefaultArtifactResolver
 
     @Override
     public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest, ArtifactCoordinate coordinate )
-        throws ArtifactResolverException
+        throws ArtifactResolverException, IllegalArgumentException
     {
+        validateParameters( buildingRequest, coordinate );
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";
@@ -78,45 +80,69 @@ public class DefaultArtifactResolver
         }
     }
 
-//    @Override
-//    public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-//                                                         Collection<Dependency> coordinates,
-//                                                         Collection<Dependency> managedDependencies,
-//                                                         TransformableFilter filter )
-//                                                             throws ArtifactResolverException
-//    {
-//        try
-//        {
-//            String hint = isMaven31() ? "maven31" : "maven3";
-//
-//            ArtifactResolver effectiveArtifactResolver = container.lookup( ArtifactResolver.class, hint );
-//
-//            return effectiveArtifactResolver.resolveDependencies( buildingRequest, coordinates, null, filter );
-//        }
-//        catch ( ComponentLookupException e )
-//        {
-//            throw new ArtifactResolverException( e.getMessage(), e );
-//        }
-//    }
-//
-//    @Override
-//    public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-//                                                         ArtifactCoordinate coordinate, TransformableFilter filter )
-//                                                             throws ArtifactResolverException
-//    {
-//        try
-//        {
-//            String hint = isMaven31() ? "maven31" : "maven3";
-//
-//            ArtifactResolver effectiveArtifactResolver = container.lookup( ArtifactResolver.class, hint );
-//
-//            return effectiveArtifactResolver.resolveDependencies( buildingRequest, coordinate, filter );
-//        }
-//        catch ( ComponentLookupException e )
-//        {
-//            throw new ArtifactResolverException( e.getMessage(), e );
-//        }
-//    }
+    private void validateParameters( ProjectBuildingRequest buildingRequest, Artifact mavenArtifact )
+    {
+        if ( buildingRequest == null )
+        {
+            throw new IllegalArgumentException( "The parameter buildingRequest is not allowed to be null." );
+        }
+        if ( mavenArtifact == null )
+        {
+            throw new IllegalArgumentException( "The parameter mavenArtifact is not allowed to be null." );
+        }
+    }
+
+    private void validateParameters( ProjectBuildingRequest buildingRequest, ArtifactCoordinate coordinate )
+    {
+        if ( buildingRequest == null )
+        {
+            throw new IllegalArgumentException( "The parameter buildingRequest is not allowed to be null." );
+        }
+        if ( coordinate == null )
+        {
+            throw new IllegalArgumentException( "The parameter coordinate is not allowed to be null." );
+        }
+    }
+
+    // @Override
+    // public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
+    // Collection<Dependency> coordinates,
+    // Collection<Dependency> managedDependencies,
+    // TransformableFilter filter )
+    // throws ArtifactResolverException
+    // {
+    // try
+    // {
+    // String hint = isMaven31() ? "maven31" : "maven3";
+    //
+    // ArtifactResolver effectiveArtifactResolver = container.lookup( ArtifactResolver.class, hint );
+    //
+    // return effectiveArtifactResolver.resolveDependencies( buildingRequest, coordinates, null, filter );
+    // }
+    // catch ( ComponentLookupException e )
+    // {
+    // throw new ArtifactResolverException( e.getMessage(), e );
+    // }
+    // }
+    //
+    // @Override
+    // public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
+    // ArtifactCoordinate coordinate, TransformableFilter filter )
+    // throws ArtifactResolverException
+    // {
+    // try
+    // {
+    // String hint = isMaven31() ? "maven31" : "maven3";
+    //
+    // ArtifactResolver effectiveArtifactResolver = container.lookup( ArtifactResolver.class, hint );
+    //
+    // return effectiveArtifactResolver.resolveDependencies( buildingRequest, coordinate, filter );
+    // }
+    // catch ( ComponentLookupException e )
+    // {
+    // throw new ArtifactResolverException( e.getMessage(), e );
+    // }
+    // }
 
     /**
      * @return true if the current Maven version is Maven 3.1.
