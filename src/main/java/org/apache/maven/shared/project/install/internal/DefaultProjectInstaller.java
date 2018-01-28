@@ -68,13 +68,14 @@ public class DefaultProjectInstaller
      * {@inheritDoc}
      */
     @Override
-    public void install( ProjectBuildingRequest buildingRequest, ProjectInstallerRequest request )
-        throws IOException, ArtifactInstallerException, NoFileAssignedException
+    public void install( ProjectBuildingRequest buildingRequest, ProjectInstallerRequest installerRequest )
+        throws IOException, ArtifactInstallerException, NoFileAssignedException, IllegalArgumentException
     {
 
-        MavenProject project = request.getProject();
-        boolean createChecksum = request.isCreateChecksum();
-        boolean updateReleaseInfo = request.isUpdateReleaseInfo();
+        validateParameters( buildingRequest, installerRequest );
+        MavenProject project = installerRequest.getProject();
+        boolean createChecksum = installerRequest.isCreateChecksum();
+        boolean updateReleaseInfo = installerRequest.isUpdateReleaseInfo();
 
         Artifact artifact = project.getArtifact();
         String packaging = project.getPackaging();
@@ -145,6 +146,18 @@ public class DefaultProjectInstaller
         installChecksums( metadataFiles );
     }
 
+    private void validateParameters( ProjectBuildingRequest buildingRequest, ProjectInstallerRequest installerRequest )
+    {
+        if ( buildingRequest == null )
+        {
+            throw new IllegalArgumentException( "The parameter buildingRequest is not allowed to be null." );
+        }
+        if ( installerRequest == null )
+        {
+            throw new IllegalArgumentException( "The parameter installerRequest is not allowed to be null." );
+        }
+    }
+    
     /**
      * Installs the checksums for the specified artifact if this has been enabled in the plugin configuration. This
      * method creates checksums for files that have already been installed to the local repo to account for on-the-fly

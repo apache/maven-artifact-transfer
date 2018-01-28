@@ -70,8 +70,10 @@ public interface ProjectInstaller
      * @throws IOException In case of problems related to checksums.
      * @throws ArtifactInstallerException In case of problems to install artifacts.
      * @throws NoFileAssignedException If no file has been assigned to the project.
+     * @throws IllegalArgumentException in case of parameter <code>projectBuildingRequest</code> is <code>null</code> or
+     *             parameter <code>projectInstallerRequest</code> is <code>null</code>.
      */
     void install( ProjectBuildingRequest projectBuildingRequest, ProjectInstallerRequest projectInstallerRequest )
-        throws IOException, ArtifactInstallerException, NoFileAssignedException;
+        throws IOException, ArtifactInstallerException, NoFileAssignedException, IllegalArgumentException;
 
 }
