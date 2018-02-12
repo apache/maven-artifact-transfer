@@ -34,7 +34,7 @@ class Maven31DependencyResolverException extends DependencyResolverException
 {
     private DependencyResolutionException e;
 
-    public Maven31DependencyResolverException( DependencyResolutionException e )
+    Maven31DependencyResolverException( DependencyResolutionException e )
     {
         super( e );
         this.e = e;

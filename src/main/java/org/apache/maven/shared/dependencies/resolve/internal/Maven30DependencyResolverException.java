@@ -43,7 +43,7 @@ class Maven30DependencyResolverException extends DependencyResolverException
         this.dce = e;
     }
     
-    public Maven30DependencyResolverException( ArtifactResolutionException e )
+    Maven30DependencyResolverException( ArtifactResolutionException e )
     {
         super( e );
         this.are = e;

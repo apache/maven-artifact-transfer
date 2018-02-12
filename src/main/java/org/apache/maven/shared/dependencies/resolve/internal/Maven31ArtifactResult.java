@@ -38,7 +38,7 @@ class Maven31ArtifactResult
     /**
      * @param artifactResult {@link ArtifactResult}
      */
-    public Maven31ArtifactResult( ArtifactResult artifactResult )
+    Maven31ArtifactResult( ArtifactResult artifactResult )
     {
         this.artifactResult = artifactResult;
     }

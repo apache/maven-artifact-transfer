@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.apache.maven.shared</groupId>
     <artifactId>maven-shared-components</artifactId>
-    <version>30</version>
+    <version>31</version>
     <relativePath>../../pom/maven/maven-shared-components/pom.xml</relativePath>
   </parent>
 
@@ -61,7 +61,6 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-        <version>1.7.1</version>
         <executions>
           <execution>
             <goals>
@@ -73,7 +72,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.0.0</version>
+        <!--
+         ! explicit overwrite cause otherwise we get an 2.4.3...instead. 
+         -->
+        <version>3.1.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -107,6 +109,10 @@
         <configuration>
           <excludes combine.children="append">
             <exclude>dependency-reduced-pom.xml</exclude>
+            <exclude>src/it/**/.settings/**</exclude>
+            <exclude>src/it/**/.project</exclude>
+            <exclude>src/it/**/.classpath</exclude>
+            <exclude>src/it/**/target/**</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -165,7 +171,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
-      <version>1.7.1</version>
     </dependency>
 
     <dependency>
