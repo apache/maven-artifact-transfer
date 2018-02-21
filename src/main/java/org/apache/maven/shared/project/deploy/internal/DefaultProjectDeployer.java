@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  *         taken from maven-deploy-plugin.
  */
 @Component( role = ProjectDeployer.class )
-public class DefaultProjectDeployer
+class DefaultProjectDeployer
     implements ProjectDeployer
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectDeployer.class );

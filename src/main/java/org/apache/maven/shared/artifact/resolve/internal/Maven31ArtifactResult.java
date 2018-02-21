@@ -30,7 +30,7 @@ import org.eclipse.aether.artifact.Artifact;
  * @author Robert Scholte
  * @since 3.0
  */
-public class Maven31ArtifactResult
+class Maven31ArtifactResult
     implements org.apache.maven.shared.artifact.resolve.ArtifactResult
 {
     private final ArtifactResult artifactResult;
@@ -38,7 +38,7 @@ public class Maven31ArtifactResult
     /**
      * @param artifactResult {@link ArtifactResult}
      */
-    public Maven31ArtifactResult( ArtifactResult artifactResult )
+    Maven31ArtifactResult( ArtifactResult artifactResult )
     {
         this.artifactResult = artifactResult;
     }

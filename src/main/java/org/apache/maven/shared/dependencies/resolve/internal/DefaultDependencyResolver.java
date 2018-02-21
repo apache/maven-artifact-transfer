@@ -41,7 +41,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * 
  */
 @Component( role = DependencyResolver.class, hint = "default" )
-public class DefaultDependencyResolver
+class DefaultDependencyResolver
     implements DependencyResolver, Contextualizable
 {
     private PlexusContainer container;

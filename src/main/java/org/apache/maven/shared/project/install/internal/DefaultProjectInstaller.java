@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */
 @Component( role = ProjectInstaller.class )
-public class DefaultProjectInstaller
+class DefaultProjectInstaller
     implements ProjectInstaller
 {
 

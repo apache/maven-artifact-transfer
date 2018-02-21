@@ -57,7 +57,7 @@ import org.eclipse.aether.resolution.DependencyResult;
  * 
  */
 @Component( role = DependencyResolver.class, hint = "maven31" )
-public class Maven31DependencyResolver
+class Maven31DependencyResolver
     implements DependencyResolver
 {
     @Requirement

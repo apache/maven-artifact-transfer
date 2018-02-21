@@ -43,7 +43,7 @@ import org.sonatype.aether.util.artifact.SubArtifact;
  * 
  */
 @Component( role = ArtifactDeployer.class, hint = "maven3" )
-public class Maven30ArtifactDeployer
+class Maven30ArtifactDeployer
     implements ArtifactDeployer
 {
 

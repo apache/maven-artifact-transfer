@@ -40,7 +40,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * @author Robert Scholte
  */
 @Component( role = DependencyCollector.class, hint = "default" )
-public class DefaultDependencyCollector implements DependencyCollector, Contextualizable 
+class DefaultDependencyCollector implements DependencyCollector, Contextualizable 
 {
     private PlexusContainer container;
    

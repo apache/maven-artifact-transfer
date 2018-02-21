@@ -40,7 +40,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * 
  */
 @Component( role = RepositoryManager.class )
-public class DefaultRepositoryManager
+class DefaultRepositoryManager
     implements RepositoryManager, Contextualizable
 {
     private PlexusContainer container;

@@ -43,7 +43,7 @@ import org.sonatype.aether.util.artifact.SubArtifact;
  * 
  */
 @Component( role = ArtifactInstaller.class, hint = "maven3" )
-public class Maven30ArtifactInstaller
+class Maven30ArtifactInstaller
     implements ArtifactInstaller
 {
     @Requirement

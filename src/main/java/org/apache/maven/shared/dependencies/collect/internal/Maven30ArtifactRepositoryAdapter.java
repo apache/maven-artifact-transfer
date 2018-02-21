@@ -37,7 +37,7 @@ import org.sonatype.aether.repository.RepositoryPolicy;
  * @author Robert Scholte
  *
  */
-public class Maven30ArtifactRepositoryAdapter implements ArtifactRepository
+class Maven30ArtifactRepositoryAdapter implements ArtifactRepository
 {
     
     private RemoteRepository remoteRepository;
@@ -45,7 +45,7 @@ public class Maven30ArtifactRepositoryAdapter implements ArtifactRepository
     /**
      * @param remoteRepository {@link RemoteRepository}
      */
-    public Maven30ArtifactRepositoryAdapter( RemoteRepository remoteRepository )
+    Maven30ArtifactRepositoryAdapter( RemoteRepository remoteRepository )
     {
         this.remoteRepository = remoteRepository;
     }

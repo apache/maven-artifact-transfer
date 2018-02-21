@@ -37,14 +37,14 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @author Robert Scholte
  *
  */
-public class Maven31CollectorResult implements CollectorResult
+class Maven31CollectorResult implements CollectorResult
 {
     private final CollectResult collectResult;
     
     /**
      * @param collectResult {@link CollectorResult}
      */
-    public Maven31CollectorResult( CollectResult collectResult )
+    Maven31CollectorResult( CollectResult collectResult )
     {
         this.collectResult = collectResult;
     }

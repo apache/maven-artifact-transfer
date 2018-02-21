@@ -43,7 +43,7 @@ import org.eclipse.aether.util.artifact.SubArtifact;
  * 
  */
 @Component( role = ArtifactDeployer.class, hint = "maven31" )
-public class Maven31ArtifactDeployer
+class Maven31ArtifactDeployer
     implements ArtifactDeployer
 {
 

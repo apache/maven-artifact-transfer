@@ -47,7 +47,7 @@ import org.sonatype.aether.util.metadata.DefaultMetadata;
  * 
  */
 @Component( role = RepositoryManager.class, hint = "maven3" )
-public class Maven30RepositoryManager
+class Maven30RepositoryManager
     implements RepositoryManager
 {
 

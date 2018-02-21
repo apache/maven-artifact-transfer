@@ -37,7 +37,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * 
  */
 @Component( role = ArtifactResolver.class, hint = "default" )
-public class DefaultArtifactResolver
+class DefaultArtifactResolver
     implements ArtifactResolver, Contextualizable
 {
     private PlexusContainer container;

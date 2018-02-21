@@ -50,7 +50,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  *
  */
 @Component( role = DependencyCollector.class, hint = "maven31" )
-public class Maven31DependencyCollector
+class Maven31DependencyCollector
     implements DependencyCollector
 {
     @Requirement

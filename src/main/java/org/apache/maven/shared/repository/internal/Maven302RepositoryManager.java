@@ -27,7 +27,7 @@ import org.sonatype.aether.repository.LocalRepository;
  * 
  */
 @Component( role = RepositoryManager.class, hint = "maven302" )
-public class Maven302RepositoryManager
+class Maven302RepositoryManager
     extends Maven30RepositoryManager
 {
 

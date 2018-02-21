@@ -50,7 +50,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
  *
  */
 @Component( role = DependencyCollector.class, hint = "maven3" )
-public class Maven30DependencyCollector
+class Maven30DependencyCollector
     implements DependencyCollector
 {
     @Requirement

@@ -47,7 +47,7 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
  * 
  */
 @Component( role = RepositoryManager.class, hint = "maven31" )
-public class Maven31RepositoryManager
+class Maven31RepositoryManager
     implements RepositoryManager
 {
     @Requirement

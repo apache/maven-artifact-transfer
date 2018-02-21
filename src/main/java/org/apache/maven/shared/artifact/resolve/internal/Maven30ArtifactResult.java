@@ -30,7 +30,7 @@ import org.sonatype.aether.resolution.ArtifactResult;
  * @author Robert Scholte
  * @since 3.0
  */
-public class Maven30ArtifactResult
+class Maven30ArtifactResult
     implements org.apache.maven.shared.artifact.resolve.ArtifactResult
 {
     private final ArtifactResult artifactResult;

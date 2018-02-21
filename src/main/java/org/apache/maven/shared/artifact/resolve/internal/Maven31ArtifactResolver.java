@@ -44,7 +44,7 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
  * 
  */
 @Component( role = ArtifactResolver.class, hint = "maven31" )
-public class Maven31ArtifactResolver
+class Maven31ArtifactResolver
     implements ArtifactResolver
 {
     @Requirement

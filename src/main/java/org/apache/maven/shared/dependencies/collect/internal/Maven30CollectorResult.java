@@ -37,14 +37,14 @@ import org.sonatype.aether.repository.RemoteRepository;
  * @author Robert Scholte
  *
  */
-public class Maven30CollectorResult implements CollectorResult
+class Maven30CollectorResult implements CollectorResult
 {
     private final CollectResult collectResult;
     
     /**
      * @param collectResult {@link CollectorResult}
      */
-    public Maven30CollectorResult( CollectResult collectResult )
+    Maven30CollectorResult( CollectResult collectResult )
     {
         this.collectResult = collectResult;
     }

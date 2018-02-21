@@ -38,7 +38,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * 
  */
 @Component( role = ArtifactDeployer.class )
-public class DefaultArtifactDeployer
+class DefaultArtifactDeployer
     implements ArtifactDeployer, Contextualizable
 {
 

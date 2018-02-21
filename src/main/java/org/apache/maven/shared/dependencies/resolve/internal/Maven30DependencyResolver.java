@@ -57,7 +57,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifactType;
  * 
  */
 @Component( role = DependencyResolver.class, hint = "maven3" )
-public class Maven30DependencyResolver
+class Maven30DependencyResolver
     implements DependencyResolver
 {
     @Requirement
