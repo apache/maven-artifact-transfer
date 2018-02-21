@@ -54,15 +54,15 @@ public interface ProjectInstaller
      *  installer.install( session.getProjectBuildingRequest(), pir );
      * </pre>
      * 
-     * To set a different local repository than the current one in the Maven session, you can inject an instance of
-     * the <code>RepositoryManager</code> and set the path to the local repository, called 
-     * <code>localRepositoryPath</code>, as such:
+     * To set a different local repository than the current one in the Maven session, you can inject an instance of the
+     * <code>RepositoryManager</code> and set the path to the local repository, called <code>localRepositoryPath</code>,
+     * as such:
      * 
      * <pre class="java">
-     *  &#64;Component
-     *  private RepositoryManager repositoryManager;
+     * &#64;Component
+     * private RepositoryManager repositoryManager;
      * 
-     *  buildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, localRepositoryPath );
+     * buildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, localRepositoryPath );
      * </pre>
      * 
      * @param projectBuildingRequest {@link ProjectBuildingRequest}
@@ -74,6 +74,6 @@ public interface ProjectInstaller
      *             parameter <code>projectInstallerRequest</code> is <code>null</code>.
      */
     void install( ProjectBuildingRequest projectBuildingRequest, ProjectInstallerRequest projectInstallerRequest )
-        throws IOException, ArtifactInstallerException, NoFileAssignedException, IllegalArgumentException;
+        throws IOException, ArtifactInstallerException, NoFileAssignedException;
 
 }

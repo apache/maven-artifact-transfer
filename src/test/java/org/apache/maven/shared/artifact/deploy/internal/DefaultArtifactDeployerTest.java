@@ -64,9 +64,10 @@ public class DefaultArtifactDeployerTest
     public void deployShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
         throws ArtifactDeployerException
     {
+        ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
+
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter mavenArtifacts is not allowed to be null." );
-        ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
         dap.deploy( pbr, null );
     }
 
@@ -74,9 +75,10 @@ public class DefaultArtifactDeployerTest
     public void deployShouldReturnIllegalArgumentExceptionForSecondParameterWithEmpty()
         throws ArtifactDeployerException
     {
+        ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
+
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The collection mavenArtifacts is not allowed to be empty." );
-        ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
         dap.deploy( pbr, Collections.<Artifact>emptyList() );
     }
 
@@ -94,9 +96,10 @@ public class DefaultArtifactDeployerTest
     public void deploy3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
         throws ArtifactDeployerException
     {
+        ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
+
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter mavenArtifacts is not allowed to be null." );
-        ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
         dap.deploy( pbr, null, null );
     }
 
@@ -104,9 +107,10 @@ public class DefaultArtifactDeployerTest
     public void deploy3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterWithEmpty()
         throws ArtifactDeployerException
     {
+        ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
+
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The collection mavenArtifacts is not allowed to be empty." );
-        ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
         dap.deploy( pbr, null, Collections.<Artifact>emptyList() );
     }
 

@@ -71,7 +71,6 @@ class DefaultProjectInstaller
     public void install( ProjectBuildingRequest buildingRequest, ProjectInstallerRequest installerRequest )
         throws IOException, ArtifactInstallerException, NoFileAssignedException, IllegalArgumentException
     {
-
         validateParameters( buildingRequest, installerRequest );
         MavenProject project = installerRequest.getProject();
         boolean createChecksum = installerRequest.isCreateChecksum();
@@ -157,7 +156,7 @@ class DefaultProjectInstaller
             throw new IllegalArgumentException( "The parameter installerRequest is not allowed to be null." );
         }
     }
-    
+
     /**
      * Installs the checksums for the specified artifact if this has been enabled in the plugin configuration. This
      * method creates checksums for files that have already been installed to the local repo to account for on-the-fly

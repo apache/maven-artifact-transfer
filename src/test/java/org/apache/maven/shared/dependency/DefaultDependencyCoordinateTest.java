@@ -18,6 +18,7 @@ package org.apache.maven.shared.dependency;
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import static org.junit.Assert.assertEquals;
 
 import org.apache.maven.shared.dependencies.DefaultDependableCoordinate;

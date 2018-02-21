@@ -51,7 +51,7 @@ class DefaultDependencyResolver
                                                          Collection<Dependency> coordinates,
                                                          Collection<Dependency> managedDependencies,
                                                          TransformableFilter filter )
-                                                             throws DependencyResolverException
+        throws DependencyResolverException
     {
         try
         {
@@ -70,8 +70,9 @@ class DefaultDependencyResolver
     @Override
     public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
                                                          DependableCoordinate coordinate, TransformableFilter filter )
-                                                             throws DependencyResolverException
+        throws DependencyResolverException
     {
+        validateParameters( buildingRequest, coordinate, filter );
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";
@@ -85,12 +86,13 @@ class DefaultDependencyResolver
             throw new DependencyResolverException( e.getMessage(), e );
         }
     }
-    
+
     @Override
-    public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-                                                         Model model, TransformableFilter filter )
+    public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest, Model model,
+                                                         TransformableFilter filter )
         throws DependencyResolverException
     {
+        validateParameters( buildingRequest, model, filter );
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";
@@ -138,4 +140,43 @@ class DefaultDependencyResolver
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
+
+    private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate coordinate,
+                                     TransformableFilter filter )
+    {
+        validateBuildingRequest( buildingRequest );
+        if ( coordinate == null )
+        {
+            throw new IllegalArgumentException( "The parameter coordinate is not allowed to be null." );
+        }
+        if ( filter == null )
+        {
+            throw new IllegalArgumentException( "The parameter filter is not allowed to be null." );
+        }
+
+    }
+
+    private void validateParameters( ProjectBuildingRequest buildingRequest, Model model,
+                                     TransformableFilter filter )
+    {
+        validateBuildingRequest( buildingRequest );
+        if ( model == null )
+        {
+            throw new IllegalArgumentException( "The parameter model is not allowed to be null." );
+        }
+        if ( filter == null )
+        {
+            throw new IllegalArgumentException( "The parameter filter is not allowed to be null." );
+        }
+
+    }
+
+    private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )
+    {
+        if ( buildingRequest == null )
+        {
+            throw new IllegalArgumentException( "The parameter buildingRequest is not allowed to be null." );
+        }
+    }
+
 }

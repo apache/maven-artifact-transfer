@@ -12,5 +12,6 @@ out/
 .DS_Store
 /bootstrap
 /dependencies.xml
+/dependency-reduced-pom.xml
 .java-version
 dependency-reduced-pom.xml

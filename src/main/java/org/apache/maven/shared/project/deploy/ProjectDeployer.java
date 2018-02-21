@@ -21,6 +21,7 @@ package org.apache.maven.shared.project.deploy;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.project.NoFileAssignedException;
 
 /**
@@ -55,11 +56,12 @@ public interface ProjectDeployer
      * @param request {@link ProjectDeployerRequest}
      * @param artifactRepository {@link ArtifactRepository}
      * @throws NoFileAssignedException In case of missing file which has not been assigned to project.
-     * @throws IllegalArgumentException in case of artifact is not correctly assigned.
+     * @throws ArtifactDeployerException in case of artifact could not correctly deployed.
+     * @throws IllegalArgumentException in case <code>buildingRequest</code> is <code>null</code>, <code>request</code>
+     *             is <code>null</code> or <code>artifactRepository</code> is <code>null</code>.
      */
     void deploy( ProjectBuildingRequest buildingRequest, ProjectDeployerRequest request,
-                        ArtifactRepository artifactRepository )
-        throws NoFileAssignedException, IllegalArgumentException;
-
+                 ArtifactRepository artifactRepository )
+        throws NoFileAssignedException, ArtifactDeployerException;
 
 }

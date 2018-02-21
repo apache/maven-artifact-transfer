@@ -38,32 +38,33 @@ import org.junit.rules.ExpectedException;
  */
 public class DefaultProjectInstallerTest
 {
+
     @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void installShouldReturnIllegalArgumentExceptionWhereBuildingRequestIsNull()
+    public void installShouldFailWithIAEWhileBuildingRequestIsNull()
         throws IOException, ArtifactInstallerException, NoFileAssignedException
     {
-        DefaultProjectInstaller dai = new DefaultProjectInstaller();
+        ProjectInstaller dpi = new DefaultProjectInstaller();
 
-        thrown.expect( IllegalArgumentException.class );
-        thrown.expectMessage( "The parameter buildingRequest is not allowed to be null." );
-        dai.install( null, null );
+        expectedException.expect( IllegalArgumentException.class );
+        expectedException.expectMessage( "The parameter buildingRequest is not allowed to be null." );
+
+        dpi.install( null, null );
     }
 
     @Test
-    public void installShouldReturnIllegalArgumentExceptionWhereInstallerRequestIsNull()
+    public void installShouldFailWithIAEWhileProjectInstallerRequestIsNull()
         throws IOException, ArtifactInstallerException, NoFileAssignedException
     {
-        DefaultProjectInstaller dai = new DefaultProjectInstaller();
+        ProjectInstaller dpi = new DefaultProjectInstaller();
 
-        thrown.expect( IllegalArgumentException.class );
-        thrown.expectMessage( "The parameter installerRequest is not allowed to be null." );
+        expectedException.expect( IllegalArgumentException.class );
+        expectedException.expectMessage( "The parameter installerRequest is not allowed to be null." );
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
-        dai.install( pbr, null );
+
+        dpi.install( pbr, null );
     }
-
-
 
 }

@@ -40,6 +40,8 @@ public interface DependencyCollector
      * @param root {@link Dependency}
      * @return {@link CollectorResult}
      * @throws DependencyCollectorException in case of an error.
+     * @throws IllegalArgumentException in case of parameter <code>buildingRequest</code> is <code>null</code> or
+     *             parameter <code>root</code> is <code>null</code>.
      */
     CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, Dependency root )
         throws DependencyCollectorException;
@@ -50,6 +52,8 @@ public interface DependencyCollector
      * @return {@link CollectorResult}
      * @throws DependencyCollectorException in case of an error which can be a component lookup error or
      *  an error while trying to look up the dependencies.
+     * @throws IllegalArgumentException in case of parameter <code>buildingRequest</code> is <code>null</code> or
+     *             parameter <code>root</code> is <code>null</code>.
      */
     CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
                     throws DependencyCollectorException;
@@ -60,6 +64,8 @@ public interface DependencyCollector
      * @return {@link CollectorResult}
      * @throws DependencyCollectorException in case of an error which can be a component lookup error or
      *  an error while trying to look up the dependencies.
+     * @throws IllegalArgumentException in case of parameter <code>buildingRequest</code> is <code>null</code> or
+     *             parameter <code>root</code> is <code>null</code>.
      */
     CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, Model root )
                     throws DependencyCollectorException;

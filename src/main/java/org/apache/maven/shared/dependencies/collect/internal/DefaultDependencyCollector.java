@@ -36,18 +36,20 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
  * This DependencyCollector passes the request to the proper Maven 3.x implementation
- *  
+ * 
  * @author Robert Scholte
  */
 @Component( role = DependencyCollector.class, hint = "default" )
 class DefaultDependencyCollector implements DependencyCollector, Contextualizable 
 {
     private PlexusContainer container;
-   
+
     @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, Dependency root )
         throws DependencyCollectorException
     {
+        validateParameters( buildingRequest, root );
+
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";
@@ -61,11 +63,13 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
             throw new DependencyCollectorException( e.getMessage(), e );
         }
     }
-    
+
     @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
         throws DependencyCollectorException
     {
+        validateParameters( buildingRequest, root );
+
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";
@@ -79,11 +83,13 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
             throw new DependencyCollectorException( e.getMessage(), e );
         }
     }
-    
+
     @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, Model root )
         throws DependencyCollectorException
     {
+        validateParameters( buildingRequest, root );
+
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";
@@ -95,6 +101,41 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
         catch ( ComponentLookupException e )
         {
             throw new DependencyCollectorException( e.getMessage(), e );
+        }
+    }
+
+    private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
+    {
+        validateBuildingRequest( buildingRequest );
+        if ( root == null )
+        {
+            throw new IllegalArgumentException( "The parameter root is not allowed to be null." );
+        }
+    }
+
+    private void validateParameters( ProjectBuildingRequest buildingRequest, Dependency root )
+    {
+        validateBuildingRequest( buildingRequest );
+        if ( root == null )
+        {
+            throw new IllegalArgumentException( "The parameter root is not allowed to be null." );
+        }
+    }
+
+    private void validateParameters( ProjectBuildingRequest buildingRequest, Model root )
+    {
+        validateBuildingRequest( buildingRequest );
+        if ( root == null )
+        {
+            throw new IllegalArgumentException( "The parameter root is not allowed to be null." );
+        }
+    }
+
+    private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )
+    {
+        if ( buildingRequest == null )
+        {
+            throw new IllegalArgumentException( "The parameter buildingRequest is not allowed to be null." );
         }
     }
 

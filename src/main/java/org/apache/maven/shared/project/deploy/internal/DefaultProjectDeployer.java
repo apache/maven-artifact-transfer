@@ -54,24 +54,19 @@ class DefaultProjectDeployer
     private ArtifactDeployer deployer;
 
     /**
-     * This will deploy a single project which may contain several artifacts into the appropriate remote repository.
-     * 
-     * @param buildingRequest {@link ProjectBuildingRequest}
-     * @param request {@link ProjectDeployerRequest}
-     * @param artifactRepository {@link ArtifactRepository}
-     * @throws IllegalArgumentException in case of artifact is not correctly assigned.
-     * @throws NoFileAssignedException In case no file has been assigned to main file.
+     * {@inheritDoc}
      */
-    public void deploy( ProjectBuildingRequest buildingRequest, ProjectDeployerRequest request,
+    public void deploy( ProjectBuildingRequest buildingRequest, ProjectDeployerRequest projectDeployerRequest,
                         ArtifactRepository artifactRepository )
-        throws NoFileAssignedException, IllegalArgumentException
+        throws NoFileAssignedException, IllegalArgumentException, ArtifactDeployerException
     {
+        validateParameters( buildingRequest, projectDeployerRequest, artifactRepository );
 
-        Artifact artifact = request.getProject().getArtifact();
-        String packaging = request.getProject().getPackaging();
-        File pomFile = request.getProject().getFile();
+        Artifact artifact = projectDeployerRequest.getProject().getArtifact();
+        String packaging = projectDeployerRequest.getProject().getPackaging();
+        File pomFile = projectDeployerRequest.getProject().getFile();
 
-        List<Artifact> attachedArtifacts = request.getProject().getAttachedArtifacts();
+        List<Artifact> attachedArtifacts = projectDeployerRequest.getProject().getAttachedArtifacts();
 
         // Deploy the POM
         boolean isPomArtifact = "pom".equals( packaging );
@@ -85,54 +80,68 @@ class DefaultProjectDeployer
             artifact.addMetadata( metadata );
         }
 
-        if ( request.isUpdateReleaseInfo() )
+        // FIXME: It does not make sense to set an artifact explicitly to a "Release"
+        // cause this should be choosen only by the not existing of "-SNAPSHOT" in the
+        // version.
+        if ( projectDeployerRequest.isUpdateReleaseInfo() )
         {
             artifact.setRelease( true );
         }
 
         artifact.setRepository( artifactRepository );
 
-        int retryFailedDeploymentCount = request.getRetryFailedDeploymentCount();
+        int retryFailedDeploymentCount = projectDeployerRequest.getRetryFailedDeploymentCount();
 
-        try
+        List<Artifact> deployableArtifacts = new ArrayList<Artifact>();
+        if ( isPomArtifact )
         {
-            List<Artifact> deployableArtifacts = new ArrayList<Artifact>();
-            if ( isPomArtifact )
+            deployableArtifacts.add( artifact );
+        }
+        else
+        {
+            File file = artifact.getFile();
+
+            if ( file != null && file.isFile() )
             {
                 deployableArtifacts.add( artifact );
             }
+            else if ( !attachedArtifacts.isEmpty() )
+            {
+                // TODO: Reconsider this exception? Better Exception type?
+                throw new NoFileAssignedException( "The packaging plugin for this project did not assign "
+                    + "a main file to the project but it has attachments. Change packaging to 'pom'." );
+            }
             else
             {
-                File file = artifact.getFile();
-
-                if ( file != null && file.isFile() )
-                {
-                    deployableArtifacts.add( artifact );
-                }
-                else if ( !attachedArtifacts.isEmpty() )
-                {
-                    // TODO: Reconsider this exception? Better Exception type?
-                    throw new NoFileAssignedException( "The packaging plugin for this project did not assign "
-                        + "a main file to the project but it has attachments. Change packaging to 'pom'." );
-                }
-                else
-                {
-                    // TODO: Reconsider this exception? Better Exception type?
-                    throw new NoFileAssignedException( "The packaging for this project did not assign "
-                        + "a file to the build artifact" );
-                }
+                // TODO: Reconsider this exception? Better Exception type?
+                throw new NoFileAssignedException( "The packaging for this project did not assign "
+                    + "a file to the build artifact" );
             }
-
-            for ( Artifact attached : attachedArtifacts )
-            {
-                deployableArtifacts.add( attached );
-            }
-
-            deploy( buildingRequest, deployableArtifacts, artifactRepository, retryFailedDeploymentCount );
         }
-        catch ( ArtifactDeployerException e )
+
+        for ( Artifact attached : attachedArtifacts )
         {
-            throw new IllegalArgumentException( e.getMessage(), e );
+            deployableArtifacts.add( attached );
+        }
+
+        deploy( buildingRequest, deployableArtifacts, artifactRepository, retryFailedDeploymentCount );
+    }
+
+    private void validateParameters( ProjectBuildingRequest buildingRequest,
+                                     ProjectDeployerRequest projectDeployerRequest,
+                                     ArtifactRepository artifactRepository )
+    {
+        if ( buildingRequest == null )
+        {
+            throw new IllegalArgumentException( "The parameter buildingRequest is not allowed to be null." );
+        }
+        if ( projectDeployerRequest == null )
+        {
+            throw new IllegalArgumentException( "The parameter projectDeployerRequest is not allowed to be null." );
+        }
+        if ( artifactRepository == null )
+        {
+            throw new IllegalArgumentException( "The parameter artifactRepository is not allowed to be null." );
         }
     }
 
