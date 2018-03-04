@@ -1,4 +1,4 @@
-package org.apache.maven.shared.dependency;
+package org.apache.maven.shared.dependencies;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import org.apache.maven.shared.dependencies.DefaultDependableCoordinate;
 import org.junit.Test;
 
-public class DefaultDependencyCoordinateTest
+public class DefaultDependableCoordinateTest
 {
 
     @Test
