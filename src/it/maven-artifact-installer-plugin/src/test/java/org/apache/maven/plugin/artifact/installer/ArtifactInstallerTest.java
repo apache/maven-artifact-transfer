@@ -37,14 +37,14 @@ import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
 
 /**
  * This will check if the ArtifactInstaller works for all Maven versions 3.0.5, 3.1.1, 3.2.5, 3.3.1, 3.3.9, 3.5.0,
- * 3.5.2. This is done by using the test plugin <code>maven-artifact-installer-plugin</code> which uses the
+ * 3.5.2, 3.5.3. This is done by using the test plugin <code>maven-artifact-installer-plugin</code> which uses the
  * ArtifactInstaller as component. By using this way we get a real runtime environment which supports all Maven
  * versions.
  * 
  * @author Karl Heinz Marbaise
  */
 @RunWith( MavenJUnitTestRunner.class )
-@MavenVersions( { "3.0.5", "3.1.1", "3.2.5", "3.3.1", "3.3.9", "3.5.0", "3.5.2" } )
+@MavenVersions( { "3.0.5", "3.1.1", "3.2.5", "3.3.1", "3.3.9", "3.5.0", "3.5.2", "3.5.3" } )
 public class ArtifactInstallerTest
 {
 
