@@ -42,7 +42,7 @@ import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
  * @author Karl Heinz Marbaise
  */
 @RunWith( MavenJUnitTestRunner.class )
-@MavenVersions( { "3.0.5", "3.1.1", "3.2.5", "3.3.1", "3.3.9", "3.5.0", "3.5.2", "3.5.3" } )
+@MavenVersions( { "3.1.1", "3.2.5", "3.3.1", "3.3.9", "3.5.0", "3.5.2", "3.5.3" } )
 public class ProjectInstallerTest
 {
 
@@ -76,7 +76,7 @@ public class ProjectInstallerTest
         result.assertErrorFreeLog();
 
         // Check that the current plugins has been called at least once.
-        result.assertLogText( "[INFO] --- maven-project-installer-plugin:1.0.0:project-installer (id-project-installer) @ maven-project-installer-plugin-it ---" );
+        result.assertLogText( "[INFO] --- maven-project-installer-plugin:1.0.0:project-installer (id-project-installer) @ maven-project-installer-project-it ---" );
 
         String mvnVersion = mavenRuntime.getMavenVersion() + "/";
         // The "." will be replaced by "/" in the running of the artifact-installer-plugin so I need to do the same
@@ -92,37 +92,82 @@ public class ProjectInstallerTest
 
         File baseDirectoy =
             new File( localRepo,
-                      "PROJECT-INSTALLER-GROUPID-" + mvnVersion + "maven-project-installer-plugin-it/1.0.0-A/" );
+                      "PROJECT-INSTALLER-GROUPID-" + mvnVersion + "maven-project-installer-project-it/1.0.0-A/" );
 
-        checkForPomFile( baseDirectoy );
+        checkForPomFile( baseDirectoy, "maven-project-installer-project-it", "1.0.0-A"  );
 
-        checkForJarFile( baseDirectoy );
+        checkForJarFile( baseDirectoy, "maven-project-installer-project-it", "1.0.0-A" );
 
-        checkForJarClassifierFile( baseDirectoy );
+        checkForJarClassifierFile( baseDirectoy, "maven-project-installer-project-it", "1.0.0-A" );
 
     }
 
-    private void checkForJarClassifierFile( File baseDirectoy )
+    @Test
+    public void buildPomOnlyExample()
+        throws Exception
     {
-        File jarClassifierFile = new File( baseDirectoy, "maven-project-installer-plugin-it-1.0.0-A-classifier.jar" );
+        File basedir = resources.getBasedir( "pom-only-example" );
+        //@formatter:off
+        MavenExecutionResult result =
+            mavenRuntime
+                .forProject( basedir )
+                .withCliOption( "-DmvnVersion=" + mavenRuntime.getMavenVersion() ) // Might be superfluous
+                .withCliOption( "-B" )
+                .withCliOption( "-V" )
+                // We use verify to prevent running maven-install-plugin.
+                .execute( "clean", "verify" );
+        //@formatter:on
+
+        result.assertErrorFreeLog();
+
+        // Check that the current plugins has been called at least once.
+        result.assertLogText( "[INFO] --- maven-project-installer-plugin:1.0.0:project-installer (id-project-installer) @ maven-project-installer-project-701 ---" );
+
+        String mvnVersion = mavenRuntime.getMavenVersion() + "/";
+        // The "." will be replaced by "/" in the running of the artifact-installer-plugin so I need to do the same
+        // here.
+        // Maybe there is a more elegant way to do that?
+        mvnVersion = mvnVersion.replaceAll( "\\.", "/" );
+
+        String mavenRepoLocal = System.getProperty( "maven.repo.local" );
+        File localRepo = new File( mavenRepoLocal );
+
+        System.out.println( "localRepo='" + localRepo.getAbsolutePath() + "'" );
+        System.out.println( "mvnVersion='" + mvnVersion + "'" );
+
+        File baseDirectoy =
+            new File( localRepo,
+                      "PROJECT-INSTALLER-GROUPID-701-" + mvnVersion + "maven-project-installer-project-701/2.0.701/" );
+
+        checkForPomFile( baseDirectoy, "maven-project-installer-project-701", "2.0.701" );
+
+        checkForJarFile( baseDirectoy, "maven-project-installer-project-701", "2.0.701" );
+
+        checkForJarClassifierFile( baseDirectoy, "maven-project-installer-project-701", "2.0.701" );
+
+    }
+
+    private void checkForJarClassifierFile( File baseDirectoy, String baseArtifact, String version )
+    {
+        File jarClassifierFile = new File( baseDirectoy, baseArtifact + "-" + version + "-classifier.jar" );
         assertTrue( "jarClassifierFile '" + jarClassifierFile.getAbsolutePath() + "'", jarClassifierFile.exists() );
         assertTrue( "jarClassifier md5 not found.", new File( jarClassifierFile.getAbsolutePath() + ".md5" ).exists() );
         assertTrue( "jarClassifier sha1 not found.",
                     new File( jarClassifierFile.getAbsolutePath() + ".sha1" ).exists() );
     }
 
-    private void checkForJarFile( File baseDirectoy )
+    private void checkForJarFile( File baseDirectoy, String baseArtifact, String version )
     {
-        File jarFile = new File( baseDirectoy, "maven-project-installer-plugin-it-1.0.0-A.jar" );
+        File jarFile = new File( baseDirectoy, baseArtifact + "-" + version + ".jar" );
         assertTrue( "jarFile '" + jarFile.getAbsolutePath() + "'", jarFile.exists() );
         assertTrue( "jar md5 not found.", new File( jarFile.getAbsolutePath() + ".md5" ).exists() );
         assertTrue( "jar sha1 not found.", new File( jarFile.getAbsolutePath() + ".sha1" ).exists() );
     }
 
-    private void checkForPomFile( File baseDirectoy )
+    private void checkForPomFile( File baseDirectoy, String baseArtifact, String version )
     {
-        File pomFile = new File( baseDirectoy, "maven-project-installer-plugin-it-1.0.0-A.pom" );
-        assertTrue( "pomFile '" + pomFile.getAbsolutePath() + "'", pomFile.exists() );
+        File pomFile = new File( baseDirectoy, baseArtifact + "-" + version + ".pom" );
+        assertTrue( "pomFile not found. '" + pomFile.getAbsolutePath() + "'", pomFile.exists() );
         assertTrue( "pom md5 not found.", new File( pomFile.getAbsolutePath() + ".md5" ).exists() );
         assertTrue( "pom sha1 not found.", new File( pomFile.getAbsolutePath() + ".sha1" ).exists() );
     }

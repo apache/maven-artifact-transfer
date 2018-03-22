@@ -100,6 +100,7 @@ class DefaultProjectInstaller
             {
                 installer.install( buildingRequest,
                                    Collections.<Artifact>singletonList( new ProjectArtifact( project ) ) );
+                // The following call will add the .md5/sha1 to the pom itself.
                 installChecksums( buildingRequest, artifact, createChecksum );
                 addMetaDataFilesForArtifact( buildingRequest, artifact, metadataFiles, createChecksum );
             }
@@ -119,6 +120,7 @@ class DefaultProjectInstaller
             if ( file != null && file.isFile() )
             {
                 installer.install( buildingRequest, Collections.<Artifact>singletonList( artifact ) );
+                //This will add the checksums for the main artifact.
                 installChecksums( buildingRequest, artifact, createChecksum );
                 addMetaDataFilesForArtifact( buildingRequest, artifact, metadataFiles, createChecksum );
             }
