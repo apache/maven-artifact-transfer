@@ -43,6 +43,7 @@
   </prerequisites>
 
   <properties>
+    <surefire.version>2.21.0</surefire.version>
     <mavenVersion>3.0</mavenVersion>
     <javaVersion>8</javaVersion>
   </properties>

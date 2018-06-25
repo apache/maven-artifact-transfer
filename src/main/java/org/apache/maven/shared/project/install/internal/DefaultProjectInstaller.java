@@ -40,7 +40,6 @@ import org.apache.maven.shared.project.install.ProjectInstallerRequest;
 import org.apache.maven.shared.repository.RepositoryManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +61,6 @@ class DefaultProjectInstaller
     @Requirement
     private RepositoryManager repositoryManager;
 
-    private final DualDigester digester = new DualDigester();
-
     /**
      * {@inheritDoc}
      */
@@ -71,10 +68,9 @@ class DefaultProjectInstaller
     public void install( ProjectBuildingRequest buildingRequest, ProjectInstallerRequest installerRequest )
         throws IOException, ArtifactInstallerException, NoFileAssignedException, IllegalArgumentException
     {
+
         validateParameters( buildingRequest, installerRequest );
         MavenProject project = installerRequest.getProject();
-        boolean createChecksum = installerRequest.isCreateChecksum();
-        boolean updateReleaseInfo = installerRequest.isUpdateReleaseInfo();
 
         Artifact artifact = project.getArtifact();
         String packaging = project.getPackaging();
@@ -87,11 +83,6 @@ class DefaultProjectInstaller
 
         ProjectArtifactMetadata metadata;
 
-        if ( updateReleaseInfo )
-        {
-            artifact.setRelease( true );
-        }
-
         Collection<File> metadataFiles = new LinkedHashSet<File>();
 
         if ( isPomArtifact )
@@ -100,9 +91,7 @@ class DefaultProjectInstaller
             {
                 installer.install( buildingRequest,
                                    Collections.<Artifact>singletonList( new ProjectArtifact( project ) ) );
-                // The following call will add the .md5/sha1 to the pom itself.
-                installChecksums( buildingRequest, artifact, createChecksum );
-                addMetaDataFilesForArtifact( buildingRequest, artifact, metadataFiles, createChecksum );
+                addMetaDataFilesForArtifact( buildingRequest, artifact, metadataFiles );
             }
         }
         else
@@ -120,9 +109,7 @@ class DefaultProjectInstaller
             if ( file != null && file.isFile() )
             {
                 installer.install( buildingRequest, Collections.<Artifact>singletonList( artifact ) );
-                //This will add the checksums for the main artifact.
-                installChecksums( buildingRequest, artifact, createChecksum );
-                addMetaDataFilesForArtifact( buildingRequest, artifact, metadataFiles, createChecksum );
+                addMetaDataFilesForArtifact( buildingRequest, artifact, metadataFiles );
             }
             else if ( !attachedArtifacts.isEmpty() )
             {
@@ -139,12 +126,11 @@ class DefaultProjectInstaller
 
         for ( Artifact attached : attachedArtifacts )
         {
+            LOGGER.debug( "Installing artifact: ", attached.getId() );
             installer.install( buildingRequest, Collections.singletonList( attached ) );
-            installChecksums( buildingRequest, attached, createChecksum );
-            addMetaDataFilesForArtifact( buildingRequest, attached, metadataFiles, createChecksum );
+            addMetaDataFilesForArtifact( buildingRequest, attached, metadataFiles );
         }
 
-        installChecksums( metadataFiles );
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, ProjectInstallerRequest installerRequest )
@@ -159,40 +145,11 @@ class DefaultProjectInstaller
         }
     }
 
-    /**
-     * Installs the checksums for the specified artifact if this has been enabled in the plugin configuration. This
-     * method creates checksums for files that have already been installed to the local repo to account for on-the-fly
-     * generated/updated files. For example, in Maven 2.0.4- the <code>ProjectArtifactMetadata</code> did not install
-     * the original POM file (cf. MNG-2820). While the plugin currently requires Maven 2.0.6, we continue to hash the
-     * installed POM for robustness with regard to future changes like re-introducing some kind of POM filtering.
-     *
-     * @param buildingRequest The project building request, must not be <code>null</code>.
-     * @param artifact The artifact for which to create checksums, must not be <code>null</code>.
-     * @param createChecksum {@code true} if checksum should be created, otherwise {@code false}.
-     * @throws IOException If the checksums could not be installed.
-     */
-    private void installChecksums( ProjectBuildingRequest buildingRequest, Artifact artifact, boolean createChecksum )
-        throws IOException
-    {
-        if ( !createChecksum )
-        {
-            return;
-        }
-
-        File artifactFile = getLocalRepoFile( buildingRequest, artifact );
-        installChecksums( artifactFile );
-    }
-
     // CHECKSTYLE_OFF: LineLength
     private void addMetaDataFilesForArtifact( ProjectBuildingRequest buildingRequest, Artifact artifact,
-                                              Collection<File> targetMetadataFiles, boolean createChecksum )
+                                              Collection<File> targetMetadataFiles )
     // CHECKSTYLE_ON: LineLength
     {
-        if ( !createChecksum )
-        {
-            return;
-        }
-
         Collection<ArtifactMetadata> metadatas = artifact.getMetadataList();
         if ( metadatas != null )
         {
@@ -202,82 +159,6 @@ class DefaultProjectInstaller
                 targetMetadataFiles.add( metadataFile );
             }
         }
-    }
-
-    /**
-     * Installs the checksums for the specified metadata files.
-     *
-     * @param metadataFiles The collection of metadata files to install checksums for, must not be <code>null</code>.
-     * @throws IOException If the checksums could not be installed.
-     */
-    private void installChecksums( Collection<File> metadataFiles )
-        throws IOException
-    {
-        for ( File metadataFile : metadataFiles )
-        {
-            installChecksums( metadataFile );
-        }
-    }
-
-    /**
-     * Installs the checksums for the specified file (if it exists).
-     *
-     * @param installedFile The path to the already installed file in the local repo for which to generate checksums,
-     *            must not be <code>null</code>.
-     * @throws IOException In case of errors. Could not install checksums.
-     */
-    private void installChecksums( File installedFile )
-        throws IOException
-    {
-        boolean signatureFile = installedFile.getName().endsWith( ".asc" );
-        if ( installedFile.isFile() && !signatureFile )
-        {
-            LOGGER.debug( "Calculating checksums for " + installedFile );
-            digester.calculate( installedFile );
-            installChecksum( installedFile, ".md5", digester.getMd5() );
-            installChecksum( installedFile, ".sha1", digester.getSha1() );
-        }
-    }
-
-    /**
-     * Installs a checksum for the specified file.
-     *
-     * @param installedFile The base path from which the path to the checksum files is derived by appending the given
-     *            file extension, must not be <code>null</code>.
-     * @param ext The file extension (including the leading dot) to use for the checksum file, must not be
-     *            <code>null</code>.
-     * @param checksum the checksum to write
-     * @throws IOException If the checksum could not be installed.
-     */
-    private void installChecksum( File installedFile, String ext, String checksum )
-        throws IOException
-    {
-        File checksumFile = new File( installedFile.getAbsolutePath() + ext );
-        LOGGER.debug( "Installing checksum to " + checksumFile );
-        try
-        {
-            // noinspection ResultOfMethodCallIgnored
-            checksumFile.getParentFile().mkdirs();
-            FileUtils.fileWrite( checksumFile.getAbsolutePath(), "UTF-8", checksum );
-        }
-        catch ( IOException e )
-        {
-            throw new IOException( "Failed to install checksum to " + checksumFile, e );
-        }
-    }
-
-    /**
-     * Gets the path of the specified artifact within the local repository. Note that the returned path need not exist
-     * (yet).
-     *
-     * @param buildingRequest The project building request, must not be <code>null</code>.
-     * @param artifact The artifact whose local repo path should be determined, must not be <code>null</code>.
-     * @return The absolute path to the artifact when installed, never <code>null</code>.
-     */
-    private File getLocalRepoFile( ProjectBuildingRequest buildingRequest, Artifact artifact )
-    {
-        String path = repositoryManager.getPathForLocalArtifact( buildingRequest, artifact );
-        return new File( repositoryManager.getLocalRepositoryBasedir( buildingRequest ), path );
     }
 
     /**

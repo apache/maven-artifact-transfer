@@ -47,9 +47,7 @@ public interface ProjectInstaller
      *  
      *    ProjectInstallerRequest pir =
      *      new ProjectInstallerRequest()
-     *         .setProject( mavenProject )
-     *         .setCreateChecksum( false )
-     *         .setUpdateReleaseInfo( false );
+     *         .setProject( mavenProject );
      *  
      *  installer.install( session.getProjectBuildingRequest(), pir );
      * </pre>

@@ -107,7 +107,6 @@ public class ProjectInstallerMojo
             session.getCurrentProject().getArtifact().setFile( tmpFile );
             
             ProjectInstallerRequest pir = new ProjectInstallerRequest();
-            pir.setCreateChecksum( true );
             pir.setProject( session.getCurrentProject());
             installer.install( pbr, pir );
         }

@@ -26,51 +26,9 @@ import org.apache.maven.project.MavenProject;
  */
 public class ProjectInstallerRequest
 {
-    // From AbstractInstallMojo
-
-    private boolean createChecksum;
-
-    private boolean updateReleaseInfo;
-
     // From InstallMojo
 
     private MavenProject project;
-
-    /**
-     * @return the createChecksum
-     */
-    public boolean isCreateChecksum()
-    {
-        return createChecksum;
-    }
-
-    /**
-     * @param theCreateChecksumToBeSet the createChecksum to set
-     * @return {@link ProjectInstallerRequest} for chaining.
-     */
-    public ProjectInstallerRequest setCreateChecksum( boolean theCreateChecksumToBeSet )
-    {
-        this.createChecksum = theCreateChecksumToBeSet;
-        return this;
-    }
-
-    /**
-     * @return the updateReleaseInfo
-     */
-    public boolean isUpdateReleaseInfo()
-    {
-        return updateReleaseInfo;
-    }
-
-    /**
-     * @param theUpdateReleaseInfoToBeSet the updateReleaseInfo to set
-     * @return {@link ProjectInstallerRequest} for chaining.
-     */
-    public ProjectInstallerRequest setUpdateReleaseInfo( boolean theUpdateReleaseInfoToBeSet )
-    {
-        this.updateReleaseInfo = theUpdateReleaseInfoToBeSet;
-        return this;
-    }
 
     /**
      * @return the project

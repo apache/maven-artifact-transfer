@@ -28,10 +28,6 @@ import org.apache.maven.project.MavenProject;
 public class ProjectDeployerRequest
 {
 
-    // From AbstractDeployMojo
-
-    private boolean updateReleaseInfo;
-
     private int retryFailedDeploymentCount;
 
     // From DeployMojo
@@ -43,24 +39,6 @@ public class ProjectDeployerRequest
     private String altSnapshotDeploymentRepository;
 
     private String altReleaseDeploymentRepository;
-
-    /**
-     * @return the updateReleaseInfo
-     */
-    public boolean isUpdateReleaseInfo()
-    {
-        return updateReleaseInfo;
-    }
-
-    /**
-     * @param theUpdateReleaseInfoToBeSet the updateReleaseInfo to set
-     * @return {@link ProjectDeployerRequest} for chaining.
-     */
-    public ProjectDeployerRequest setUpdateReleaseInfo( boolean theUpdateReleaseInfoToBeSet )
-    {
-        this.updateReleaseInfo = theUpdateReleaseInfoToBeSet;
-        return this;
-    }
 
     /**
      * @return the retryFailedDeploymentCount

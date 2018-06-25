@@ -1,4 +1,4 @@
-package org.apache.maven.shared.project.install.internal;
+package org.apache.maven.shared.project.deploy.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

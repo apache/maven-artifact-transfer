@@ -20,6 +20,7 @@ package org.apache.maven.plugin.project.install;
  */
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 
@@ -42,7 +43,7 @@ import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
  * @author Karl Heinz Marbaise
  */
 @RunWith( MavenJUnitTestRunner.class )
-@MavenVersions( { "3.1.1", "3.2.5", "3.3.1", "3.3.9", "3.5.0", "3.5.2", "3.5.3" } )
+@MavenVersions( { "3.1.1", "3.2.5", "3.3.1", "3.3.9", "3.5.0", "3.5.2", "3.5.3", "3.5.4" } )
 public class ProjectInstallerTest
 {
 
@@ -140,8 +141,8 @@ public class ProjectInstallerTest
                       "PROJECT-INSTALLER-GROUPID-701-" + mvnVersion + "maven-project-installer-project-701/2.0.701/" );
 
         checkForPomFile( baseDirectoy, "maven-project-installer-project-701", "2.0.701" );
-
-        checkForJarFile( baseDirectoy, "maven-project-installer-project-701", "2.0.701" );
+        
+        checkForNonExistingJarFile( baseDirectoy, "maven-project-installer-project-701", "2.0.701" );
 
         checkForJarClassifierFile( baseDirectoy, "maven-project-installer-project-701", "2.0.701" );
 
@@ -151,8 +152,8 @@ public class ProjectInstallerTest
     {
         File jarClassifierFile = new File( baseDirectoy, baseArtifact + "-" + version + "-classifier.jar" );
         assertTrue( "jarClassifierFile '" + jarClassifierFile.getAbsolutePath() + "'", jarClassifierFile.exists() );
-        assertTrue( "jarClassifier md5 not found.", new File( jarClassifierFile.getAbsolutePath() + ".md5" ).exists() );
-        assertTrue( "jarClassifier sha1 not found.",
+        assertFalse( "jarClassifier md5 not found.", new File( jarClassifierFile.getAbsolutePath() + ".md5" ).exists() );
+        assertFalse( "jarClassifier sha1 not found.",
                     new File( jarClassifierFile.getAbsolutePath() + ".sha1" ).exists() );
     }
 
@@ -160,15 +161,25 @@ public class ProjectInstallerTest
     {
         File jarFile = new File( baseDirectoy, baseArtifact + "-" + version + ".jar" );
         assertTrue( "jarFile '" + jarFile.getAbsolutePath() + "'", jarFile.exists() );
-        assertTrue( "jar md5 not found.", new File( jarFile.getAbsolutePath() + ".md5" ).exists() );
-        assertTrue( "jar sha1 not found.", new File( jarFile.getAbsolutePath() + ".sha1" ).exists() );
+        assertFalse( "jar md5 not found.", new File( jarFile.getAbsolutePath() + ".md5" ).exists() );
+        assertFalse( "jar sha1 not found.", new File( jarFile.getAbsolutePath() + ".sha1" ).exists() );
     }
 
     private void checkForPomFile( File baseDirectoy, String baseArtifact, String version )
     {
         File pomFile = new File( baseDirectoy, baseArtifact + "-" + version + ".pom" );
-        assertTrue( "pomFile not found. '" + pomFile.getAbsolutePath() + "'", pomFile.exists() );
-        assertTrue( "pom md5 not found.", new File( pomFile.getAbsolutePath() + ".md5" ).exists() );
-        assertTrue( "pom sha1 not found.", new File( pomFile.getAbsolutePath() + ".sha1" ).exists() );
+        assertTrue( "pomFile '" + pomFile.getAbsolutePath() + "'", pomFile.exists() );
+        assertFalse( "pom md5 not found.", new File( pomFile.getAbsolutePath() + ".md5" ).exists() );
+        assertFalse( "pom sha1 not found.", new File( pomFile.getAbsolutePath() + ".sha1" ).exists() );
     }
+
+    private void checkForNonExistingJarFile( File baseDirectoy, String baseArtifact, String version )
+    {
+        File jarFile = new File( baseDirectoy, baseArtifact + "-" + version + ".jar" );
+        assertFalse( "jarFile '" + jarFile.getAbsolutePath() + "'", jarFile.exists() );
+        assertFalse( "jar md5 not found.", new File( jarFile.getAbsolutePath() + ".md5" ).exists() );
+        assertFalse( "jar sha1 not found.", new File( jarFile.getAbsolutePath() + ".sha1" ).exists() );
+    }
+
+    
 }

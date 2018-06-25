@@ -20,11 +20,13 @@ package org.apache.maven.shared.project.deploy.internal;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
@@ -33,8 +35,10 @@ import org.apache.maven.shared.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.project.NoFileAssignedException;
 import org.apache.maven.shared.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.project.deploy.ProjectDeployerRequest;
+import org.apache.maven.shared.repository.RepositoryManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +56,11 @@ class DefaultProjectDeployer
 
     @Requirement
     private ArtifactDeployer deployer;
+
+    @Requirement
+    private RepositoryManager repositoryManager;
+
+    private final DualDigester digester = new DualDigester();
 
     /**
      * {@inheritDoc}
@@ -80,13 +89,8 @@ class DefaultProjectDeployer
             artifact.addMetadata( metadata );
         }
 
-        // FIXME: It does not make sense to set an artifact explicitly to a "Release"
-        // cause this should be choosen only by the not existing of "-SNAPSHOT" in the
-        // version.
-        if ( projectDeployerRequest.isUpdateReleaseInfo() )
-        {
-            artifact.setRelease( true );
-        }
+        // What consequence does this have?
+        // artifact.setRelease( true );
 
         artifact.setRepository( artifactRepository );
 
@@ -104,6 +108,7 @@ class DefaultProjectDeployer
             if ( file != null && file.isFile() )
             {
                 deployableArtifacts.add( artifact );
+                // installChecksums( buildingRequest, artifact, createChecksum );
             }
             else if ( !attachedArtifacts.isEmpty() )
             {
@@ -121,9 +126,11 @@ class DefaultProjectDeployer
 
         for ( Artifact attached : attachedArtifacts )
         {
+            // installChecksums( buildingRequest, artifact, createChecksum );
             deployableArtifacts.add( attached );
         }
 
+        installChecksumsForAllArtifacts( buildingRequest, deployableArtifacts );
         deploy( buildingRequest, deployableArtifacts, artifactRepository, retryFailedDeploymentCount );
     }
 
@@ -142,6 +149,23 @@ class DefaultProjectDeployer
         if ( artifactRepository == null )
         {
             throw new IllegalArgumentException( "The parameter artifactRepository is not allowed to be null." );
+        }
+    }
+
+    private void installChecksumsForAllArtifacts( ProjectBuildingRequest request, Collection<Artifact> artifacts )
+    {
+        for ( Artifact item : artifacts )
+        {
+            try
+            {
+                LOGGER.debug( "Installing checksum for " + item.getId() );
+                installChecksums( request, item );
+            }
+            catch ( IOException e )
+            {
+                // THINK HARD ABOUT IT
+                LOGGER.error( "Failure during checksum generation for " + item.getId() );
+            }
         }
     }
 
@@ -184,6 +208,109 @@ class DefaultProjectDeployer
         {
             throw exception;
         }
+    }
+
+    /**
+     * @param buildingRequest The project building request, must not be <code>null</code>.
+     * @param artifact The artifact for which to create checksums, must not be <code>null</code>.
+     * @param createChecksum {@code true} if checksum should be created, otherwise {@code false}.
+     * @throws IOException If the checksums could not be installed.
+     */
+    private void installChecksums( ProjectBuildingRequest buildingRequest, Artifact artifact )
+        throws IOException
+    {
+        File artifactFile = getLocalRepoFile( buildingRequest, artifact );
+        installChecksums( artifactFile );
+    }
+
+    /**
+     * Installs the checksums for the specified metadata files.
+     *
+     * @param metadataFiles The collection of metadata files to install checksums for, must not be <code>null</code>.
+     * @throws IOException If the checksums could not be installed.
+     */
+    private void installChecksums( Collection<File> metadataFiles )
+        throws IOException
+    {
+        for ( File metadataFile : metadataFiles )
+        {
+            installChecksums( metadataFile );
+        }
+    }
+
+    /**
+     * Installs the checksums for the specified file (if it exists).
+     *
+     * @param installedFile The path to the already installed file in the local repo for which to generate checksums,
+     *            must not be <code>null</code>.
+     * @throws IOException In case of errors. Could not install checksums.
+     */
+    private void installChecksums( File installedFile )
+        throws IOException
+    {
+        boolean signatureFile = installedFile.getName().endsWith( ".asc" );
+        if ( installedFile.isFile() && !signatureFile )
+        {
+            LOGGER.debug( "Calculating checksums for " + installedFile );
+            digester.calculate( installedFile );
+            installChecksum( installedFile, ".md5", digester.getMd5() );
+            installChecksum( installedFile, ".sha1", digester.getSha1() );
+        }
+    }
+
+    /**
+     * Installs a checksum for the specified file.
+     *
+     * @param installedFile The base path from which the path to the checksum files is derived by appending the given
+     *            file extension, must not be <code>null</code>.
+     * @param ext The file extension (including the leading dot) to use for the checksum file, must not be
+     *            <code>null</code>.
+     * @param checksum the checksum to write
+     * @throws IOException If the checksum could not be installed.
+     */
+    private void installChecksum( File installedFile, String ext, String checksum )
+        throws IOException
+    {
+        File checksumFile = new File( installedFile.getAbsolutePath() + ext );
+        LOGGER.debug( "Installing checksum to " + checksumFile );
+        try
+        {
+            // noinspection ResultOfMethodCallIgnored
+            checksumFile.getParentFile().mkdirs();
+            FileUtils.fileWrite( checksumFile.getAbsolutePath(), "UTF-8", checksum );
+        }
+        catch ( IOException e )
+        {
+            throw new IOException( "Failed to install checksum to " + checksumFile, e );
+        }
+    }
+
+    /**
+     * Gets the path of the specified artifact within the local repository. Note that the returned path need not exist
+     * (yet).
+     *
+     * @param buildingRequest The project building request, must not be <code>null</code>.
+     * @param artifact The artifact whose local repo path should be determined, must not be <code>null</code>.
+     * @return The absolute path to the artifact when installed, never <code>null</code>.
+     */
+    private File getLocalRepoFile( ProjectBuildingRequest buildingRequest, Artifact artifact )
+    {
+        String path = repositoryManager.getPathForLocalArtifact( buildingRequest, artifact );
+        return new File( repositoryManager.getLocalRepositoryBasedir( buildingRequest ), path );
+    }
+
+    /**
+     * Gets the path of the specified artifact metadata within the local repository. Note that the returned path need
+     * not exist (yet).
+     *
+     * @param buildingRequest The project building request, must not be <code>null</code>.
+     * @param metadata The artifact metadata whose local repo path should be determined, must not be <code>null</code>.
+     * @return The absolute path to the artifact metadata when installed, never <code>null</code>.
+     */
+    private File getLocalRepoFile( ProjectBuildingRequest buildingRequest, ArtifactMetadata metadata )
+    {
+        String path = repositoryManager.getPathForLocalMetadata( buildingRequest, metadata );
+        return new File( repositoryManager.getLocalRepositoryBasedir( buildingRequest ), path );
     }
 
 }
