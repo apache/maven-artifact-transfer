@@ -37,11 +37,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.artifact.install.ArtifactInstallerException;
-import org.apache.maven.shared.project.NoFileAssignedException;
-import org.apache.maven.shared.project.install.ProjectInstaller;
-import org.apache.maven.shared.project.install.ProjectInstallerRequest;
-import org.apache.maven.shared.repository.RepositoryManager;
+import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
+import org.apache.maven.shared.transfer.project.NoFileAssignedException;
+import org.apache.maven.shared.transfer.project.install.ProjectInstaller;
+import org.apache.maven.shared.transfer.project.install.ProjectInstallerRequest;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
 
 /**
  * This mojo is implemented to test the {@link ProjectInstaller} part of the maven-artifact-transfer shared component.

@@ -40,9 +40,9 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.artifact.install.ArtifactInstaller;
-import org.apache.maven.shared.artifact.install.ArtifactInstallerException;
-import org.apache.maven.shared.repository.RepositoryManager;
+import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
+import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
 
 /**
  * This mojo is implemented to test the ArtifactInstaller part of the maven-artifact-transfer shared component.
