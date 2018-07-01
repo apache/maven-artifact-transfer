@@ -53,6 +53,8 @@ class DefaultDependencyResolver
                                                          TransformableFilter filter )
         throws DependencyResolverException
     {
+        validateBuildingRequest( buildingRequest );
+        
         try
         {
             String hint = isMaven31() ? "maven31" : "maven3";
