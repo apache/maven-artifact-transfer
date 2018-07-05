@@ -45,8 +45,7 @@ Install a Project
       
       ProjectInstallerRequest pir =
            new ProjectInstallerRequest()
-           //TODO: THink about setUpdateReleaseInfo()..
-             .setProject( project ).setUpdateReleaseInfo( updateReleaseInfo );
+             .setProject( project );
 
       installer.install( session.getProjectBuildingRequest(), pir );
       ...
