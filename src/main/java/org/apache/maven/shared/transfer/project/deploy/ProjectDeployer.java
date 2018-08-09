@@ -46,8 +46,7 @@ public interface ProjectDeployer
      *  
      *  ProjectDeployerRequest pdr = 
      *      new ProjectDeployerRequest()
-     *        .setProject (project)
-     *        .setUpdateReleaseInfo( true );
+     *        .setProject (project);
      *  
      *  deployer.deploy (session.getProjectBuildingRequest(), pdr, artifactRepository);
      * </pre>
