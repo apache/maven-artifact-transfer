@@ -144,7 +144,7 @@ class DefaultRepositoryManager
     /**
      * @return true if the current Maven version is Maven 3.1.
      */
-    protected static boolean isMaven31()
+    private boolean isMaven31()
     {
         return canFindCoreClass( "org.eclipse.aether.artifact.Artifact" ); // Maven 3.1 specific
     }
@@ -152,12 +152,12 @@ class DefaultRepositoryManager
     /**
      * @return true if the current Maven version is Maven 3.0.2
      */
-    protected static boolean isMaven302()
+    private boolean isMaven302()
     {
         return canFindCoreClass( "org.sonatype.aether.spi.localrepo.LocalRepositoryManagerFactory" );
     }
 
-    private static boolean canFindCoreClass( String className )
+    private boolean canFindCoreClass( String className )
     {
         try
         {

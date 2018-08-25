@@ -112,12 +112,12 @@ class DefaultArtifactInstaller
     /**
      * @return true if the current Maven version is Maven 3.1.
      */
-    protected static boolean isMaven31()
+    private boolean isMaven31()
     {
         return canFindCoreClass( "org.eclipse.aether.artifact.Artifact" ); // Maven 3.1 specific
     }
 
-    private static boolean canFindCoreClass( String className )
+    private boolean canFindCoreClass( String className )
     {
         try
         {

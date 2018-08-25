@@ -108,7 +108,6 @@ class DefaultProjectDeployer
             if ( file != null && file.isFile() )
             {
                 deployableArtifacts.add( artifact );
-                // installChecksums( buildingRequest, artifact, createChecksum );
             }
             else if ( !attachedArtifacts.isEmpty() )
             {
@@ -126,7 +125,6 @@ class DefaultProjectDeployer
 
         for ( Artifact attached : attachedArtifacts )
         {
-            // installChecksums( buildingRequest, artifact, createChecksum );
             deployableArtifacts.add( attached );
         }
 
@@ -213,7 +211,6 @@ class DefaultProjectDeployer
     /**
      * @param buildingRequest The project building request, must not be <code>null</code>.
      * @param artifact The artifact for which to create checksums, must not be <code>null</code>.
-     * @param createChecksum {@code true} if checksum should be created, otherwise {@code false}.
      * @throws IOException If the checksums could not be installed.
      */
     private void installChecksums( ProjectBuildingRequest buildingRequest, Artifact artifact )

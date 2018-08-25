@@ -111,7 +111,7 @@ final class Invoker
      * @param argClasses the classes of the argument, used to select the right static method
      * @param args the actual arguments to be passed
      * @return the result of the method invocation
-     * @throws ArtifactResolverException if any checked exception occurs
+     * @throws DependencyResolverException if any checked exception occurs
      */
     public static Object invoke( Class<?> objectClazz, String staticMethod, Class<?>[] argClasses, Object[] args )
         throws DependencyResolverException
