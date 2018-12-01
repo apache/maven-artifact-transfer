@@ -61,7 +61,8 @@ class DefaultDependencyResolver
 
             DependencyResolver effectiveArtifactResolver = container.lookup( DependencyResolver.class, hint );
 
-            return effectiveArtifactResolver.resolveDependencies( buildingRequest, coordinates, null, filter );
+            return effectiveArtifactResolver.resolveDependencies( buildingRequest, coordinates, managedDependencies,
+                                                                  filter );
         }
         catch ( ComponentLookupException e )
         {
