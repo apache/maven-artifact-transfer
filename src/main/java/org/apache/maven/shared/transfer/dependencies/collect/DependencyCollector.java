@@ -70,4 +70,14 @@ public interface DependencyCollector
     CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, Model root )
                     throws DependencyCollectorException;
 
+    /**
+     * @param buildingRequest {@link ProjectBuildingRequest}.
+     * @return {@link CollectorResult}
+     * @throws DependencyCollectorException in case of an error which can be a component lookup error or an error while
+     *             trying to collect the dependencies.
+     * @throws IllegalArgumentException in case of parameter <code>buildingRequest</code> is <code>null</code>
+     */
+    CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest )
+        throws DependencyCollectorException;
+
 }

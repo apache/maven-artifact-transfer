@@ -104,6 +104,21 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
         }
     }
 
+    @Override
+    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest )
+        throws DependencyCollectorException
+    {
+        validateBuildingRequest( buildingRequest );
+        try
+        {
+            return getMavenDependencyCollector( buildingRequest ).collectDependenciesGraph( buildingRequest );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new DependencyCollectorException( e.getMessage(), e );
+        }
+    }
+
     private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
     {
         validateBuildingRequest( buildingRequest );
@@ -167,6 +182,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
      * @param context Plexus context to inject.
      * @throws ContextException if the PlexusContainer could not be located.
      */
+    @Override
     public void contextualize( Context context )
         throws ContextException
     {
