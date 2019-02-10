@@ -41,7 +41,7 @@ public interface DependencyResolver
      * 
      * @param buildingRequest {@link ProjectBuildingRequest}
      * @param coordinate {@link DependableCoordinate}
-     * @param filter {@link TransformableFilter}
+     * @param filter {@link TransformableFilter} (can be {@code null}).
      * @return the resolved dependencies.
      * @throws DependencyResolverException in case of an error.
      */
@@ -57,7 +57,7 @@ public interface DependencyResolver
      * 
      * @param buildingRequest {@link ProjectBuildingRequest}
      * @param model {@link Model}
-     * @param filter {@link TransformableFilter}
+     * @param filter {@link TransformableFilter} (can be {@code null}).
      * @return the resolved dependencies.
      * @throws DependencyResolverException in case of an error.
      */

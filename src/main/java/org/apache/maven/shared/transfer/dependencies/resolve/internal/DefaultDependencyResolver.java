@@ -152,11 +152,6 @@ class DefaultDependencyResolver
         {
             throw new IllegalArgumentException( "The parameter coordinate is not allowed to be null." );
         }
-        if ( filter == null )
-        {
-            throw new IllegalArgumentException( "The parameter filter is not allowed to be null." );
-        }
-
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, Model model,
@@ -166,10 +161,6 @@ class DefaultDependencyResolver
         if ( model == null )
         {
             throw new IllegalArgumentException( "The parameter model is not allowed to be null." );
-        }
-        if ( filter == null )
-        {
-            throw new IllegalArgumentException( "The parameter filter is not allowed to be null." );
         }
 
     }

@@ -72,18 +72,6 @@ public class DefaultDependencyResolverTest
     }
 
     @Test
-    public void resolveDependenciesWithDependableCoordinatShouldFailWithIAEWhenParameterFilterIsNull()
-        throws DependencyResolverException
-    {
-        thrown.expect( IllegalArgumentException.class );
-        thrown.expectMessage( "The parameter filter is not allowed to be null." );
-
-        ProjectBuildingRequest request = mock( ProjectBuildingRequest.class );
-        DependableCoordinate dc = mock( DependableCoordinate.class );
-        dr.resolveDependencies( request, dc, null );
-    }
-
-    @Test
     public void resolveDependenciesWithModelShouldFailWithIAEWhenParameterBuildingRequestIsNull()
         throws DependencyResolverException
     {
@@ -102,18 +90,6 @@ public class DefaultDependencyResolverTest
 
         ProjectBuildingRequest request = mock( ProjectBuildingRequest.class );
         dr.resolveDependencies( request, (Model) null, null );
-    }
-
-    @Test
-    public void resolveDependenciesWithModelShouldFailWithIAEWhenParameterFilterIsNull()
-        throws DependencyResolverException
-    {
-        thrown.expect( IllegalArgumentException.class );
-        thrown.expectMessage( "The parameter filter is not allowed to be null." );
-
-        ProjectBuildingRequest request = mock( ProjectBuildingRequest.class );
-        Model model = mock( Model.class );
-        dr.resolveDependencies( request, model, null );
     }
 
 }
