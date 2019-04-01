@@ -29,6 +29,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
+import org.apache.maven.shared.transfer.metadata.internal.Maven31MetadataBridge;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositorySystem;
@@ -109,9 +110,12 @@ class Maven31ArtifactDeployer
                 {
                     // eaten, handled by repo system
                 }
-                else
+                else if ( metadata instanceof org.apache.maven.shared.transfer.metadata.ArtifactMetadata )
                 {
-                    // request.addMetadata( new MetadataBridge( metadata ) );
+                    org.apache.maven.shared.transfer.metadata.ArtifactMetadata transferMetadata = 
+                                    (org.apache.maven.shared.transfer.metadata.ArtifactMetadata) metadata;
+                    
+                    request.addMetadata( new Maven31MetadataBridge( metadata ).setFile( transferMetadata.getFile() ) );
                 }
             }
         }

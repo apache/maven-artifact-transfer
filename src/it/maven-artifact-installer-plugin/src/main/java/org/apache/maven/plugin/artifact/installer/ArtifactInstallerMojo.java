@@ -31,6 +31,9 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -42,6 +45,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
+import org.apache.maven.shared.transfer.metadata.ArtifactMetadata;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
 
 /**
@@ -111,6 +115,15 @@ public class ArtifactInstallerMojo
             artifactWithClassifier.setFile( tmpFileClassifier );
 
             Collection<Artifact> mavenArtifacts = Arrays.<Artifact>asList( artifact, artifactWithClassifier );
+            
+            for ( Artifact a : mavenArtifacts )
+            {
+                File camVfile = File.createTempFile( "test-install", ".camV", artifactsDirectory );
+                a.addMetadata( new CustomArtifactMetadata( a, camVfile, true ) );
+                
+                File camGfile = File.createTempFile( "test-install", ".camG", artifactsDirectory );
+                a.addMetadata( new CustomArtifactMetadata( a, camGfile, false ) );
+            }
 
             installer.install( session.getProjectBuildingRequest(), mavenArtifacts );
         }
@@ -125,4 +138,77 @@ public class ArtifactInstallerMojo
 
     }
 
+    private class CustomArtifactMetadata extends AbstractArtifactMetadata implements ArtifactMetadata
+    {
+        private final File file;
+
+        private final boolean storedInArtifactVersionDirectory;
+        
+        protected CustomArtifactMetadata( Artifact artifact, File file, boolean storedInArtifactVersionDirectory ) 
+        {
+            super( artifact );   
+            this.file = file;
+            this.storedInArtifactVersionDirectory = storedInArtifactVersionDirectory;
+        }
+        
+        @Override
+        public File getFile() 
+        {
+            return file;
+        }
+        
+        @Override
+        public String getRemoteFilename()
+        {
+            return artifact.getArtifactId() + '-' + artifact.getVersion() + getDotExtension();
+        }
+        
+        @Override
+        public String getLocalFilename( ArtifactRepository repository )
+        {
+            return artifact.getArtifactId() + '-' + artifact.getVersion() + getDotExtension();
+        }
+        
+        @Override
+        public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+            throws RepositoryMetadataStoreException
+        {
+            throw new UnsupportedOperationException("ArtifactDeployerMojo.CustomArtifactMetadata.storeInLocalRepository(ArtifactRepository, ArtifactRepository)");   
+        }
+        
+        @Override
+        public boolean storedInArtifactVersionDirectory()
+        {
+            return storedInArtifactVersionDirectory;
+        }
+        
+        @Override
+        public void merge( org.apache.maven.artifact.metadata.ArtifactMetadata metadata )
+        {
+            throw new UnsupportedOperationException("ArtifactDeployerMojo.CustomArtifactMetadata.merge(ArtifactMetadata)");
+        }
+
+        @Override
+        public void merge( org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata )
+        {
+            throw new UnsupportedOperationException("ArtifactDeployerMojo.CustomArtifactMetadata.merge(ArtifactMetadata)");
+        }
+        
+        @Override
+        public String getBaseVersion()
+        {
+            return artifact.getBaseVersion();
+        }
+
+        @Override
+        public Object getKey()
+        {
+            return artifact.getId() + getDotExtension();
+        }
+        
+        private String getDotExtension() 
+        {
+            return file.getName().substring( file.getName().lastIndexOf( '.' ) );
+        }
+    }
 }

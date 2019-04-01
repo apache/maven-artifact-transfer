@@ -70,6 +70,7 @@ public class ArtifactDeployerTest
                 .withCliOption( "-DmvnVersion=" + mavenRuntime.getMavenVersion() ) // Might be superfluous
                 .withCliOption( "-B" )
                 .withCliOption( "-V" )
+                .withCliOption( "-e" )
                 .execute( "clean", "verify" );
         //@formatter:on
 
@@ -92,6 +93,8 @@ public class ArtifactDeployerTest
         File baseDirectoy = new File( localRepo, "ARTIFACT-DEPLOYER-GROUPID-" + mvnVersion + "/ARTIFACTID/VERSION/" );
 
         checkForArtifactFile( baseDirectoy );
+        checkForArtifactGroupMetaFile( baseDirectoy );
+        checkForArtifactVersionMetaFile( baseDirectoy );
         checkForArtifactClassifierFile( baseDirectoy );
 
         assertTrue( new File( localRepo, "ARTIFACT-DEPLOYER-GROUPID-" + mvnVersion
@@ -116,5 +119,23 @@ public class ArtifactDeployerTest
         assertTrue( "artifactFile '" + artifactFile.getAbsolutePath() + "'", artifactFile.exists() );
         assertTrue( "artifactFile md5 not found.", new File( artifactFile.getAbsolutePath() + ".md5" ).exists() );
         assertTrue( "artifactFile sha1 not found.", new File( artifactFile.getAbsolutePath() + ".sha1" ).exists() );
+    }
+    
+    private void checkForArtifactGroupMetaFile( File baseDirectoy )
+    {
+        File localFile = new File( baseDirectoy.getParentFile(), "ARTIFACTID-VERSION-local.camG" );
+        File baseFile = new File( baseDirectoy.getParentFile(), "ARTIFACTID-VERSION.camG" );
+        assertTrue( "localFile '" + localFile.getAbsolutePath() + "'", localFile.exists() );
+        assertTrue( "artifactFile md5 not found.", new File( baseFile.getAbsolutePath() + ".md5" ).exists() );
+        assertTrue( "artifactFile sha1 not found.", new File( baseFile.getAbsolutePath() + ".sha1" ).exists() );
+    }
+    
+    private void checkForArtifactVersionMetaFile( File baseDirectoy )
+    {
+        File localFile = new File( baseDirectoy, "ARTIFACTID-VERSION-local.camV" );
+        File baseFile = new File( baseDirectoy, "ARTIFACTID-VERSION.camV" );
+        assertTrue( "localFile '" + localFile.getAbsolutePath() + "'", localFile.exists() );
+        assertTrue( "artifactFile md5 not found.", new File( baseFile.getAbsolutePath() + ".md5" ).exists() );
+        assertTrue( "artifactFile sha1 not found.", new File( baseFile.getAbsolutePath() + ".sha1" ).exists() );
     }
 }

@@ -95,6 +95,8 @@ public class ArtifactInstallerTest
         // We don't have a pom file.
         checkForNonExistingPomFile( baseDirectoy );
         checkForArtifact( baseDirectoy );
+        checkForArtifactGroupMetaFile( baseDirectoy );
+        checkForArtifactVersionMetaFile( baseDirectoy );
         checkForArtifactClassifier( baseDirectoy );
     }
 
@@ -115,6 +117,20 @@ public class ArtifactInstallerTest
         assertTrue( "artifactFile '" + artifactFile.getAbsolutePath() + "'", artifactFile.exists() );
         assertFalse( "artifactFile md5 not found.", new File( artifactFile.getAbsolutePath() + ".md5" ).exists() );
         assertFalse( "artifactFile sha1 not found.", new File( artifactFile.getAbsolutePath() + ".sha1" ).exists() );
+    }
+    
+    private void checkForArtifactGroupMetaFile( File baseDirectoy )
+    {
+        File localFile = new File( baseDirectoy.getParentFile(), "ARTIFACTID-VERSION-local.camG" );
+        File baseFile = new File( baseDirectoy.getParentFile(), "ARTIFACTID-VERSION.camG" );
+        assertTrue( "localFile '" + localFile.getAbsolutePath() + "'", localFile.exists() );
+    }
+    
+    private void checkForArtifactVersionMetaFile( File baseDirectoy )
+    {
+        File localFile = new File( baseDirectoy, "ARTIFACTID-VERSION-local.camV" );
+        File baseFile = new File( baseDirectoy, "ARTIFACTID-VERSION.camV" );
+        assertTrue( "localFile '" + localFile.getAbsolutePath() + "'", localFile.exists() );
     }
 
     private void checkForNonExistingPomFile( File baseDirectoy )
