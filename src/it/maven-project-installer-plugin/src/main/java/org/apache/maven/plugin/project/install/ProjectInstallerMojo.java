@@ -31,12 +31,14 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.artifact.TransferUtils;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.install.ProjectInstaller;
@@ -62,6 +64,9 @@ public class ProjectInstallerMojo
 
     @Parameter( defaultValue = "${session}", required = true, readonly = true )
     protected MavenSession session;
+
+    @Parameter( defaultValue = "${plugin}", required = true, readonly = true )
+    protected PluginDescriptor pluginDescriptor;
 
     @Component
     private ProjectInstaller installer;
@@ -108,6 +113,7 @@ public class ProjectInstallerMojo
             
             ProjectInstallerRequest pir = new ProjectInstallerRequest();
             pir.setProject( session.getCurrentProject());
+            TransferUtils.importAetherLibrary( pluginDescriptor );
             installer.install( pbr, pir );
         }
         catch ( ArtifactInstallerException e )

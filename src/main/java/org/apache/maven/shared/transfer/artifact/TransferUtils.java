@@ -24,6 +24,9 @@ import org.apache.maven.model.Extension;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 
 /**
  * Utility class
@@ -120,6 +123,26 @@ public final class TransferUtils
         coordinate.setVersion( plugin.getVersion() );
 
         return coordinate;
+    }
+
+    /**
+     * Import the core Aether library from the maven distribution.
+     * 
+     * @param pluginDescriptor the plugin descriptor where the operation will be executed.
+     * @throws MojoExecutionException if there is an error when importing the library.
+     * @since 0.11.1
+     */
+    public static void importAetherLibrary( PluginDescriptor pluginDescriptor )
+        throws MojoExecutionException
+    {
+        try
+        {
+            pluginDescriptor.getClassRealm().importFrom( "plexus.core", "org.eclipse.aether.util" );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            throw new MojoExecutionException( "NoSuchRealmException", e );
+        }
     }
 
 }

@@ -68,40 +68,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <!--
-         ! explicit overwrite cause otherwise we get an 2.4.3...instead. 
-         -->
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <includes>
-                  <include>org.eclipse.aether:aether-util</include>
-                </includes>
-              </artifactSet>
-              <filters>
-                <filter>
-                  <artifact>org.eclipse.aether:aether-util</artifact>
-                  <includes>
-                    <!-- to prevent java.lang.ClassNotFoundException: org.eclipse.aether.util.artifact.SubArtifact (M3.1.1 - M3.3.3) -->
-                    <include>org/eclipse/aether/util/artifact/SubArtifact.class</include>
-                    <!-- to prevent java.lang.ClassNotFoundException: org.eclipse.aether.util.filter.* (M3.1.1+ ) -->
-                    <include>org/eclipse/aether/util/filter/*</include>
-                  </includes>
-                </filter>
-              </filters>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <configuration>
@@ -206,7 +172,7 @@
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-impl</artifactId>
       <version>1.7</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Maven 3.1.x and above -->
@@ -220,7 +186,7 @@
       <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-util</artifactId>
       <version>0.9.0.M2</version>
-      <!-- provided scoped dependencies aren't shaded -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.aether</groupId>
