@@ -32,21 +32,18 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.artifact.TransferUtils;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
 import org.apache.maven.shared.transfer.project.install.ProjectInstaller;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 
 /**
  * This mojo is implemented to test the {@link ProjectInstaller} part of the maven-artifact-transfer shared component.
@@ -115,7 +112,6 @@ public class ProjectDeployerMojo
             pdr.setProject( session.getCurrentProject());
             
             ArtifactRepository repo = session.getCurrentProject().getDistributionManagementArtifactRepository();
-            
             deployer.deploy( session.getProjectBuildingRequest(), pdr, repo );
         }
         catch ( IOException e )
