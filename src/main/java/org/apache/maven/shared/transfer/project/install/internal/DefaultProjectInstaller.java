@@ -34,6 +34,7 @@ import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
+import org.apache.maven.shared.transfer.project.MavenAetherUtils;
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.install.ProjectInstaller;
 import org.apache.maven.shared.transfer.project.install.ProjectInstallerRequest;
@@ -70,6 +71,9 @@ class DefaultProjectInstaller
     {
 
         validateParameters( buildingRequest, installerRequest );
+
+        MavenAetherUtils.importAetherLibrary();
+
         MavenProject project = installerRequest.getProject();
 
         Artifact artifact = project.getArtifact();

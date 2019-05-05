@@ -65,9 +65,6 @@ public class ProjectInstallerMojo
     @Parameter( defaultValue = "${session}", required = true, readonly = true )
     protected MavenSession session;
 
-    @Parameter( defaultValue = "${plugin}", required = true, readonly = true )
-    protected PluginDescriptor pluginDescriptor;
-
     @Component
     private ProjectInstaller installer;
 
@@ -113,7 +110,6 @@ public class ProjectInstallerMojo
             
             ProjectInstallerRequest pir = new ProjectInstallerRequest();
             pir.setProject( session.getCurrentProject());
-            TransferUtils.importAetherLibrary( pluginDescriptor );
             installer.install( pbr, pir );
         }
         catch ( ArtifactInstallerException e )

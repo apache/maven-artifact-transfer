@@ -68,9 +68,6 @@ public class ProjectDeployerMojo
     @Parameter( defaultValue = "${session}", required = true, readonly = true )
     protected MavenSession session;
 
-    @Parameter( defaultValue = "${plugin}", required = true, readonly = true )
-    protected PluginDescriptor pluginDescriptor;
-
     @Component
     private ProjectDeployer deployer;
 
@@ -119,7 +116,6 @@ public class ProjectDeployerMojo
             
             ArtifactRepository repo = session.getCurrentProject().getDistributionManagementArtifactRepository();
             
-            TransferUtils.importAetherLibrary( pluginDescriptor );
             deployer.deploy( session.getProjectBuildingRequest(), pdr, repo );
         }
         catch ( IOException e )
