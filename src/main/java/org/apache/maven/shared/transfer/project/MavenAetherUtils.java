@@ -19,10 +19,8 @@ package org.apache.maven.shared.transfer.project;
  * under the License.
  */
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +35,8 @@ public class MavenAetherUtils
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( MavenAetherUtils.class );
+
+    private static final String NO_SUCH_REALM_EXCEPTION = "org.codehaus.plexus.classworlds.realm.NoSuchRealmException";
 
     /**
      * Import the core Aether library from the maven distribution.
@@ -54,39 +54,33 @@ public class MavenAetherUtils
     }
 
     /**
-     * Using reflection check if the Classloader is actually a ClassRealm.
+     * Imports aether-util library from the user's Maven distribution.
      * <p>
      * PRECONDITION: the classLoader parameter is an instance of ClassRealm.
      * </p>
      *
-     * @param classLoader the Classloader to test.
+     * @param classLoader the Classloader which needs to access aether-util.
      */
     private static void importAether( ClassLoader classLoader )
     {
+        ClassRealm classRealm = (ClassRealm) classLoader;
         try
         {
-            try
-            {
-                Method importFromMethod = classLoader.getClass().getMethod( "importFrom", String.class, String.class );
-                importFromMethod.invoke( classLoader, "plexus.core", "org.eclipse.aether.util" );
-            }
-            catch ( InvocationTargetException e )
-            {
-                if ( "NoSuchRealmException".equals( e.getCause().getClass().getSimpleName() ) )
-                {
-                    LOGGER.info( "'plexus.core' ClassRealm could not be found. "
-                        + "Ignore this message if you are using the library outside of a Maven execution.", e );
-                }
-                else
-                {
-                    // another exception
-                    throw e;
-                }
-            }
+            classRealm.importFrom( "plexus.core", "org.eclipse.aether.util" );
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Unexpected exception when importing Aether library to the '{}' ClassRealm", classLoader, e );
+            if ( NO_SUCH_REALM_EXCEPTION.equals( e.getClass().getCanonicalName() ) )
+            {
+                LOGGER.info( "'plexus.core' ClassRealm could not be found. "
+                    + "Ignore this message if you are using the library outside of a Maven execution.", e );
+            }
+            else
+            {
+                // another exception
+                LOGGER.error( "Unexpected exception when importing Aether library to the '{}' ClassRealm", classLoader,
+                              e );
+            }
         }
     }
 

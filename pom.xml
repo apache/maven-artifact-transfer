@@ -195,6 +195,14 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- Allow importing the aether-util library from the user's distribution -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-classworlds</artifactId>
+      <version>2.2.3</version>
+      <optional>true</optional>
+    </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
