@@ -94,7 +94,7 @@ public class MavenAetherUtils
     {
         for ( Class<?> clazz = classLoader.getClass(); clazz != null; clazz = clazz.getSuperclass() )
         {
-            if ( "ClassRealm".equals( clazz.getSimpleName() ) )
+            if ( "org.codehaus.plexus.classworlds.realm.ClassRealm".equals( clazz.getCanonicalName() ) )
             {
                 return true;
             }
