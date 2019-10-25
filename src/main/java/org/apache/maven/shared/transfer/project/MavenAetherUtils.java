@@ -19,7 +19,6 @@ package org.apache.maven.shared.transfer.project;
  * under the License.
  */
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +39,6 @@ public class MavenAetherUtils
 
     /**
      * Import the core Aether library from the maven distribution.
-     *
-     * @param pluginDescriptor the plugin descriptor where the operation will be executed.
-     * @throws MojoExecutionException if there is an error when importing the library.
      */
     public static void importAetherLibrary()
     {
