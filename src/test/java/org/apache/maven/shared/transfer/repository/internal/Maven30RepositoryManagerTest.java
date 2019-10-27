@@ -24,9 +24,9 @@ import java.io.File;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.apache.maven.shared.transfer.repository.internal.Maven30RepositoryManager;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.impl.internal.EnhancedLocalRepositoryManager;
 import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
 
@@ -35,13 +35,13 @@ public class Maven30RepositoryManagerTest extends PlexusTestCase
 
     private final File localRepo = new File( "target/tests/local-repo" );
     
-    private Maven30RepositoryManager repositoryManager;
+    private RepositorySystem repositorySystem;
 
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
-        repositoryManager = (Maven30RepositoryManager) super.lookup( RepositoryManager.class, "maven3" );
+        repositorySystem = lookup( RepositorySystem.class );
     }
     
     public void testSetLocalRepositoryBasedirSimple() throws Exception
@@ -52,6 +52,9 @@ public class Maven30RepositoryManagerTest extends PlexusTestCase
         buildingRequest.setRepositorySession( repositorySession );
 
         File basedir = new File( "NEW/LOCAL/REPO" );
+        
+        Maven30RepositoryManager repositoryManager =
+            new Maven30RepositoryManager( repositorySystem, buildingRequest.getRepositorySession() );
         
         ProjectBuildingRequest newBuildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, basedir );
         
@@ -67,6 +70,9 @@ public class Maven30RepositoryManagerTest extends PlexusTestCase
         buildingRequest.setRepositorySession( repositorySession );
 
         File basedir = new File( "NEW/LOCAL/REPO" );
+        
+        Maven30RepositoryManager repositoryManager =
+            new Maven30RepositoryManager( repositorySystem, buildingRequest.getRepositorySession() );
         
         ProjectBuildingRequest newBuildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, basedir );
         

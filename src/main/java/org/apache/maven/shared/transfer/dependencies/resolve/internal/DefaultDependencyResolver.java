@@ -20,7 +20,10 @@ package org.apache.maven.shared.transfer.dependencies.resolve.internal;
  */
 
 import java.util.Collection;
+import java.util.List;
 
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -57,12 +60,8 @@ class DefaultDependencyResolver
         
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            DependencyResolver effectiveArtifactResolver = container.lookup( DependencyResolver.class, hint );
-
-            return effectiveArtifactResolver.resolveDependencies( buildingRequest, coordinates, managedDependencies,
-                                                                  filter );
+            return getMavenDependencyResolver( buildingRequest ).resolveDependencies( coordinates, managedDependencies,
+                                                                                      filter );
         }
         catch ( ComponentLookupException e )
         {
@@ -78,11 +77,7 @@ class DefaultDependencyResolver
         validateParameters( buildingRequest, coordinate, filter );
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            DependencyResolver effectiveArtifactResolver = container.lookup( DependencyResolver.class, hint );
-
-            return effectiveArtifactResolver.resolveDependencies( buildingRequest, coordinate, filter );
+            return getMavenDependencyResolver( buildingRequest ).resolveDependencies( coordinate, filter );
         }
         catch ( ComponentLookupException e )
         {
@@ -98,11 +93,7 @@ class DefaultDependencyResolver
         validateParameters( buildingRequest, model, filter );
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            DependencyResolver effectiveArtifactResolver = container.lookup( DependencyResolver.class, hint );
-
-            return effectiveArtifactResolver.resolveDependencies( buildingRequest, model, filter );
+            return getMavenDependencyResolver( buildingRequest ).resolveDependencies( model, filter );
         }
         catch ( ComponentLookupException e )
         {
@@ -163,6 +154,48 @@ class DefaultDependencyResolver
             throw new IllegalArgumentException( "The parameter model is not allowed to be null." );
         }
 
+    }
+    
+    private MavenDependencyResolver getMavenDependencyResolver( ProjectBuildingRequest buildingRequest )
+        throws ComponentLookupException, DependencyResolverException
+    {
+        ArtifactHandlerManager artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
+        
+        if ( isMaven31() )
+        {
+            org.eclipse.aether.RepositorySystem m31RepositorySystem =
+                container.lookup( org.eclipse.aether.RepositorySystem.class );
+
+            org.eclipse.aether.RepositorySystemSession session =
+                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+
+            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories =
+                (List<org.eclipse.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class, 
+                                                                           "toRepos",
+                                                                           List.class,
+                                                                           buildingRequest.getRemoteRepositories() );
+
+            return new Maven31DependencyResolver( m31RepositorySystem, artifactHandlerManager, session,
+                                                  aetherRepositories );
+        }
+        else
+        {
+            org.sonatype.aether.RepositorySystem m30RepositorySystem =
+                container.lookup( org.sonatype.aether.RepositorySystem.class );
+
+            org.sonatype.aether.RepositorySystemSession session =
+                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+
+            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories =
+                (List<org.sonatype.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class,
+                                                                            "toRepos", 
+                                                                            List.class,
+                                                                            buildingRequest.getRemoteRepositories() );
+
+            return new Maven30DependencyResolver( m30RepositorySystem, artifactHandlerManager, session,
+                                                  aetherRepositories );
+
+        }
     }
 
     private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )

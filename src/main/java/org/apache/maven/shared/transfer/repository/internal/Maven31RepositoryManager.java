@@ -22,15 +22,11 @@ package org.apache.maven.shared.transfer.repository.internal;
 import java.io.File;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
-import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.apache.maven.shared.transfer.repository.RepositoryManagerException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -46,30 +42,30 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
 /**
  * 
  */
-@Component( role = RepositoryManager.class, hint = "maven31" )
 class Maven31RepositoryManager
-    implements RepositoryManager
+    implements MavenRepositoryManager
 {
-    @Requirement
-    private RepositorySystem repositorySystem;
+    private final RepositorySystem repositorySystem;
 
-    @Requirement
-    private ArtifactHandlerManager artifactHandlerManager;
+    private final RepositorySystemSession session;
+
+    Maven31RepositoryManager( RepositorySystem repositorySystem, 
+                              RepositorySystemSession session )
+    {
+        this.repositorySystem = repositorySystem;
+        this.session = session;
+    }
 
     @Override
-    public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest,
-                                           org.apache.maven.artifact.Artifact mavenArtifact )
+    public String getPathForLocalArtifact( org.apache.maven.artifact.Artifact mavenArtifact )
     {
         Artifact aetherArtifact;
-        RepositorySystemSession session;
 
         // LRM.getPathForLocalArtifact() won't throw an Exception, so translate reflection error to RuntimeException
         try
         {
             aetherArtifact = (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
                                                         org.apache.maven.artifact.Artifact.class, mavenArtifact );
-
-            session = (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
         }
         catch ( RepositoryManagerException e )
         {
@@ -80,29 +76,15 @@ class Maven31RepositoryManager
     }
 
     @Override
-    public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest, ArtifactCoordinate coordinate )
+    public String getPathForLocalArtifact( ArtifactCoordinate coordinate )
     {
-        Artifact aetherArtifact;
-
-        RepositorySystemSession session;
-
-        // LRM.getPathForLocalArtifact() won't throw an Exception, so translate reflection error to RuntimeException
-        try
-        {
-            aetherArtifact = toArtifact( coordinate );
-
-            session = (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-        }
-        catch ( RepositoryManagerException e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
+        Artifact aetherArtifact = toArtifact( coordinate );
 
         return session.getLocalRepositoryManager().getPathForLocalArtifact( aetherArtifact );
     }
     
     @Override
-    public String getPathForLocalMetadata( ProjectBuildingRequest buildingRequest, ArtifactMetadata metadata )
+    public String getPathForLocalMetadata( ArtifactMetadata metadata )
     {
         Metadata aetherMetadata =
             new DefaultMetadata( metadata.getGroupId(),
@@ -110,15 +92,6 @@ class Maven31RepositoryManager
                                  metadata.storedInArtifactVersionDirectory() ? metadata.getBaseVersion() : null,
                                  "maven-metadata.xml", Nature.RELEASE_OR_SNAPSHOT );
 
-        RepositorySystemSession session;
-        try
-        {
-            session = (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-        }
-        catch ( RepositoryManagerException e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
         return session.getLocalRepositoryManager().getPathForLocalMetadata( aetherMetadata );
     }
 
@@ -164,18 +137,8 @@ class Maven31RepositoryManager
     }
 
     @Override
-    public File getLocalRepositoryBasedir( ProjectBuildingRequest buildingRequest )
+    public File getLocalRepositoryBasedir()
     {
-        RepositorySystemSession session;
-        try
-        {
-            session = (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-        }
-        catch ( RepositoryManagerException e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
-
         return session.getLocalRepository().getBasedir();
     }
 

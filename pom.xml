@@ -53,6 +53,10 @@
       <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
     </site>
   </distributionManagement>
+  
+  <properties>
+    <javaVersion>7</javaVersion>
+  </properties>
 
   <build>
     <plugins>
@@ -83,7 +87,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.15</version>
+        <version>1.18</version>
         <executions>
           <execution>
             <id>sniff</id>
@@ -94,10 +98,13 @@
           </execution>
         </executions>
         <configuration>
+          <ignores>
+            <ignore>java.lang.invoke.MethodHandle</ignore>
+          </ignores>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
-            <artifactId>java16</artifactId>
-            <version>1.1</version>
+            <artifactId>java17</artifactId>
+            <version>1.0</version>
           </signature>
         </configuration>
       </plugin>
@@ -110,7 +117,7 @@
             <configuration>
               <rules>
                 <enforceBytecodeVersion>
-                  <maxJdkVersion>1.6</maxJdkVersion>
+                  <maxJdkVersion>1.${javaVersion}</maxJdkVersion>
                 </enforceBytecodeVersion>
               </rules>
             </configuration>

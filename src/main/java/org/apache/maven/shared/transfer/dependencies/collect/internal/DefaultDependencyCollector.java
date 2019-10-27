@@ -19,6 +19,10 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
  * under the License.
  */
 
+import java.util.List;
+
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -72,11 +76,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            DependencyCollector effectiveDependencyCollector = container.lookup( DependencyCollector.class, hint );
-
-            return effectiveDependencyCollector.collectDependencies( buildingRequest, root );
+            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
         }
         catch ( ComponentLookupException e )
         {
@@ -171,6 +171,50 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+    
+    private MavenDependencyCollector getMavenDependencyCollector( ProjectBuildingRequest buildingRequest )
+        throws ComponentLookupException, DependencyCollectorException
+    {
+        ArtifactHandlerManager artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
+        
+        if ( isMaven31() )
+        {
+            org.eclipse.aether.RepositorySystem m31RepositorySystem =
+                container.lookup( org.eclipse.aether.RepositorySystem.class );
+
+            org.eclipse.aether.RepositorySystemSession session =
+                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+
+            @SuppressWarnings( "unchecked" )
+            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories =
+                (List<org.eclipse.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos",
+                                                                           List.class,
+                                                                           buildingRequest.getRemoteRepositories() );
+
+            return new Maven31DependencyCollector( m31RepositorySystem, artifactHandlerManager, session,
+                                                   aetherRepositories );
+            
+        }
+        else
+        {
+
+            org.sonatype.aether.RepositorySystem m30RepositorySystem =
+                            container.lookup( org.sonatype.aether.RepositorySystem.class );
+
+            org.sonatype.aether.RepositorySystemSession session =
+                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+
+            @SuppressWarnings( "unchecked" )
+            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories =
+                (List<org.sonatype.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class,
+                                                                            "toRepos", List.class,
+                                                                            buildingRequest.getRemoteRepositories() );
+
+            return new Maven30DependencyCollector( m30RepositorySystem, artifactHandlerManager, session,
+                                                   aetherRepositories );
+        }
+
     }
 
 }

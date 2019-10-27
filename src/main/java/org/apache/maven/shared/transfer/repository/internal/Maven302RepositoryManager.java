@@ -19,17 +19,20 @@ package org.apache.maven.shared.transfer.repository.internal;
  * under the License.
  */
 
-import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.LocalRepository;
 
 /**
  * 
  */
-@Component( role = RepositoryManager.class, hint = "maven302" )
 class Maven302RepositoryManager
     extends Maven30RepositoryManager
 {
+    Maven302RepositoryManager( RepositorySystem repositorySystem, RepositorySystemSession session )
+    {
+        super( repositorySystem, session );
+    }
 
     /**
      * Aether-1.9+ (i.e. M3.0.2+) expects "default", not "enhanced" as repositoryType

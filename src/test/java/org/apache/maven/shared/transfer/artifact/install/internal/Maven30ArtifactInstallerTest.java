@@ -28,22 +28,22 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.artifact.install.internal.Maven30ArtifactInstaller;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
 
 public class Maven30ArtifactInstallerTest extends PlexusTestCase
 {
     private final File localRepo = new File( "target/tests/local-repo" );
     
-    private Maven30ArtifactInstaller installer;
+    private RepositorySystem repositorySystem;
 
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
-        installer = (Maven30ArtifactInstaller) super.lookup( ArtifactInstaller.class, "maven3" );
+        repositorySystem = lookup( RepositorySystem.class );
     }
 
     public void testInstall() throws Exception
@@ -67,7 +67,8 @@ public class Maven30ArtifactInstallerTest extends PlexusTestCase
         
         Collection<Artifact> mavenArtifacts = Arrays.<Artifact>asList( artifact, artifactWithClassifier );
         
-        installer.install( buildingRequest, mavenArtifacts );
+        MavenArtifactInstaller installer = new Maven30ArtifactInstaller( repositorySystem, repositorySession );
+        installer.install( mavenArtifacts );
         
         assertTrue( new File( localRepo, "GROUPID/ARTIFACTID/VERSION/ARTIFACTID-VERSION.EXTENSION" ).exists() );
         assertTrue( new File( localRepo, "GROUPID/ARTIFACTID/VERSION/ARTIFACTID-VERSION-CLASSIFIER.EXTENSION" ).exists() );

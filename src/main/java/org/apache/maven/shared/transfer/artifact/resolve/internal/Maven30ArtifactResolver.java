@@ -22,13 +22,8 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
 import java.util.List;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -43,33 +38,38 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 /**
  * 
  */
-@Component( role = ArtifactResolver.class, hint = "maven3" )
 class Maven30ArtifactResolver
-    implements ArtifactResolver
+    implements MavenArtifactResolver
 {
-    @Requirement
-    private RepositorySystem repositorySystem;
+    private final RepositorySystem repositorySystem;
 
-    @Requirement
-    private ArtifactHandlerManager artifactHandlerManager;
+    private final List<RemoteRepository> aetherRepositories;
+    
+    private final RepositorySystemSession session;
+
+    Maven30ArtifactResolver( RepositorySystem repositorySystem, List<RemoteRepository> aetherRepositories,
+                                    RepositorySystemSession session )
+    {
+        this.repositorySystem = repositorySystem;
+        this.aetherRepositories = aetherRepositories;
+        this.session = session;
+    }
 
     @Override
     // CHECKSTYLE_OFF: LineLength
-    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest,
-                                                                                    org.apache.maven.artifact.Artifact mavenArtifact )
+    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( org.apache.maven.artifact.Artifact mavenArtifact )
                                                                                         throws ArtifactResolverException
     // CHECKSTYLE_ON: LineLength
     {
         Artifact aetherArtifact = (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
                                                              org.apache.maven.artifact.Artifact.class, mavenArtifact );
 
-        return resolveArtifact( buildingRequest, aetherArtifact );
+        return resolveArtifact( aetherArtifact );
     }
 
     @Override
     // CHECKSTYLE_OFF: LineLength
-    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest,
-                                                                                    ArtifactCoordinate coordinate )
+    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( ArtifactCoordinate coordinate )
                                                                                         throws ArtifactResolverException
     // CHECKSTYLE_ON: LineLength
     {
@@ -77,23 +77,14 @@ class Maven30ArtifactResolver
             new DefaultArtifact( coordinate.getGroupId(), coordinate.getArtifactId(), coordinate.getClassifier(),
                                  coordinate.getExtension(), coordinate.getVersion() );
 
-        return resolveArtifact( buildingRequest, aetherArtifact );
+        return resolveArtifact( aetherArtifact );
     }
 
     // CHECKSTYLE_OFF: LineLength
-    private org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest,
-                                                                                     Artifact aetherArtifact )
+    private org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( Artifact aetherArtifact )
                                                                                          throws ArtifactResolverException
     // CHECKSTYLE_ON: LineLength
     {
-        @SuppressWarnings( "unchecked" )
-        List<RemoteRepository> aetherRepositories =
-            (List<RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos", List.class,
-                                                     buildingRequest.getRemoteRepositories() );
-
-        RepositorySystemSession session =
-            (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-
         try
         {
             // use descriptor to respect relocation

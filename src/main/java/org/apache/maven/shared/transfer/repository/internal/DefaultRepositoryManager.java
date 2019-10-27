@@ -28,6 +28,7 @@ import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
+import org.apache.maven.shared.transfer.repository.RepositoryManagerException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -41,22 +42,18 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  */
 @Component( role = RepositoryManager.class )
 class DefaultRepositoryManager
-    implements RepositoryManager, Contextualizable
+    implements RepositoryManager, Contextualizable 
 {
     private PlexusContainer container;
-
+    
     @Override
     public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest, Artifact artifact )
     {
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            RepositoryManager effectiveRepositoryManager = container.lookup( RepositoryManager.class, hint );
-
-            return effectiveRepositoryManager.getPathForLocalArtifact( buildingRequest, artifact );
+            return getMavenRepositoryManager( buildingRequest ).getPathForLocalArtifact( artifact );
         }
-        catch ( ComponentLookupException e )
+        catch ( ComponentLookupException | RepositoryManagerException e )
         {
             throw new IllegalStateException( e.getMessage(), e );
         }
@@ -67,13 +64,9 @@ class DefaultRepositoryManager
     {
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            RepositoryManager effectiveRepositoryManager = container.lookup( RepositoryManager.class, hint );
-
-            return effectiveRepositoryManager.getPathForLocalArtifact( buildingRequest, coor );
+            return getMavenRepositoryManager( buildingRequest ).getPathForLocalArtifact( coor );
         }
-        catch ( ComponentLookupException e )
+        catch ( ComponentLookupException | RepositoryManagerException e )
         {
             throw new IllegalStateException( e.getMessage(), e );
         }
@@ -91,51 +84,38 @@ class DefaultRepositoryManager
             pomCoordinate.setExtension( "pom" );
             return getPathForLocalArtifact( buildingRequest, pomCoordinate );
         }
-        
+
         try
         {
-            
-            String hint = isMaven31() ? "maven31" : "maven3";
-            
-            RepositoryManager effectiveRepositoryManager = container.lookup( RepositoryManager.class, hint );
-            
-            return effectiveRepositoryManager.getPathForLocalMetadata( buildingRequest, metadata );
+            return getMavenRepositoryManager( buildingRequest ).getPathForLocalMetadata( metadata );
         }
-        catch ( ComponentLookupException e )
+        catch ( ComponentLookupException | RepositoryManagerException e )
         {
             throw new IllegalStateException( e.getMessage(), e );
         }
     }
 
     @Override
-    public ProjectBuildingRequest setLocalRepositoryBasedir( ProjectBuildingRequest request, File basedir )
+    public ProjectBuildingRequest setLocalRepositoryBasedir( ProjectBuildingRequest buildingRequest, File basedir )
     {
         try
         {
-            String hint = isMaven31() ? "maven31" : isMaven302() ? "maven302" : "maven3";
-
-            RepositoryManager effectiveRepositoryManager = container.lookup( RepositoryManager.class, hint );
-
-            return effectiveRepositoryManager.setLocalRepositoryBasedir( request, basedir );
+            return getMavenRepositoryManager( buildingRequest ).setLocalRepositoryBasedir( buildingRequest, basedir );
         }
-        catch ( ComponentLookupException e )
+        catch ( ComponentLookupException | RepositoryManagerException e )
         {
             throw new IllegalStateException( e.getMessage(), e );
         }
     }
 
     @Override
-    public File getLocalRepositoryBasedir( ProjectBuildingRequest request )
+    public File getLocalRepositoryBasedir( ProjectBuildingRequest buildingRequest )
     {
         try
         {
-            String hint = isMaven31() ? "maven31" : isMaven302() ? "maven302" : "maven3";
-
-            RepositoryManager effectiveRepositoryManager = container.lookup( RepositoryManager.class, hint );
-
-            return effectiveRepositoryManager.getLocalRepositoryBasedir( request );
+            return getMavenRepositoryManager( buildingRequest ).getLocalRepositoryBasedir();
         }
-        catch ( ComponentLookupException e )
+        catch ( ComponentLookupException | RepositoryManagerException e )
         {
             throw new IllegalStateException( e.getMessage(), e );
         }
@@ -170,15 +150,41 @@ class DefaultRepositoryManager
             return false;
         }
     }
+    
+    private MavenRepositoryManager getMavenRepositoryManager( ProjectBuildingRequest buildingRequest )
+        throws ComponentLookupException, RepositoryManagerException
+    {
+        if ( isMaven31() )
+        {
+            org.eclipse.aether.RepositorySystem m31RepositorySystem =
+                            container.lookup( org.eclipse.aether.RepositorySystem.class );
 
-    /**
-     * Injects the Plexus content.
-     *
-     * @param context Plexus context to inject.
-     * @throws ContextException if the PlexusContainer could not be located.
-     */
-    public void contextualize( Context context )
-        throws ContextException
+            org.eclipse.aether.RepositorySystemSession session =
+                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+
+            return new Maven31RepositoryManager( m31RepositorySystem, session );
+        }
+        else
+        {
+            org.sonatype.aether.RepositorySystem m30RepositorySystem =
+                container.lookup( org.sonatype.aether.RepositorySystem.class );
+
+            org.sonatype.aether.RepositorySystemSession session =
+                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            
+            if ( isMaven302() )
+            {
+                return new Maven302RepositoryManager( m30RepositorySystem, session );
+                
+            }
+            else
+            {
+                return new Maven30RepositoryManager( m30RepositorySystem, session );
+            }
+        }
+    }
+    
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }

@@ -19,20 +19,14 @@ package org.apache.maven.shared.transfer.artifact.install.internal;
  * under the License.
  */
 
-import java.io.File;
 import java.util.Collection;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
-import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
 import org.apache.maven.shared.transfer.metadata.internal.Maven31MetadataBridge;
-import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -43,27 +37,22 @@ import org.eclipse.aether.util.artifact.SubArtifact;
 /**
  * 
  */
-@Component( role = ArtifactInstaller.class, hint = "maven31" )
 class Maven31ArtifactInstaller
-    implements ArtifactInstaller
+    implements MavenArtifactInstaller
 {
-    @Requirement
-    private RepositorySystem repositorySystem;
+    private final RepositorySystem repositorySystem;
 
-    @Requirement
-    private RepositoryManager repositoryManager;
-
-    @Override
-    public void install( ProjectBuildingRequest buildingRequest,
-                         Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
-                             throws ArtifactInstallerException
-    {
-        install( buildingRequest, null, mavenArtifacts );
-    }
+    private final RepositorySystemSession session;
     
+    Maven31ArtifactInstaller( RepositorySystem repositorySystem,
+                                     RepositorySystemSession session )
+    {
+        this.repositorySystem = repositorySystem;
+        this.session = session;
+    }
+
     @Override
-    public void install( ProjectBuildingRequest buildingRequest, File localRepository,
-                         Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
+    public void install( Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
                              throws ArtifactInstallerException
     {
         // prepare installRequest
@@ -100,14 +89,6 @@ class Maven31ArtifactInstaller
             }
         }
         
-        if ( localRepository != null )
-        {
-            buildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, localRepository );
-        }
-
-        RepositorySystemSession session =
-            (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-
         // install
         try
         {

@@ -25,13 +25,9 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
-import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.transfer.metadata.internal.Maven30MetadataBridge;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -43,32 +39,34 @@ import org.sonatype.aether.util.artifact.SubArtifact;
 /**
  * 
  */
-@Component( role = ArtifactDeployer.class, hint = "maven3" )
 class Maven30ArtifactDeployer
-    implements ArtifactDeployer
+    implements MavenArtifactDeployer
 {
 
-    @Requirement
-    private RepositorySystem repositorySystem;
-
-    @Override
-    public void deploy( ProjectBuildingRequest buildingRequest,
-                        Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
-                            throws ArtifactDeployerException
+    private final RepositorySystem repositorySystem;
+    
+    private final RepositorySystemSession session;
+    
+    Maven30ArtifactDeployer( RepositorySystem repositorySystem, RepositorySystemSession session )
     {
-        deploy( buildingRequest, null, mavenArtifacts );
+        this.repositorySystem = repositorySystem;
+        this.session = session;
     }
 
     @Override
-    public void deploy( ProjectBuildingRequest buildingRequest, ArtifactRepository remoteRepository,
+    public void deploy( Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
+                            throws ArtifactDeployerException
+    {
+        deploy( null, mavenArtifacts );
+    }
+
+    @Override
+    public void deploy( ArtifactRepository remoteRepository,
                         Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
                             throws ArtifactDeployerException
     {
         // prepare request
         DeployRequest request = new DeployRequest();
-
-        RepositorySystemSession session =
-            (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
 
         RemoteRepository defaultRepository = null;
 

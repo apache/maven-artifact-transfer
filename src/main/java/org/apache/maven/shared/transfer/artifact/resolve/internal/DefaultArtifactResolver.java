@@ -19,6 +19,9 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
  * under the License.
  */
 
+import java.util.List;
+
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
@@ -32,6 +35,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+
 
 /**
  * 
@@ -49,11 +53,7 @@ class DefaultArtifactResolver
         validateParameters( buildingRequest, mavenArtifact );
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            ArtifactResolver effectiveArtifactResolver = container.lookup( ArtifactResolver.class, hint );
-
-            return effectiveArtifactResolver.resolveArtifact( buildingRequest, mavenArtifact );
+            return getMavenArtifactResolver( buildingRequest ).resolveArtifact( mavenArtifact );
         }
         catch ( ComponentLookupException e )
         {
@@ -68,11 +68,7 @@ class DefaultArtifactResolver
         validateParameters( buildingRequest, coordinate );
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            ArtifactResolver effectiveArtifactResolver = container.lookup( ArtifactResolver.class, hint );
-
-            return effectiveArtifactResolver.resolveArtifact( buildingRequest, coordinate );
+            return getMavenArtifactResolver( buildingRequest ).resolveArtifact( coordinate );
         }
         catch ( ComponentLookupException e )
         {
@@ -136,5 +132,45 @@ class DefaultArtifactResolver
         throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+    
+    private MavenArtifactResolver getMavenArtifactResolver( ProjectBuildingRequest buildingRequest )
+        throws ComponentLookupException, ArtifactResolverException
+    {
+        if ( isMaven31() )
+        {
+            org.eclipse.aether.RepositorySystem repositorySystem =
+                            container.lookup( org.eclipse.aether.RepositorySystem.class );
+            
+            @SuppressWarnings( "unchecked" )
+            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories =
+                (List<org.eclipse.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos",
+                                                                           List.class,
+                                                                           buildingRequest.getRemoteRepositories() );
+
+            org.eclipse.aether.RepositorySystemSession session =
+                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            
+            return new Maven31ArtifactResolver( repositorySystem, aetherRepositories, session );
+            
+        }
+        else
+        {
+            org.sonatype.aether.RepositorySystem repositorySystem =
+                            container.lookup( org.sonatype.aether.RepositorySystem.class );
+            
+            @SuppressWarnings( "unchecked" )
+            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories =
+                (List<org.sonatype.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class,
+                                                                            "toRepos", List.class,
+                                                                            buildingRequest.getRemoteRepositories() );
+
+            org.sonatype.aether.RepositorySystemSession session =
+                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            
+            return new Maven30ArtifactResolver( repositorySystem, aetherRepositories, session );
+        }
+
+
     }
 }

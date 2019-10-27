@@ -29,14 +29,10 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.artifact.filter.resolve.TransformableFilter;
 import org.apache.maven.shared.artifact.filter.resolve.transform.EclipseAetherFilterTransformer;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
-import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -56,20 +52,30 @@ import org.eclipse.aether.resolution.DependencyResult;
 /**
  * 
  */
-@Component( role = DependencyResolver.class, hint = "maven31" )
 class Maven31DependencyResolver
-    implements DependencyResolver
+    implements MavenDependencyResolver
 {
-    @Requirement
     private RepositorySystem repositorySystem;
 
-    @Requirement
     private ArtifactHandlerManager artifactHandlerManager;
+
+    private final RepositorySystemSession session;
+
+    private final List<RemoteRepository> aetherRepositories;
+
+    Maven31DependencyResolver( RepositorySystem repositorySystem, ArtifactHandlerManager artifactHandlerManager,
+                                      RepositorySystemSession session, List<RemoteRepository> aetherRepositories )
+    {
+        super();
+        this.repositorySystem = repositorySystem;
+        this.artifactHandlerManager = artifactHandlerManager;
+        this.session = session;
+        this.aetherRepositories = aetherRepositories;
+    }
 
     @Override
     // CHECKSTYLE_OFF: LineLength
-    public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-                                                                                                  DependableCoordinate coordinate,
+    public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( DependableCoordinate coordinate,
                                                                                                   TransformableFilter dependencyFilter )
                                                                                                       throws DependencyResolverException
     // CHECKSTYLE_ON: LineLength
@@ -80,20 +86,14 @@ class Maven31DependencyResolver
 
         Dependency aetherRoot = toDependency( coordinate, typeRegistry );
 
-        @SuppressWarnings( "unchecked" )
-        List<RemoteRepository> aetherRepositories =
-            (List<RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos", List.class,
-                                                     buildingRequest.getRemoteRepositories() );
-
         CollectRequest request = new CollectRequest( aetherRoot, aetherRepositories );
 
-        return resolveDependencies( buildingRequest, aetherRepositories, dependencyFilter, request );
+        return resolveDependencies( aetherRepositories, dependencyFilter, request );
     }
     
     @Override
     // CHECKSTYLE_OFF: LineLength
-    public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-                                                                                                  Model model,
+    public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( Model model,
                                                                                                   TransformableFilter dependencyFilter )
     // CHECKSTYLE_ON: LineLength
         throws DependencyResolverException
@@ -108,11 +108,6 @@ class Maven31DependencyResolver
         
         Dependency aetherRoot = new Dependency( aetherArtifact, null );
         
-        @SuppressWarnings( "unchecked" )
-        List<RemoteRepository> aetherRepositories =
-            (List<RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos", List.class,
-                                                     buildingRequest.getRemoteRepositories() );
-
         CollectRequest request = new CollectRequest( aetherRoot, aetherRepositories );
         
         ArtifactTypeRegistry typeRegistry =
@@ -140,13 +135,12 @@ class Maven31DependencyResolver
             request.setManagedDependencies( aetherManagerDependencies );
         }
 
-        return resolveDependencies( buildingRequest, aetherRepositories, dependencyFilter, request );
+        return resolveDependencies( aetherRepositories, dependencyFilter, request );
     }
 
     @Override
     // CHECKSTYLE_OFF: LineLength
-    public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-                                                                                                  Collection<org.apache.maven.model.Dependency> mavenDependencies,
+    public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( Collection<org.apache.maven.model.Dependency> mavenDependencies,
                                                                                                   Collection<org.apache.maven.model.Dependency> managedMavenDependencies,
                                                                                                   TransformableFilter filter )
                                                                                                       throws DependencyResolverException
@@ -193,19 +187,13 @@ class Maven31DependencyResolver
             }
         }
 
-        @SuppressWarnings( "unchecked" )
-        List<RemoteRepository> aetherRepos =
-            (List<RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos", List.class,
-                                                     buildingRequest.getRemoteRepositories() );
+        CollectRequest request = new CollectRequest( aetherDeps, aetherManagedDependencies, aetherRepositories );
 
-        CollectRequest request = new CollectRequest( aetherDeps, aetherManagedDependencies, aetherRepos );
-
-        return resolveDependencies( buildingRequest, aetherRepos, filter, request );
+        return resolveDependencies( aetherRepositories, filter, request );
     }
 
     // CHECKSTYLE_OFF: LineLength
-    private Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-                                                                                                   List<RemoteRepository> aetherRepositories,
+    private Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( List<RemoteRepository> aetherRepositories,
                                                                                                    TransformableFilter dependencyFilter,
                                                                                                    CollectRequest request )
                                                                                                        throws DependencyResolverException
@@ -220,9 +208,6 @@ class Maven31DependencyResolver
             }
 
             DependencyRequest depRequest = new DependencyRequest( request, depFilter );
-
-            RepositorySystemSession session =
-                (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
 
             final DependencyResult dependencyResults = repositorySystem.resolveDependencies( session, depRequest );
 
