@@ -32,7 +32,7 @@ import org.sonatype.aether.graph.DependencyVisitor;
  * 
  * @author Gabriel Belingueres
  */
-public class Maven30PathRecordingDependencyVisitor
+class Maven30PathRecordingDependencyVisitor
     implements DependencyVisitor
 {
 
@@ -50,7 +50,7 @@ public class Maven30PathRecordingDependencyVisitor
      * 
      * @param filter The filter used to select terminal nodes of paths to record, may be {@code null} to match any node.
      */
-    public Maven30PathRecordingDependencyVisitor( DependencyFilter filter )
+    Maven30PathRecordingDependencyVisitor( DependencyFilter filter )
     {
         this( filter, true );
     }
@@ -64,7 +64,7 @@ public class Maven30PathRecordingDependencyVisitor
      *            node. If {@code true}, all recorded paths will have only one matching node (namely the terminal node),
      *            if {@code false} a recorded path can consist of multiple matching nodes.
      */
-    public Maven30PathRecordingDependencyVisitor( DependencyFilter filter, boolean excludeChildrenOfMatches )
+    Maven30PathRecordingDependencyVisitor( DependencyFilter filter, boolean excludeChildrenOfMatches )
     {
         this.filter = filter;
         this.excludeChildrenOfMatches = excludeChildrenOfMatches;
@@ -94,6 +94,7 @@ public class Maven30PathRecordingDependencyVisitor
         return paths;
     }
 
+    @Override
     public boolean visitEnter( DependencyNode node )
     {
         boolean accept = filter == null || filter.accept( node, parents );
@@ -115,6 +116,7 @@ public class Maven30PathRecordingDependencyVisitor
         return !( excludeChildrenOfMatches && accept );
     }
 
+    @Override
     public boolean visitLeave( DependencyNode node )
     {
         parents.pop();

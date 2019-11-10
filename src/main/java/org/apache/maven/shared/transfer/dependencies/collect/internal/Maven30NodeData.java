@@ -31,11 +31,10 @@ import org.sonatype.aether.graph.DependencyNode;
  * 
  * @author Gabriel Belingueres
  */
-public class Maven30NodeData
+class Maven30NodeData
 {
 
-    private IdentityHashMap<DependencyNode, Map<Object, Object>> nodeMap =
-        new IdentityHashMap<DependencyNode, Map<Object, Object>>();
+    private IdentityHashMap<DependencyNode, Map<Object, Object>> nodeMap = new IdentityHashMap<>();
 
     public void putData( DependencyNode node, Object key, Object value )
     {
@@ -81,7 +80,7 @@ public class Maven30NodeData
         {
             if ( data.isEmpty() )
             {
-                data = new HashMap<Object, Object>();
+                data = new HashMap<>();
             }
             data.put( key, value );
         }

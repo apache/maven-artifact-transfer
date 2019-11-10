@@ -34,7 +34,7 @@ import org.sonatype.aether.util.artifact.JavaScopes;
  * 
  * @author Gabriel Belingueres
  */
-public class Maven30JavaScopeSelector
+class Maven30JavaScopeSelector
     extends ScopeSelector
 {
 

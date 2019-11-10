@@ -31,7 +31,7 @@ import org.sonatype.aether.RepositoryException;
  * 
  * @author Gabriel Belingueres
  */
-public class Maven30SimpleOptionalitySelector
+class Maven30SimpleOptionalitySelector
     extends OptionalitySelector
 {
 

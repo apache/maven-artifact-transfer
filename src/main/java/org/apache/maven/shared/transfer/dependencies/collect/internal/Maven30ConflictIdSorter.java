@@ -41,10 +41,10 @@ import org.sonatype.aether.util.graph.transformer.TransformationContextKeys;
  * 
  * @author Gabriel Belingueres
  */
-public class Maven30ConflictIdSorter
+class Maven30ConflictIdSorter
     implements DependencyGraphTransformer
 {
-
+    @Override
     public DependencyNode transformGraph( DependencyNode node, DependencyGraphTransformationContext context )
         throws RepositoryException
     {

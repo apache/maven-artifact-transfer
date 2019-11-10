@@ -47,7 +47,7 @@ import org.sonatype.aether.util.graph.transformer.TransformationContextKeys;
  * 
  * @author Gabriel Belingueres
  */
-public class Maven30ConflictResolver
+class Maven30ConflictResolver
     implements DependencyGraphTransformer
 {
 
@@ -104,7 +104,7 @@ public class Maven30ConflictResolver
      * @param nodeData the object where to save node data since Sonatype Aether 1.7 does not have that info inside the
      *            DependencyNode.
      */
-    public Maven30ConflictResolver( VersionSelector versionSelector, ScopeSelector scopeSelector,
+    Maven30ConflictResolver( VersionSelector versionSelector, ScopeSelector scopeSelector,
                                     OptionalitySelector optionalitySelector, ScopeDeriver scopeDeriver,
                                     Maven30NodeData nodeData )
     {
@@ -131,6 +131,7 @@ public class Maven30ConflictResolver
         this.nodeData = nodeData;
     }
 
+    @Override
     public DependencyNode transformGraph( DependencyNode node, DependencyGraphTransformationContext context )
         throws RepositoryException
     {
@@ -161,7 +162,7 @@ public class Maven30ConflictResolver
             throw new RepositoryException( "conflict groups have not been identified" );
         }
 
-        Map<Object, Collection<Object>> cyclicPredecessors = new HashMap<Object, Collection<Object>>();
+        Map<Object, Collection<Object>> cyclicPredecessors = new HashMap<>();
         for ( Collection<?> cycle : conflictIdCycles )
         {
             for ( Object conflictId : cycle )
@@ -304,11 +305,7 @@ public class Maven30ConflictResolver
                         nodeData.putData( loser, NODE_DATA_WINNER, winner.node );
                         nodeData.putData( loser, NODE_DATA_ORIGINAL_SCOPE, loser.getDependency().getScope() );
                         nodeData.putData( loser, NODE_DATA_ORIGINAL_OPTIONALITY, loser.getDependency().isOptional() );
-//                        loser.setData( NODE_DATA_WINNER, winner.node );
-//                        loser.setData( NODE_DATA_ORIGINAL_SCOPE, loser.getDependency().getScope() );
-//                        loser.setData( NODE_DATA_ORIGINAL_OPTIONALITY, loser.getDependency().isOptional() );
                         loser.setScope( item.getScopes().iterator().next() );
-//                    loser.setChildren( Collections.<DependencyNode>emptyList() );
                         childIt.set( loser );
                     }
                     else
@@ -778,7 +775,7 @@ public class Maven30ConflictResolver
      * @noinstantiate This class is not intended to be instantiated by clients in production code, the constructor may
      *                change without notice and only exists to enable unit testing.
      */
-    public static final class ScopeContext
+    static final class ScopeContext
     {
 
         String parentScope;
@@ -795,7 +792,7 @@ public class Maven30ConflictResolver
          * @noreference This class is not intended to be instantiated by clients in production code, the constructor may
          *              change without notice and only exists to enable unit testing.
          */
-        public ScopeContext( String parentScope, String childScope )
+        ScopeContext( String parentScope, String childScope )
         {
             this.parentScope = ( parentScope != null ) ? parentScope : "";
             derivedScope = ( childScope != null ) ? childScope : "";
@@ -853,7 +850,7 @@ public class Maven30ConflictResolver
      * @noinstantiate This class is not intended to be instantiated by clients in production code, the constructor may
      *                change without notice and only exists to enable unit testing.
      */
-    public static final class ConflictItem
+    static final class ConflictItem
     {
 
         // nodes can share child lists, we care about the unique owner of a child node which is the child list
@@ -913,7 +910,7 @@ public class Maven30ConflictResolver
          * @noreference This class is not intended to be instantiated by clients in production code, the constructor may
          *              change without notice and only exists to enable unit testing.
          */
-        public ConflictItem( DependencyNode parent, DependencyNode node, int depth, int optionalities,
+        ConflictItem( DependencyNode parent, DependencyNode node, int depth, int optionalities,
                              String... scopes )
         {
             this.parent = ( parent != null ) ? parent.getChildren() : null;
@@ -1035,7 +1032,7 @@ public class Maven30ConflictResolver
      * @noinstantiate This class is not intended to be instantiated by clients in production code, the constructor may
      *                change without notice and only exists to enable unit testing.
      */
-    public static final class ConflictContext
+    static final class ConflictContext
     {
 
         final DependencyNode root;
@@ -1070,7 +1067,7 @@ public class Maven30ConflictResolver
          * @noreference This class is not intended to be instantiated by clients in production code, the constructor may
          *              change without notice and only exists to enable unit testing.
          */
-        public ConflictContext( DependencyNode root, Object conflictId, Map<DependencyNode, Object> conflictIds,
+        ConflictContext( DependencyNode root, Object conflictId, Map<DependencyNode, Object> conflictIds,
                                 Collection<ConflictItem> items )
         {
             this( root, conflictIds, items );
@@ -1182,7 +1179,7 @@ public class Maven30ConflictResolver
      * version selector does not need to deal with potential scope conflicts, these will be addressed afterwards by the
      * {@link ScopeSelector}. Implementations must be stateless.
      */
-    public abstract static class VersionSelector
+    abstract static class VersionSelector
     {
 
         /**
@@ -1224,7 +1221,7 @@ public class Maven30ConflictResolver
      * potentially conflicting set of {@link ScopeDeriver derived scopes}. The scope selector gets invoked after the
      * {@link VersionSelector} has picked the winning node. Implementations must be stateless.
      */
-    public abstract static class ScopeSelector
+    abstract static class ScopeSelector
     {
 
         /**
@@ -1265,7 +1262,7 @@ public class Maven30ConflictResolver
      * An extension point of {@link ConflictResolver} that determines the scope of a dependency in relation to the scope
      * of its parent. Implementations must be stateless.
      */
-    public abstract static class ScopeDeriver
+    abstract static class ScopeDeriver
     {
 
         /**
@@ -1306,7 +1303,7 @@ public class Maven30ConflictResolver
      * potentially conflicting set of derived optionalities. The optionality selector gets invoked after the
      * {@link VersionSelector} has picked the winning node. Implementations must be stateless.
      */
-    public abstract static class OptionalitySelector
+    abstract static class OptionalitySelector
     {
 
         /**

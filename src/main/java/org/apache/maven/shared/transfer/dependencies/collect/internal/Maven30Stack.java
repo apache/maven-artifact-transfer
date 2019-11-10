@@ -29,7 +29,7 @@ import java.util.RandomAccess;
  * @param <E> the type of the elements of the stack.
  * @author Gabriel Belingueres
  */
-public class Maven30Stack<E>
+class Maven30Stack<E>
     extends AbstractList<E>
     implements RandomAccess
 {

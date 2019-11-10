@@ -56,11 +56,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            DependencyCollector effectiveDependencyCollector = container.lookup( DependencyCollector.class, hint );
-
-            return effectiveDependencyCollector.collectDependencies( buildingRequest, root );
+            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
         }
         catch ( ComponentLookupException e )
         {
@@ -92,11 +88,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            DependencyCollector effectiveDependencyCollector = container.lookup( DependencyCollector.class, hint );
-
-            return effectiveDependencyCollector.collectDependencies( buildingRequest, root );
+            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
         }
         catch ( ComponentLookupException e )
         {
@@ -105,13 +97,43 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
     }
 
     @Override
-    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest )
+    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, Model root )
         throws DependencyCollectorException
     {
         validateBuildingRequest( buildingRequest );
         try
         {
-            return getMavenDependencyCollector( buildingRequest ).collectDependenciesGraph( buildingRequest );
+            return getMavenDependencyCollector( buildingRequest ).collectDependenciesGraph( root );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new DependencyCollectorException( e.getMessage(), e );
+        }
+    }
+    
+    @Override
+    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
+        throws DependencyCollectorException
+    {
+        validateBuildingRequest( buildingRequest );
+        try
+        {
+            return getMavenDependencyCollector( buildingRequest ).collectDependenciesGraph( root );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new DependencyCollectorException( e.getMessage(), e );
+        }
+    }
+    
+    @Override
+    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, Dependency root )
+        throws DependencyCollectorException
+    {
+        validateBuildingRequest( buildingRequest );
+        try
+        {
+            return getMavenDependencyCollector( buildingRequest ).collectDependenciesGraph( root );
         }
         catch ( ComponentLookupException e )
         {

@@ -19,6 +19,8 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
  * under the License.
  */
 
+import java.util.Objects;
+
 import org.sonatype.aether.collection.DependencyCollectionContext;
 import org.sonatype.aether.collection.DependencySelector;
 import org.sonatype.aether.graph.Dependency;
@@ -30,27 +32,26 @@ import org.sonatype.aether.graph.Dependency;
  * @see {@link Dependency#getScope()}
  * @author Gabriel Belingueres
  */
-public class Maven30DirectScopeDependencySelector
+class Maven30DirectScopeDependencySelector
     implements DependencySelector
 {
 
     private final String scope;
 
     private final int depth;
+    
+    private final int hashCode;
 
-    public Maven30DirectScopeDependencySelector( String scope )
+    Maven30DirectScopeDependencySelector( String scope )
     {
         this( scope, 0 );
     }
 
-    private Maven30DirectScopeDependencySelector( String scope, int depth )
+    Maven30DirectScopeDependencySelector( String scope, int depth )
     {
-        if ( scope == null )
-        {
-            throw new IllegalArgumentException( "scope is null!" );
-        }
-        this.scope = scope;
+        this.scope = Objects.requireNonNull( scope, "scope is null!" );
         this.depth = depth;
+        this.hashCode = Objects.hash( depth, scope );
     }
 
     /**
@@ -87,11 +88,7 @@ public class Maven30DirectScopeDependencySelector
     @Override
     public int hashCode()
     {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + depth;
-        result = prime * result + ( ( scope == null ) ? 0 : scope.hashCode() );
-        return result;
+        return hashCode;
     }
 
     @Override
@@ -114,14 +111,7 @@ public class Maven30DirectScopeDependencySelector
         {
             return false;
         }
-        if ( scope == null )
-        {
-            if ( other.scope != null )
-            {
-                return false;
-            }
-        }
-        else if ( !scope.equals( other.scope ) )
+        if ( !Objects.equals( scope, other.scope ) )
         {
             return false;
         }

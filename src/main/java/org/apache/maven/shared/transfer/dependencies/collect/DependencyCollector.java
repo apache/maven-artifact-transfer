@@ -72,12 +72,36 @@ public interface DependencyCollector
 
     /**
      * @param buildingRequest {@link ProjectBuildingRequest}.
+     * @param root {@link Dependency}
      * @return {@link CollectorResult}
      * @throws DependencyCollectorException in case of an error which can be a component lookup error or an error while
      *             trying to collect the dependencies.
      * @throws IllegalArgumentException in case of parameter <code>buildingRequest</code> is <code>null</code>
      */
-    CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest )
+    CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, Dependency root )
         throws DependencyCollectorException;
 
+    /**
+     * @param buildingRequest {@link ProjectBuildingRequest}.
+     * @param root {@link DependableCoordinate}
+     * @return {@link CollectorResult}
+     * @throws DependencyCollectorException in case of an error which can be a component lookup error or an error while
+     *             trying to collect the dependencies.
+     * @throws IllegalArgumentException in case of parameter <code>buildingRequest</code> is <code>null</code>
+     */
+    CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
+        throws DependencyCollectorException;
+
+    /**
+     * @param buildingRequest {@link ProjectBuildingRequest}.
+     * @param root {@link Model}
+     * @return {@link CollectorResult}
+     * @throws DependencyCollectorException in case of an error which can be a component lookup error or an error while
+     *             trying to collect the dependencies.
+     * @throws IllegalArgumentException in case of parameter <code>buildingRequest</code> is <code>null</code>
+     */
+    CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, Model root )
+        throws DependencyCollectorException;
+
+    
 }

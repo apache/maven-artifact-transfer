@@ -92,7 +92,7 @@ public class DependencyCollectorMojo
     {
         try
         {
-            CollectorResult result = dependencyCollector.collectDependenciesGraph( buildingRequest );
+            CollectorResult result = dependencyCollector.collectDependenciesGraph( buildingRequest, project.getModel() );
             DependencyNode root = result.getDependencyGraphRoot();
 
             StringWriter writer = new StringWriter();

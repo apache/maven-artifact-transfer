@@ -29,7 +29,7 @@ import org.sonatype.aether.util.artifact.JavaScopes;
  * 
  * @author Gabriel Belingueres
  */
-public class Maven30JavaScopeDeriver
+class Maven30JavaScopeDeriver
     extends ScopeDeriver
 {
 

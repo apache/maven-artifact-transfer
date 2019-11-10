@@ -40,7 +40,7 @@ import org.sonatype.aether.version.VersionConstraint;
  * 
  * @author Gabriel Belingueres
  */
-public class Maven30NearestVersionSelector
+class Maven30NearestVersionSelector
     extends VersionSelector
 {
 
@@ -56,7 +56,6 @@ public class Maven30NearestVersionSelector
 
             boolean backtrack = false;
             boolean hardConstraint = !constraint.getRanges().isEmpty();
-//        boolean hardConstraint = constraint.getRange() != null;
 
             if ( hardConstraint )
             {
@@ -151,8 +150,6 @@ public class Maven30NearestVersionSelector
         Maven30PathRecordingDependencyVisitor visitor = new Maven30PathRecordingDependencyVisitor( filter );
         context.getRoot().accept( visitor );
         return new UnsolvableVersionConflictException( visitor.getPaths(), null );
-//    return new UnsolvableVersionConflictException( visitor.getPaths(), context.conflictId );
-//    return new UnsolvableVersionConflictException( visitor.getPaths() );
     }
 
     static final class ConflictGroup
