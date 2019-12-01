@@ -1,5 +1,5 @@
  -----
- Install Project
+ Install a Project
  -----
  Karl Heinz Marbaise
  -----
@@ -28,20 +28,22 @@
 
 Install a Project
 
-  If you are developing a maven plugin or other components related to Maven you need
+  If you are developing a Maven plugin or other components related to Maven, you need
   often to install artifacts into the local repository which is a little bit cumbersome. 
-  This can be easily done via the following code parts.
+
+  With this component, this can be easily done via the following code parts:
 
 +---  
-   @Parameter ( defaultValue = "${session}", required = true, readonly = true)
+   @Parameter ( defaultValue = "${session}", required = true, readonly = true )
    private MavenSession session;
-   @Parameter ( defaultValue = "${project}", required = true, readonly = true)
+   @Parameter ( defaultValue = "${project}", required = true, readonly = true )
    private MavenProject project;
 
    @Component
    private ProjectInstaller installer;
    ...
-   public void execute() {
+   public void execute()
+   {
       
       ProjectInstallerRequest pir =
            new ProjectInstallerRequest()

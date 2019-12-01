@@ -1,5 +1,5 @@
  -----
- Deploy Project
+ Deploy a Project
  -----
  Karl Heinz Marbaise
  -----
@@ -28,27 +28,29 @@
 
 Deploy a Project
 
-  If you are developing a maven plugin you need often to deploy a whole project 
-  into a repository which is a little bit cumbersome. This can be easily 
-  done via the following code parts.
+  If you are developing a Maven plugin, you need often to deploy a whole project 
+  into a repository, which is a little bit cumbersome.
+  
+  With this component, this can be easily done via the following code parts:
 
 +---  
-   @Parameter ( defaultValue = "${session}", required = true, readonly = true)
+   @Parameter ( defaultValue = "${session}", required = true, readonly = true )
    private MavenSession session;
-   @Parameter ( defaultValue = "${project}", required = true, readonly = true)
+   @Parameter ( defaultValue = "${project}", required = true, readonly = true )
    private MavenProject project;
 
    @Component
    private ProjectDeployer deployer;
    ...
-   public void execute() {
+   public void execute()
+   {
       
-      ProjectDeployerRequest pir =
+      ProjectDeployerRequest pdr =
            new ProjectDeployerRequest()
            //TODO: Think about setUpdateReleaseInfo()..
              .setProject( project ).setUpdateReleaseInfo( true );
              
-      deployer.deploy( session.getProjectBuildingRequest(), pir );
+      deployer.deploy( session.getProjectBuildingRequest(), pdr );
       ...
    }
    
