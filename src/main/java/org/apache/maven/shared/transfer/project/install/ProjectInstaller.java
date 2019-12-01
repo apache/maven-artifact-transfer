@@ -37,19 +37,22 @@ public interface ProjectInstaller
      * the appropriate repository.
      * 
      * <pre class="java">
-     *  &#64;Parameter( defaultValue = "${session}", required=true, readonly = true)
+     *  &#64;Parameter( defaultValue = "${session}", required = true, readonly = true )
      *  private MavenSession session;
-     *  &#64;Parameter( defaultValue = "${project}", required=true, readonly = true)
+     *  &#64;Parameter( defaultValue = "${project}", required = true, readonly = true )
      *  private MavenProject project;
      *  ..
      *  &#64;Component
      *  private ProjectInstaller installer;
-     *  
+     *  ...
+     *  public void execute()
+     *  {
      *    ProjectInstallerRequest pir =
      *      new ProjectInstallerRequest()
      *         .setProject( mavenProject );
-     *  
-     *  installer.install( session.getProjectBuildingRequest(), pir );
+     * 
+     *    installer.install( session.getProjectBuildingRequest(), pir );
+     *  }
      * </pre>
      * 
      * To set a different local repository than the current one in the Maven session, you can inject an instance of the

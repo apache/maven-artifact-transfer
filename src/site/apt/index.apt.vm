@@ -34,11 +34,14 @@ ${project.name}
   The {{{./comparison.html} comparison shows}} the differences between
   a dependency, an artifact, and a Maven project.
   
-  The {{{./install-project.html} install project}} part shows
+  The {{{./install-project.html} install project}} page shows
   how to use this component to install artifacts into the local
   repository from your plugin's source code.
 
+  The {{{./deploy-project.html} deploy project}} page shows
+  how to use this component to make a deploy of an existing project.
+
   <<Current State Of The Component>>
   This shared component has not yet reached 1.0.0 and is not stable. 
-  The API can change.
+  The API can and likely will change.
   

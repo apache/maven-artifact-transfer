@@ -34,6 +34,7 @@ under the License.
     <menu name="References">
       <item name="Dependency vs Artifact vs MavenProject" href="comparison.html"/>
       <item name="Install a Project" href="install-project.html"/>
+      <item name="Deploy a Project" href="deploy-project.html"/>
     </menu>
 
     <menu ref="parent"/>

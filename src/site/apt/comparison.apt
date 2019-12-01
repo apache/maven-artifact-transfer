@@ -1,5 +1,5 @@
  -----
- Introduction
+ Comparison: Dependency vs Artifact vs MavenProject
  -----
  Robert Scholte
  -----
@@ -26,24 +26,26 @@
  ~~ NOTE: For help with the syntax of this file, see:
  ~~ http://maven.apache.org/doxia/references/apt-format.html
 
-Comparison
+Comparison: Dependency vs Artifact vs MavenProject
 
-  Here's a small matrix which should help you choosing the right instance. 
+  Here's a small matrix which should help you choosing the right instance.
 
-  In general: 
+  In general:
   
-  * an Artifact holds a file mapped on a certain coordinate.
+  * an Artifact holds a file mapped on a certain coordinate (GAV + classifier + extension),
   
-  * a Dependency contains an artifact and has transitive information
+  * a {{{/ref/current/maven-model/maven.html#class_dependency}Dependency}} contains an artifact and has transitive information,
   
-  * a MavenProject hold a pom-file and optional mainfile and can have attached (=classified) files, all using the same GAV.
+  * a MavenProject holds a pom-file, an optional main file derived from the packaging, and can have attached files (= with classifier and extension), all using the same GAV.
+
+  []
 
 *--------------------+-------------+----------------+---------------+
 ||                   || Dependency || Artifact      || MavenProject ||
 *--------------------+-------------+----------------+---------------+
 | Has dependencies   | yes         | no             | yes           |
 *--------------------+-------------+----------------+---------------+
-| filetype reference | type        | file-extension | packaging     |
+| filetype reference | {{{/ref/current/maven-core/artifact-handlers.html}type}} | file extension | packaging     |
 *--------------------+-------------+----------------+---------------+
 | version ranges     | yes         | no             | no            |
 *--------------------+-------------+----------------+---------------+
@@ -52,10 +54,8 @@ Comparison
 
 This implies the following:
 
-  * From dependency to artifact is possible, since you can map a type to an extension. 
+  * From dependency to artifact is possible, since you can map a type to an extension.
     However, it is not possible to go from artifact back to dependency, there are several types which have jar as file extension.
     
-  * There's no such thing as transitive artifacts. Filtering during resolution as based on DependencyFilters, 
+  * There's no such thing as transitive artifacts. Filtering during resolution is based on DependencyFilters,
     ArtifactFilters can only be applied afterwards, hence are less efficient.
-    
-       
