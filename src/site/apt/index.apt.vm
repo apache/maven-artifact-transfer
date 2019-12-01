@@ -28,19 +28,17 @@
 
 ${project.name}
 
-  The Maven Artifact Transfer Component is intended as an API
-  to install, deploy and resolving artifacts in Maven 3.
+  The Maven Artifact Transfer Component is a library
+  to install, deploy and resolve artifacts in Maven 3.
   
-  The {{{./comparison.html} comparison will show }} the differences between
-  a dependency, artifact and a maven project.
+  The {{{./comparison.html} comparison shows}} the differences between
+  a dependency, an artifact, and a Maven project.
   
-  The {{{./install-project.html} install project}} part will show
-  how to this component to make an install of an existing project
-  which makes the handling within plugins much easier.
+  The {{{./install-project.html} install project}} part shows
+  how to use this component to install artifacts into the local
+  repository from your plugin's source code.
 
   <<Current State Of The Component>>
-  Currently this shared component has not yet reached the final 1.0.0 version state which means the interfaces can
-  change.
-  
-
+  This shared component has not yet reached 1.0.0 and is not stable. 
+  The API can change.
   
