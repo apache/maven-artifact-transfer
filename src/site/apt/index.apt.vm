@@ -38,6 +38,9 @@ ${project.name}
   how to use this component to make an install of an existing project,
   which makes the handling within plugins much easier.
 
+  The {{{./deploy-project.html} deploy project}} page will show
+  how to use this component to make a deploy of an existing project.
+
   <<Current State Of The Component>>
   Currently this shared component has not yet reached the final 1.0.0 version state, which means the interfaces can
   change.

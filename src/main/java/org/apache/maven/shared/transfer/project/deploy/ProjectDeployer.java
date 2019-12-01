@@ -36,19 +36,22 @@ public interface ProjectDeployer
      * appropriate remote repository.
      * 
      * <pre class="java">
-     *  &#64;Parameter( defaultValue = "${session}", required=true, readonly = true)
+     *  &#64;Parameter( defaultValue = "${session}", required = true, readonly = true )
      *  MavenSession session;
-     *  &#64;Parameter( defaultValue = "${project}", required=true, readonly = true)
+     *  &#64;Parameter( defaultValue = "${project}", required = true, readonly = true )
      *  MavenProject project;
      *  ..
      *  &#64;Component
      *  ProjectDeployer deployer;
-     *  
-     *  ProjectDeployerRequest pdr = 
+     *  ...
+     *  public void execute()
+     *  {
+     *    ProjectDeployerRequest pdr = 
      *      new ProjectDeployerRequest()
-     *        .setProject (project);
+     *        .setProject( project );
      *  
-     *  deployer.deploy (session.getProjectBuildingRequest(), pdr, artifactRepository);
+     *    deployer.deploy( session.getProjectBuildingRequest(), pdr, artifactRepository );
+     *  }
      * </pre>
      * 
      * @param buildingRequest {@link ProjectBuildingRequest}

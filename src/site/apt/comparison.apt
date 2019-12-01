@@ -34,7 +34,7 @@ Comparison: Dependency vs Artifact vs MavenProject
   
   * an Artifact holds a file mapped on a certain coordinate (GAV + classifier + extension),
   
-  * a {{{/ref/current/maven-model/maven.html#class_dependency}}Dependency} contains an artifact and has transitive information,
+  * a {{{/ref/current/maven-model/maven.html#class_dependency}Dependency}} contains an artifact and has transitive information,
   
   * a MavenProject holds a pom-file, an optional main file derived from the packaging, and can have attached files (= with classifier and extension), all using the same GAV.
 
@@ -45,7 +45,7 @@ Comparison: Dependency vs Artifact vs MavenProject
 *--------------------+-------------+----------------+---------------+
 | Has dependencies   | yes         | no             | yes           |
 *--------------------+-------------+----------------+---------------+
-| filetype reference | {{{/ref/current/maven-core/artifact-handlers.html}}type} | file extension | packaging     |
+| filetype reference | {{{/ref/current/maven-core/artifact-handlers.html}type}} | file extension | packaging     |
 *--------------------+-------------+----------------+---------------+
 | version ranges     | yes         | no             | no            |
 *--------------------+-------------+----------------+---------------+
