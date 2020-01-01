@@ -56,11 +56,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            DependencyCollector effectiveDependencyCollector = container.lookup( DependencyCollector.class, hint );
-
-            return effectiveDependencyCollector.collectDependencies( buildingRequest, root );
+            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
         }
         catch ( ComponentLookupException e )
         {
@@ -92,11 +88,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
         try
         {
-            String hint = isMaven31() ? "maven31" : "maven3";
-
-            DependencyCollector effectiveDependencyCollector = container.lookup( DependencyCollector.class, hint );
-
-            return effectiveDependencyCollector.collectDependencies( buildingRequest, root );
+            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
         }
         catch ( ComponentLookupException e )
         {
@@ -194,7 +186,6 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
             return new Maven31DependencyCollector( m31RepositorySystem, artifactHandlerManager, session,
                                                    aetherRepositories );
-            
         }
         else
         {
