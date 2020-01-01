@@ -26,7 +26,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.Model;
-
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.collect.CollectorResult;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector;

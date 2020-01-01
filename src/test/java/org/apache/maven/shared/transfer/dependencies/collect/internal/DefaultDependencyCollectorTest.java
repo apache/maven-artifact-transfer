@@ -29,7 +29,6 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverExcepti
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
-import org.apache.maven.shared.transfer.dependencies.collect.internal.DefaultDependencyCollector;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
