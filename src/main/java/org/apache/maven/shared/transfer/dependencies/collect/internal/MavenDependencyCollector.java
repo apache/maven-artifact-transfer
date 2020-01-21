@@ -21,6 +21,7 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.collect.CollectorResult;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
@@ -39,6 +40,9 @@ public interface MavenDependencyCollector
         throws DependencyCollectorException;
 
     CollectorResult collectDependencies( Model root )
+        throws DependencyCollectorException;
+
+    CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest )
         throws DependencyCollectorException;
 
 }

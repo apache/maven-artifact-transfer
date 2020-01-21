@@ -20,16 +20,25 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyNode;
 import org.apache.maven.shared.transfer.dependencies.collect.CollectorResult;
+import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+import org.eclipse.aether.version.VersionConstraint;
 
 /**
  * CollectorResult wrapper around {@link CollectResult}
@@ -82,4 +91,81 @@ class Maven31CollectorResult implements CollectorResult
         return mavenRepositories;
     }
 
+    @Override
+    public org.apache.maven.shared.dependency.graph.DependencyNode getDependencyGraphRoot()
+    {
+        DependencyNode root = collectResult.getRoot();
+        org.apache.maven.artifact.Artifact rootArtifact = getDependencyArtifact( root.getDependency() );
+
+        return buildDependencyNode( null, root, rootArtifact, null );
+    }
+
+    // CHECKSTYLE_OFF: LineLength
+    private org.apache.maven.shared.dependency.graph.DependencyNode buildDependencyNode( org.apache.maven.shared.dependency.graph.DependencyNode parent,
+                                                                                         DependencyNode node,
+                                                                                         org.apache.maven.artifact.Artifact artifact,
+                                                                                         ArtifactFilter filter )
+    // CHECKSTYLE_ON: LineLength
+    {
+        String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
+        String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
+
+        Boolean optional = null;
+        if ( node.getDependency() != null )
+        {
+            optional = node.getDependency().isOptional();
+        }
+
+        DefaultDependencyNode current =
+            new DefaultDependencyNode( parent, artifact, premanagedVersion, premanagedScope,
+                                       getVersionSelectedFromRange( node.getVersionConstraint() ), optional );
+
+        List<org.apache.maven.shared.dependency.graph.DependencyNode> nodes =
+            new ArrayList<org.apache.maven.shared.dependency.graph.DependencyNode>( node.getChildren().size() );
+        for ( DependencyNode child : node.getChildren() )
+        {
+            org.apache.maven.artifact.Artifact childArtifact = getDependencyArtifact( child.getDependency() );
+
+            if ( ( filter == null ) || filter.include( childArtifact ) )
+            {
+                nodes.add( buildDependencyNode( current, child, childArtifact, filter ) );
+            }
+        }
+
+        current.setChildren( Collections.unmodifiableList( nodes ) );
+
+        return current;
+    }
+
+    private String getVersionSelectedFromRange( VersionConstraint constraint )
+    {
+        if ( ( constraint == null ) || ( constraint.getVersion() != null ) )
+        {
+            return null;
+        }
+
+        return constraint.getRange().toString();
+    }
+
+    private org.apache.maven.artifact.Artifact getDependencyArtifact( Dependency dep )
+    {
+        Artifact artifact = dep.getArtifact();
+
+        try
+        {
+            org.apache.maven.artifact.Artifact mavenArtifact =
+                (org.apache.maven.artifact.Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
+                                                                org.eclipse.aether.artifact.Artifact.class, artifact );
+
+            mavenArtifact.setScope( dep.getScope() );
+            mavenArtifact.setOptional( dep.isOptional() );
+
+            return mavenArtifact;
+        }
+        catch ( DependencyCollectorException e )
+        {
+            // ReflectionException should not happen
+            throw new RuntimeException( e.getMessage(), e );
+        }
+    }
 }

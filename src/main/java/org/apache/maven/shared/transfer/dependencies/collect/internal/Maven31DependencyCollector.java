@@ -25,20 +25,37 @@ import java.util.List;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.collect.CollectorResult;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
+import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
+import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
+import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 
 /**
  * Maven 3.1+ implementation of the {@link DependencyCollector}
@@ -152,6 +169,105 @@ class Maven31DependencyCollector
         catch ( DependencyCollectionException e )
         {
             throw new DependencyCollectorException( e.getMessage(), e );
+        }
+    }
+
+    @Override
+    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest )
+        throws DependencyCollectorException
+    {
+        DefaultRepositorySystemSession session = null;
+        try
+        {
+            MavenProject project = buildingRequest.getProject();
+
+            org.apache.maven.artifact.Artifact projectArtifact = project.getArtifact();
+            List<ArtifactRepository> remoteArtifactRepositories = project.getRemoteArtifactRepositories();
+
+            DefaultRepositorySystemSession repositorySession =
+                (DefaultRepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+
+            session = new DefaultRepositorySystemSession( repositorySession );
+
+            DependencyGraphTransformer transformer =
+                new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
+                                      new SimpleOptionalitySelector(), new JavaScopeDeriver() );
+            session.setDependencyGraphTransformer( transformer );
+
+            DependencySelector depFilter =
+                new AndDependencySelector( new Maven31DirectScopeDependencySelector( JavaScopes.TEST ),
+                                           new OptionalDependencySelector(), new ExclusionDependencySelector() );
+            session.setDependencySelector( depFilter );
+
+            session.setConfigProperty( ConflictResolver.CONFIG_PROP_VERBOSE, true );
+            session.setConfigProperty( DependencyManagerUtils.CONFIG_PROP_VERBOSE, true );
+
+            Artifact aetherArtifact =
+                (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
+                                           org.apache.maven.artifact.Artifact.class, projectArtifact );
+
+            @SuppressWarnings( "unchecked" )
+            List<org.eclipse.aether.repository.RemoteRepository> aetherRepos =
+                (List<org.eclipse.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos",
+                                                                                       List.class,
+                                                                                       remoteArtifactRepositories );
+
+            CollectRequest collectRequest = new CollectRequest();
+            collectRequest.setRoot( new org.eclipse.aether.graph.Dependency( aetherArtifact, "" ) );
+            collectRequest.setRepositories( aetherRepos );
+
+            org.eclipse.aether.artifact.ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
+            collectDependencyList( collectRequest, project, stereotypes );
+            collectManagedDependencyList( collectRequest, project, stereotypes );
+
+            CollectResult collectResult = repositorySystem.collectDependencies( session, collectRequest );
+
+            return new Maven31CollectorResult( collectResult );
+
+//            org.eclipse.aether.graph.DependencyNode rootNode = collectResult.getRoot();
+
+//            if ( getLogger().isDebugEnabled() )
+//            {
+//                logTree( rootNode );
+//            }
+
+//            return buildDependencyNode( null, rootNode, projectArtifact, filter );
+        }
+        catch ( DependencyCollectionException e )
+        {
+            throw new DependencyCollectorException( "Could not collect dependencies: " + e.getResult(), e );
+        }
+        finally
+        {
+            if ( session != null )
+            {
+                session.setReadOnly();
+            }
+        }
+    }
+
+    private void collectManagedDependencyList( CollectRequest collectRequest, MavenProject project,
+                                               ArtifactTypeRegistry typeRegistry )
+        throws DependencyCollectorException
+    {
+        if ( project.getDependencyManagement() != null )
+        {
+            for ( org.apache.maven.model.Dependency dependency : project.getDependencyManagement().getDependencies() )
+            {
+                Dependency aetherDep = toDependency( dependency, typeRegistry );
+                collectRequest.addManagedDependency( aetherDep );
+            }
+        }
+    }
+
+    private void collectDependencyList( CollectRequest collectRequest, MavenProject project,
+                                        org.eclipse.aether.artifact.ArtifactTypeRegistry typeRegistry )
+        throws DependencyCollectorException
+    {
+        for ( org.apache.maven.model.Dependency dependency : project.getDependencies() )
+        {
+            Dependency aetherDep = toDependency( dependency, typeRegistry );
+            collectRequest.addDependency( aetherDep );
         }
     }
 
