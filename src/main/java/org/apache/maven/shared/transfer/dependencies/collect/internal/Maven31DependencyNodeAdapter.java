@@ -98,11 +98,10 @@ class Maven31DependencyNodeAdapter implements DependencyNode
     {
         if ( visitor.visitEnter( this ) )
         {
-            List<org.eclipse.aether.graph.DependencyNode> aetherNodes = dependencyNode.getChildren();
-            for ( int i = 0, n = aetherNodes.size(); i < n; i++ )
+            for ( org.eclipse.aether.graph.DependencyNode child : dependencyNode.getChildren() )
             {
-                DependencyNode child = new Maven31DependencyNodeAdapter( aetherNodes.get( i ) );
-                if ( !child.accept( visitor ) )
+                DependencyNode node = new Maven31DependencyNodeAdapter( child );
+                if ( !node.accept( visitor ) )
                 {
                     break;
                 }
