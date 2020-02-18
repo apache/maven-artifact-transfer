@@ -224,21 +224,6 @@ class DefaultProjectDeployer
     }
 
     /**
-     * Installs the checksums for the specified metadata files.
-     *
-     * @param metadataFiles The collection of metadata files to install checksums for, must not be <code>null</code>.
-     * @throws IOException If the checksums could not be installed.
-     */
-    private void installChecksums( Collection<File> metadataFiles )
-        throws IOException
-    {
-        for ( File metadataFile : metadataFiles )
-        {
-            installChecksums( metadataFile );
-        }
-    }
-
-    /**
      * Installs the checksums for the specified file (if it exists).
      *
      * @param installedFile The path to the already installed file in the local repo for which to generate checksums,
