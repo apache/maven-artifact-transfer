@@ -88,7 +88,7 @@ class Maven31DependencyResolver
 
         CollectRequest request = new CollectRequest( aetherRoot, aetherRepositories );
 
-        return resolveDependencies( aetherRepositories, dependencyFilter, request );
+        return resolveDependencies( dependencyFilter, request );
     }
     
     @Override
@@ -135,7 +135,7 @@ class Maven31DependencyResolver
             request.setManagedDependencies( aetherManagerDependencies );
         }
 
-        return resolveDependencies( aetherRepositories, dependencyFilter, request );
+        return resolveDependencies( dependencyFilter, request );
     }
 
     @Override
@@ -189,12 +189,11 @@ class Maven31DependencyResolver
 
         CollectRequest request = new CollectRequest( aetherDeps, aetherManagedDependencies, aetherRepositories );
 
-        return resolveDependencies( aetherRepositories, filter, request );
+        return resolveDependencies( filter, request );
     }
 
     // CHECKSTYLE_OFF: LineLength
-    private Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( List<RemoteRepository> aetherRepositories,
-                                                                                                   TransformableFilter dependencyFilter,
+    private Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( TransformableFilter dependencyFilter,
                                                                                                    CollectRequest request )
                                                                                                        throws DependencyResolverException
     // CHECKSTYLE_ON: LineLength
