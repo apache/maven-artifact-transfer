@@ -35,8 +35,6 @@ public class Maven31MetadataBridge extends AbstractMetadata implements Metadata
 {
     private ArtifactMetadata metadata;
     
-    private File file;
-    
     public Maven31MetadataBridge( ArtifactMetadata metadata )
     {
         this.metadata = metadata;
@@ -74,7 +72,7 @@ public class Maven31MetadataBridge extends AbstractMetadata implements Metadata
     @Override
     public File getFile()
     {
-        return file;
+        return null;
     }
     
     @Override
