@@ -154,12 +154,12 @@ class Maven30DependencyResolver
         final Class<?>[] argClasses =
             new Class<?>[] { org.apache.maven.model.Dependency.class, ArtifactTypeRegistry.class };
 
-         List<Dependency> aetherDependencies;
+         List<Dependency> aetherDependencies = mavenDependencies != null
+                                                 ? new ArrayList<Dependency>( mavenDependencies.size() )
+                                                 : Collections.<Dependency>emptyList();
 
          if ( mavenDependencies != null )
          {
-             aetherDependencies = new ArrayList<Dependency>( mavenDependencies.size() );
-
              for ( org.apache.maven.model.Dependency mavenDependency : mavenDependencies )
              {
                  Object[] args = new Object[] { mavenDependency, typeRegistry };
@@ -169,10 +169,6 @@ class Maven30DependencyResolver
 
                  aetherDependencies.add( aetherDependency );
              }
-         }
-         else
-         {
-             aetherDependencies = Collections.emptyList();
          }
 
         List<Dependency> aetherManagedDependencies = null;
