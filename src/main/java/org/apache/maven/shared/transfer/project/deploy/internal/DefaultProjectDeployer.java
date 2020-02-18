@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
@@ -283,19 +282,4 @@ class DefaultProjectDeployer
         String path = repositoryManager.getPathForLocalArtifact( buildingRequest, artifact );
         return new File( repositoryManager.getLocalRepositoryBasedir( buildingRequest ), path );
     }
-
-    /**
-     * Gets the path of the specified artifact metadata within the local repository. Note that the returned path need
-     * not exist (yet).
-     *
-     * @param buildingRequest The project building request, must not be <code>null</code>.
-     * @param metadata The artifact metadata whose local repo path should be determined, must not be <code>null</code>.
-     * @return The absolute path to the artifact metadata when installed, never <code>null</code>.
-     */
-    private File getLocalRepoFile( ProjectBuildingRequest buildingRequest, ArtifactMetadata metadata )
-    {
-        String path = repositoryManager.getPathForLocalMetadata( buildingRequest, metadata );
-        return new File( repositoryManager.getLocalRepositoryBasedir( buildingRequest ), path );
-    }
-
 }
