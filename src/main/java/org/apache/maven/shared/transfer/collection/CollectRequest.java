@@ -41,7 +41,7 @@ import org.apache.maven.artifact.Artifact;
 public final class CollectRequest
 {
 
-    private org.apache.maven.artifact.Artifact rootArtifact;
+    private Artifact rootArtifact;
 
     private Dependency root;
 

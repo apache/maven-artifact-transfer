@@ -134,7 +134,7 @@ class Maven30ArtifactDeployer
     {
         // CHECKSTYLE_OFF: LineLength
         RemoteRepository aetherRepo = (RemoteRepository) Invoker.invoke( RepositoryUtils.class, "toRepo",
-                                                                         org.apache.maven.artifact.repository.ArtifactRepository.class,
+                                                                         ArtifactRepository.class,
                                                                          remoteRepository );
         // CHECKSTYLE_ON: LineLength
 
