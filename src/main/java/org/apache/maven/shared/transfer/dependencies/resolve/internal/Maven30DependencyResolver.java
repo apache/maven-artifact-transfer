@@ -21,6 +21,7 @@ package org.apache.maven.shared.transfer.dependencies.resolve.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -153,7 +154,7 @@ class Maven30DependencyResolver
         final Class<?>[] argClasses =
             new Class<?>[] { org.apache.maven.model.Dependency.class, ArtifactTypeRegistry.class };
 
-         List<Dependency> aetherDependencies = new ArrayList<Dependency>( mavenDependencies.size() );
+         List<Dependency> aetherDependencies;
 
          if ( mavenDependencies != null )
          {
@@ -168,6 +169,10 @@ class Maven30DependencyResolver
 
                  aetherDependencies.add( aetherDependency );
              }
+         }
+         else
+         {
+             aetherDependencies = Collections.emptyList();
          }
 
         List<Dependency> aetherManagedDependencies = null;
