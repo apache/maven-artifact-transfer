@@ -74,7 +74,7 @@ class DefaultDependencyResolver
                                                          DependableCoordinate coordinate, TransformableFilter filter )
         throws DependencyResolverException
     {
-        validateParameters( buildingRequest, coordinate, filter );
+        validateParameters( buildingRequest, coordinate );
         try
         {
             return getMavenDependencyResolver( buildingRequest ).resolveDependencies( coordinate, filter );
@@ -90,7 +90,7 @@ class DefaultDependencyResolver
                                                          TransformableFilter filter )
         throws DependencyResolverException
     {
-        validateParameters( buildingRequest, model, filter );
+        validateParameters( buildingRequest, model );
         try
         {
             return getMavenDependencyResolver( buildingRequest ).resolveDependencies( model, filter );
@@ -135,8 +135,7 @@ class DefaultDependencyResolver
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate coordinate,
-                                     TransformableFilter filter )
+    private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate coordinate )
     {
         validateBuildingRequest( buildingRequest );
         if ( coordinate == null )
@@ -145,8 +144,7 @@ class DefaultDependencyResolver
         }
     }
 
-    private void validateParameters( ProjectBuildingRequest buildingRequest, Model model,
-                                     TransformableFilter filter )
+    private void validateParameters( ProjectBuildingRequest buildingRequest, Model model )
     {
         validateBuildingRequest( buildingRequest );
         if ( model == null )

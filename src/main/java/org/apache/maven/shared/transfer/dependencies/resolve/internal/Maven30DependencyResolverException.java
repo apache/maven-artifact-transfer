@@ -35,8 +35,6 @@ class Maven30DependencyResolverException extends DependencyResolverException
 {
     private DependencyCollectionException dce;
     
-    private ArtifactResolutionException are;
-
     protected Maven30DependencyResolverException( DependencyCollectionException e )
     {
         super( e );
@@ -46,7 +44,6 @@ class Maven30DependencyResolverException extends DependencyResolverException
     Maven30DependencyResolverException( ArtifactResolutionException e )
     {
         super( e );
-        this.are = e;
     }
     
     @Override
