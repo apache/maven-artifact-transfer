@@ -37,9 +37,13 @@ public class Maven30DependencyResolverTest
 {
     private Maven30DependencyResolver dr;
 
+    private TransformableFilter filter;
+
     @Before
     public void setUp()
     {
+      filter = mock( TransformableFilter.class );
+
       RepositorySystem system = mock( RepositorySystem.class );
       ArtifactHandlerManager manager = mock( ArtifactHandlerManager.class );
       RepositorySystemSession session = mock( RepositorySystemSession.class );
@@ -51,8 +55,6 @@ public class Maven30DependencyResolverTest
     public void resolveDependenciesWithEmptyDependenciesShouldNotThrow()
         throws DependencyResolverException
     {
-        TransformableFilter filter = mock( TransformableFilter.class );
-
         dr.resolveDependencies( new ArrayList<Dependency>(), new ArrayList<Dependency>(), filter );
     }
 
@@ -60,8 +62,6 @@ public class Maven30DependencyResolverTest
     public void resolveDependenciesWithNullMavenDependenciesShouldNotThrow()
         throws DependencyResolverException
     {
-        TransformableFilter filter = mock( TransformableFilter.class );
-
         dr.resolveDependencies( null, new ArrayList<Dependency>(), filter );
     }
 
