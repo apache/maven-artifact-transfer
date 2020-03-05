@@ -55,6 +55,16 @@ public class Maven30DependencyResolverTest
 
         dr.resolveDependencies( new ArrayList<Dependency>(), new ArrayList<Dependency>(), filter );
     }
+
+    @Test
+    public void resolveDependenciesWithNullMavenDependenciesShouldNotThrow()
+        throws DependencyResolverException
+    {
+        TransformableFilter filter = mock( TransformableFilter.class );
+
+        dr.resolveDependencies( null, new ArrayList<Dependency>(), filter );
+    }
+
 }
 
 
