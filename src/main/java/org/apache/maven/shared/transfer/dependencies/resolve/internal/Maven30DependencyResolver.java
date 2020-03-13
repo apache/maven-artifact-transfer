@@ -153,7 +153,7 @@ class Maven30DependencyResolver
         final Class<?>[] argClasses =
             new Class<?>[] { org.apache.maven.model.Dependency.class, ArtifactTypeRegistry.class };
 
-         List<Dependency> aetherDependencies = new ArrayList<Dependency>( mavenDependencies.size() );
+         List<Dependency> aetherDependencies = null;
 
          if ( mavenDependencies != null )
          {
