@@ -44,7 +44,7 @@ import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
  * @author Karl Heinz Marbaise
  */
 @RunWith( MavenJUnitTestRunner.class )
-@MavenVersions( { "3.0.5", "3.1.1", "3.2.5", "3.3.1", "3.3.9", "3.5.0", "3.5.4", "3.6.3" } )
+@MavenVersions( { "3.0.5", "3.1.1", "3.2.5", "3.3.9", "3.5.4", "3.6.3" } )
 public class DependencyCollectorTest
 {
 
