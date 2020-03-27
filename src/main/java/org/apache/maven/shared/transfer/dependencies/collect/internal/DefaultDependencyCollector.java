@@ -99,28 +99,19 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
     private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
     {
         validateBuildingRequest( buildingRequest );
-        if ( root == null )
-        {
-            throw new IllegalArgumentException( "The parameter root is not allowed to be null." );
-        }
+        validateRoot( root );
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, Dependency root )
     {
         validateBuildingRequest( buildingRequest );
-        if ( root == null )
-        {
-            throw new IllegalArgumentException( "The parameter root is not allowed to be null." );
-        }
+        validateRoot( root );
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, Model root )
     {
         validateBuildingRequest( buildingRequest );
-        if ( root == null )
-        {
-            throw new IllegalArgumentException( "The parameter root is not allowed to be null." );
-        }
+        validateRoot( root );
     }
 
     private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )
@@ -128,6 +119,14 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
         if ( buildingRequest == null )
         {
             throw new IllegalArgumentException( "The parameter buildingRequest is not allowed to be null." );
+        }
+    }
+
+    private void validateRoot( Object root )
+    {
+        if ( root == null )
+        {
+            throw new IllegalArgumentException( "The parameter root is not allowed to be null." );
         }
     }
 

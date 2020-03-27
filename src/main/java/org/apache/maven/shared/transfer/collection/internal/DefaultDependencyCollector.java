@@ -99,25 +99,33 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
   private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
   {
-    validateBuildingRequest( buildingRequest );
-    Objects.requireNonNull( root, "The parameter root is not allowed to be null." );
+    validateBuildingRequestAndRoot( buildingRequest, root );
   }
 
   private void validateParameters( ProjectBuildingRequest buildingRequest, Dependency root )
   {
-    validateBuildingRequest( buildingRequest );
-    Objects.requireNonNull( root, "The parameter root is not allowed to be null." );
+    validateBuildingRequestAndRoot( buildingRequest, root );
   }
 
   private void validateParameters( ProjectBuildingRequest buildingRequest, Model root )
   {
+    validateBuildingRequestAndRoot( buildingRequest, root );
+  }
+
+  private void validateBuildingRequestAndRoot( ProjectBuildingRequest buildingRequest, Object root )
+  {
     validateBuildingRequest( buildingRequest );
-    Objects.requireNonNull( root, "The parameter root is not allowed to be null." );
+    validateRoot( root );
   }
 
   private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )
   {
     Objects.requireNonNull( buildingRequest, "The parameter buildingRequest is not allowed to be null." );
+  }
+
+  private void validateRoot( Object root )
+  {
+    Objects.requireNonNull( root, "The parameter root is not allowed to be null." );
   }
 
   /**
