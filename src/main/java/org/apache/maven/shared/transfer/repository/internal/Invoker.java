@@ -33,50 +33,32 @@ final class Invoker
         // do not instantiate
     }
 
-    public static Object invoke( Object object, String method )
-        throws RepositoryManagerException
-    {
-        return invoke( object.getClass(), object, method );
-    }
-
-    public static Object invoke( Class<?> objectClazz, Object object, String method )
+    public static <T> T invoke( Object object, String method )
         throws RepositoryManagerException
     {
         try
         {
-            return objectClazz.getMethod( method ).invoke( object );
+            @SuppressWarnings( "unchecked" )
+            T invoke = (T) object.getClass().getMethod( method ).invoke( object );
+            return invoke;
         }
-        catch ( IllegalAccessException e )
-        {
-            throw new RepositoryManagerException( e.getMessage(), e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new RepositoryManagerException( e.getMessage(), e );
-        }
-        catch ( NoSuchMethodException e )
+        catch ( IllegalAccessException | InvocationTargetException | NoSuchMethodException e )
         {
             throw new RepositoryManagerException( e.getMessage(), e );
         }
     }
 
-    public static Object invoke( Object object, String method, Class<?> argClazz, Object arg )
+    public static <T> T invoke( Object object, String method, Class<?> argClazz, Object arg )
         throws RepositoryManagerException
     {
         try
         {
             final Class<?> objectClazz = object.getClass();
-            return objectClazz.getMethod( method, argClazz ).invoke( object, arg );
+            @SuppressWarnings( "unchecked" )
+            T invoke = (T) objectClazz.getMethod( method, argClazz ).invoke( object, arg );
+            return invoke;
         }
-        catch ( IllegalAccessException e )
-        {
-            throw new RepositoryManagerException( e.getMessage(), e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new RepositoryManagerException( e.getMessage(), e );
-        }
-        catch ( NoSuchMethodException e )
+        catch ( IllegalAccessException | InvocationTargetException | NoSuchMethodException e )
         {
             throw new RepositoryManagerException( e.getMessage(), e );
         }
@@ -89,15 +71,7 @@ final class Invoker
         {
             return objectClazz.getMethod( staticMethod, argClazz ).invoke( null, arg );
         }
-        catch ( IllegalAccessException e )
-        {
-            throw new RepositoryManagerException( e.getMessage(), e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new RepositoryManagerException( e.getMessage(), e );
-        }
-        catch ( NoSuchMethodException e )
+        catch ( IllegalAccessException | InvocationTargetException | NoSuchMethodException e )
         {
             throw new RepositoryManagerException( e.getMessage(), e );
         }

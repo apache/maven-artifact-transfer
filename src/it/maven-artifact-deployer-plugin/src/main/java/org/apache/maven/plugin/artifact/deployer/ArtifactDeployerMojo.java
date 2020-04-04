@@ -130,13 +130,9 @@ public class ArtifactDeployerMojo
 
             deployer.deploy( session.getProjectBuildingRequest(), mavenArtifacts );
         }
-        catch ( ArtifactDeployerException e )
+        catch ( ArtifactDeployerException | IOException e )
         {
-            throw new MojoExecutionException( "ArtifactDeployerException", e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "IOException", e );
+            throw new MojoExecutionException( e.getClass().getName(), e );
         }
     }
 

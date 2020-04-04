@@ -114,21 +114,9 @@ public class ProjectDeployerMojo
             ArtifactRepository repo = session.getCurrentProject().getDistributionManagementArtifactRepository();
             deployer.deploy( session.getProjectBuildingRequest(), pdr, repo );
         }
-        catch ( IOException e )
+        catch ( IOException | NoFileAssignedException | IllegalArgumentException | ArtifactDeployerException e )
         {
-            throw new MojoExecutionException( "IOException", e );
-        }
-        catch ( NoFileAssignedException e )
-        {
-            throw new MojoExecutionException( "NoFileAssignedException", e );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            throw new MojoExecutionException( "IllegalArgumentException", e );
-        }
-        catch ( ArtifactDeployerException e )
-        {
-            throw new MojoExecutionException( "ArtifactDeployerException", e );
+            throw new MojoExecutionException( e.getClass().getName(), e);
         }
 
     }

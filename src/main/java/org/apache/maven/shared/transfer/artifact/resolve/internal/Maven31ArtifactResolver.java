@@ -56,13 +56,11 @@ class Maven31ArtifactResolver
     }
 
     @Override
-    // CHECKSTYLE_OFF: LineLength
-    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( org.apache.maven.artifact.Artifact mavenArtifact )
-                                                                                        throws ArtifactResolverException
-    // CHECKSTYLE_ON: LineLength
+    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact(
+            org.apache.maven.artifact.Artifact mavenArtifact ) throws ArtifactResolverException
     {
-        Artifact aetherArtifact = (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                                                             org.apache.maven.artifact.Artifact.class, mavenArtifact );
+        Artifact aetherArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
+                org.apache.maven.artifact.Artifact.class, mavenArtifact );
 
         return resolveArtifact( aetherArtifact );
     }
@@ -98,11 +96,7 @@ class Maven31ArtifactResolver
 
             return new Maven31ArtifactResult( repositorySystem.resolveArtifact( session, request ) );
         }
-        catch ( ArtifactDescriptorException e )
-        {
-            throw new ArtifactResolverException( e.getMessage(), e );
-        }
-        catch ( ArtifactResolutionException e )
+        catch ( ArtifactDescriptorException | ArtifactResolutionException e )
         {
             throw new ArtifactResolverException( e.getMessage(), e );
         }

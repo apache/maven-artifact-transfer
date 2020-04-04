@@ -33,7 +33,7 @@ import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverE
  * @author Robert Scholte
  *
  */
-public interface MavenDependencyResolver
+interface MavenDependencyResolver
 {
 
     Iterable<ArtifactResult> resolveDependencies( DependableCoordinate coordinate,

@@ -29,7 +29,7 @@ import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector
  * 
  * @author Robert Scholte
  */
-public interface MavenDependencyCollector
+interface MavenDependencyCollector
 {
 
     CollectorResult collectDependencies( Dependency root )

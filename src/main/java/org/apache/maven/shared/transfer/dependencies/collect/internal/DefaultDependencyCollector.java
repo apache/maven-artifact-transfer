@@ -40,17 +40,17 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
  * This DependencyCollector passes the request to the proper Maven 3.x implementation
- * 
+ *
  * @author Robert Scholte
  */
 @Component( role = DependencyCollector.class, hint = "default" )
-class DefaultDependencyCollector implements DependencyCollector, Contextualizable 
+class DefaultDependencyCollector implements DependencyCollector, Contextualizable
 {
     private PlexusContainer container;
 
     @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, Dependency root )
-        throws DependencyCollectorException
+            throws DependencyCollectorException
     {
         validateParameters( buildingRequest, root );
 
@@ -66,7 +66,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
     @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
-        throws DependencyCollectorException
+            throws DependencyCollectorException
     {
         validateParameters( buildingRequest, root );
 
@@ -82,7 +82,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
 
     @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest, Model root )
-        throws DependencyCollectorException
+            throws DependencyCollectorException
     {
         validateParameters( buildingRequest, root );
 
@@ -158,51 +158,44 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
      * @param context Plexus context to inject.
      * @throws ContextException if the PlexusContainer could not be located.
      */
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
-    
+
     private MavenDependencyCollector getMavenDependencyCollector( ProjectBuildingRequest buildingRequest )
-        throws ComponentLookupException, DependencyCollectorException
+            throws ComponentLookupException, DependencyCollectorException
     {
         ArtifactHandlerManager artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
-        
+
         if ( isMaven31() )
         {
-            org.eclipse.aether.RepositorySystem m31RepositorySystem =
-                container.lookup( org.eclipse.aether.RepositorySystem.class );
+            org.eclipse.aether.RepositorySystem m31RepositorySystem = container.lookup(
+                    org.eclipse.aether.RepositorySystem.class );
 
-            org.eclipse.aether.RepositorySystemSession session =
-                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
 
-            @SuppressWarnings( "unchecked" )
-            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories =
-                (List<org.eclipse.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos",
-                                                                           List.class,
-                                                                           buildingRequest.getRemoteRepositories() );
+            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
+                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
 
             return new Maven31DependencyCollector( m31RepositorySystem, artifactHandlerManager, session,
-                                                   aetherRepositories );
+                    aetherRepositories );
         }
         else
         {
 
-            org.sonatype.aether.RepositorySystem m30RepositorySystem =
-                            container.lookup( org.sonatype.aether.RepositorySystem.class );
+            org.sonatype.aether.RepositorySystem m30RepositorySystem = container.lookup(
+                    org.sonatype.aether.RepositorySystem.class );
 
-            org.sonatype.aether.RepositorySystemSession session =
-                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
 
-            @SuppressWarnings( "unchecked" )
-            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories =
-                (List<org.sonatype.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class,
-                                                                            "toRepos", List.class,
-                                                                            buildingRequest.getRemoteRepositories() );
+            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
+                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
 
             return new Maven30DependencyCollector( m30RepositorySystem, artifactHandlerManager, session,
-                                                   aetherRepositories );
+                    aetherRepositories );
         }
 
     }

@@ -36,19 +36,18 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
- * 
+ *
  */
 @Component( role = ArtifactInstaller.class )
-class DefaultArtifactInstaller
-    implements ArtifactInstaller, Contextualizable
+class DefaultArtifactInstaller implements ArtifactInstaller, Contextualizable
 {
     private PlexusContainer container;
-    
+
     private RepositoryManager repositoryManager;
 
     @Override
     public void install( ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts )
-        throws ArtifactInstallerException, IllegalArgumentException
+            throws ArtifactInstallerException, IllegalArgumentException
     {
         validateParameters( request, mavenArtifacts );
         try
@@ -63,7 +62,7 @@ class DefaultArtifactInstaller
 
     @Override
     public void install( ProjectBuildingRequest request, File localRepositry, Collection<Artifact> mavenArtifacts )
-        throws ArtifactInstallerException
+            throws ArtifactInstallerException
     {
         validateParameters( request, mavenArtifacts );
         if ( localRepositry == null )
@@ -76,7 +75,7 @@ class DefaultArtifactInstaller
         }
 
         // TODO: Should we check for exists() ?
-        
+
         // update local repo in request 
         ProjectBuildingRequest newRequest = repositoryManager.setLocalRepositoryBasedir( request, localRepositry );
 
@@ -134,32 +133,31 @@ class DefaultArtifactInstaller
      * @param context Plexus context to inject.
      * @throws ContextException if the PlexusContainer could not be located.
      */
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
-    
+
     private MavenArtifactInstaller getMavenArtifactInstaller( ProjectBuildingRequest buildingRequest )
-        throws ComponentLookupException, ArtifactInstallerException
+            throws ComponentLookupException, ArtifactInstallerException
     {
         if ( isMaven31() )
         {
-            org.eclipse.aether.RepositorySystem repositorySystem =
-                            container.lookup( org.eclipse.aether.RepositorySystem.class );
-            
-            org.eclipse.aether.RepositorySystemSession session =
-                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            org.eclipse.aether.RepositorySystem repositorySystem = container.lookup(
+                    org.eclipse.aether.RepositorySystem.class );
+
+            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
 
             return new Maven31ArtifactInstaller( repositorySystem, session );
         }
         else
         {
-            org.sonatype.aether.RepositorySystem repositorySystem =
-                            container.lookup( org.sonatype.aether.RepositorySystem.class );
-            
-            org.sonatype.aether.RepositorySystemSession session =
-                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            org.sonatype.aether.RepositorySystem repositorySystem = container.lookup(
+                    org.sonatype.aether.RepositorySystem.class );
+
+            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
 
             return new Maven30ArtifactInstaller( repositorySystem, session );
         }

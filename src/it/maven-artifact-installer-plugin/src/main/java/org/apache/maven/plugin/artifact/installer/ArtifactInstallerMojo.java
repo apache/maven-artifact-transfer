@@ -127,13 +127,9 @@ public class ArtifactInstallerMojo
 
             installer.install( session.getProjectBuildingRequest(), mavenArtifacts );
         }
-        catch ( ArtifactInstallerException e )
+        catch ( ArtifactInstallerException | IOException e )
         {
-            throw new MojoExecutionException( "ArtifactInstallerException", e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "IOException", e );
+            throw new MojoExecutionException( e.getClass().getName(), e );
         }
 
     }

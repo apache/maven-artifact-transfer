@@ -48,7 +48,7 @@ class Maven31ArtifactResult
     {
         try
         {
-            return (org.apache.maven.artifact.Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
+            return Invoker.invoke( RepositoryUtils.class, "toArtifact",
                                                                         Artifact.class, artifactResult.getArtifact() );
         }
         catch ( ArtifactResolverException e )

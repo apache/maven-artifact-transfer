@@ -30,7 +30,7 @@ import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerExceptio
  * @author Robert Scholte
  *
  */
-public interface MavenArtifactDeployer
+interface MavenArtifactDeployer
 {
 
     void deploy( Collection<Artifact> mavenArtifacts )

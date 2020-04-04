@@ -149,10 +149,8 @@ class DefaultProjectInstaller
         }
     }
 
-    // CHECKSTYLE_OFF: LineLength
     private void addMetaDataFilesForArtifact( ProjectBuildingRequest buildingRequest, Artifact artifact,
-                                              Collection<File> targetMetadataFiles )
-    // CHECKSTYLE_ON: LineLength
+            Collection<File> targetMetadataFiles )
     {
         Collection<ArtifactMetadata> metadatas = artifact.getMetadataList();
         if ( metadatas != null )

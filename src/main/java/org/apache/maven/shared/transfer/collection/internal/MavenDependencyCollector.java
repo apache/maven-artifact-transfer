@@ -28,7 +28,7 @@ import org.apache.maven.shared.transfer.collection.DependencyCollectionException
 /**
  * @author Robert Scholte
  */
-public interface MavenDependencyCollector
+interface MavenDependencyCollector
 {
 
   CollectResult collectDependencies( Dependency root )

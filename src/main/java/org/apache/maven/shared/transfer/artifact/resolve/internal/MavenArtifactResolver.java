@@ -29,7 +29,7 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
  * @author Robert Scholte
  *
  */
-public interface MavenArtifactResolver
+interface MavenArtifactResolver
 {
     ArtifactResult resolveArtifact( Artifact mavenArtifact ) throws ArtifactResolverException;
 

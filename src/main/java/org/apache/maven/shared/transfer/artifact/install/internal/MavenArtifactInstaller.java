@@ -29,7 +29,7 @@ import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerExcept
  * @author Robert Scholte
  *
  */
-public interface MavenArtifactInstaller
+interface MavenArtifactInstaller
 {
     void install( Collection<Artifact> mavenArtifacts )
         throws ArtifactInstallerException;

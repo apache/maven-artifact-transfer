@@ -33,71 +33,31 @@ final class Invoker
         // do not instantiate
     }
 
-    public static Object invoke( Object object, String method )
-        throws ArtifactDeployerException
-    {
-        return invoke( object.getClass(), object, method );
-    }
-
-    public static Object invoke( Class<?> objectClazz, Object object, String method )
+    public static <T> T invoke( Object object, String method )
         throws ArtifactDeployerException
     {
         try
         {
-            return objectClazz.getMethod( method ).invoke( object );
+            @SuppressWarnings( "unchecked" )
+            T invoke = (T) object.getClass().getMethod( method ).invoke( object );
+            return invoke;
         }
-        catch ( IllegalAccessException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
-        catch ( NoSuchMethodException e )
+        catch ( IllegalAccessException | InvocationTargetException | NoSuchMethodException e )
         {
             throw new ArtifactDeployerException( e.getMessage(), e );
         }
     }
 
-    public static Object invoke( Object object, String method, Class<?> clazz, Object arg )
-        throws ArtifactDeployerException
-    {
-        try
-        {
-            final Class<?> objectClazz = object.getClass();
-            return objectClazz.getMethod( method, clazz ).invoke( object, arg );
-        }
-        catch ( IllegalAccessException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
-        catch ( NoSuchMethodException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
-    }
-    
-    public static Object invoke( Class<?> objectClazz, String staticMethod, Class<?> argClazz, Object arg )
+    public static <T> T invoke( Class<?> objectClazz, String staticMethod, Class<?> argClazz, Object arg )
                     throws ArtifactDeployerException
     {
         try
         {
-            return objectClazz.getMethod( staticMethod, argClazz ).invoke( null, arg );
+            @SuppressWarnings( "unchecked" )
+            T invoke = (T) objectClazz.getMethod( staticMethod, argClazz ).invoke( null, arg );
+            return invoke;
         }
-        catch ( IllegalAccessException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
-        catch ( InvocationTargetException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
-        catch ( NoSuchMethodException e )
+        catch ( IllegalAccessException | InvocationTargetException | NoSuchMethodException e )
         {
             throw new ArtifactDeployerException( e.getMessage(), e );
         }

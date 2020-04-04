@@ -38,17 +38,16 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 
 /**
- * 
+ *
  */
 @Component( role = ArtifactResolver.class, hint = "default" )
-class DefaultArtifactResolver
-    implements ArtifactResolver, Contextualizable
+class DefaultArtifactResolver implements ArtifactResolver, Contextualizable
 {
     private PlexusContainer container;
 
     @Override
     public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest, Artifact mavenArtifact )
-        throws ArtifactResolverException, IllegalArgumentException
+            throws ArtifactResolverException, IllegalArgumentException
     {
         validateParameters( buildingRequest, mavenArtifact );
         try
@@ -63,7 +62,7 @@ class DefaultArtifactResolver
 
     @Override
     public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest, ArtifactCoordinate coordinate )
-        throws ArtifactResolverException, IllegalArgumentException
+            throws ArtifactResolverException, IllegalArgumentException
     {
         validateParameters( buildingRequest, coordinate );
         try
@@ -128,46 +127,39 @@ class DefaultArtifactResolver
      * @param context Plexus context to inject.
      * @throws ContextException if the PlexusContainer could not be located.
      */
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
-    
+
     private MavenArtifactResolver getMavenArtifactResolver( ProjectBuildingRequest buildingRequest )
-        throws ComponentLookupException, ArtifactResolverException
+            throws ComponentLookupException, ArtifactResolverException
     {
         if ( isMaven31() )
         {
-            org.eclipse.aether.RepositorySystem repositorySystem =
-                            container.lookup( org.eclipse.aether.RepositorySystem.class );
-            
-            @SuppressWarnings( "unchecked" )
-            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories =
-                (List<org.eclipse.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class, "toRepos",
-                                                                           List.class,
-                                                                           buildingRequest.getRemoteRepositories() );
+            org.eclipse.aether.RepositorySystem repositorySystem = container.lookup(
+                    org.eclipse.aether.RepositorySystem.class );
 
-            org.eclipse.aether.RepositorySystemSession session =
-                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-            
+            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
+                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
+
+            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
+
             return new Maven31ArtifactResolver( repositorySystem, aetherRepositories, session );
-            
+
         }
         else
         {
-            org.sonatype.aether.RepositorySystem repositorySystem =
-                            container.lookup( org.sonatype.aether.RepositorySystem.class );
-            
-            @SuppressWarnings( "unchecked" )
-            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories =
-                (List<org.sonatype.aether.repository.RemoteRepository>) Invoker.invoke( RepositoryUtils.class,
-                                                                            "toRepos", List.class,
-                                                                            buildingRequest.getRemoteRepositories() );
+            org.sonatype.aether.RepositorySystem repositorySystem = container.lookup(
+                    org.sonatype.aether.RepositorySystem.class );
 
-            org.sonatype.aether.RepositorySystemSession session =
-                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-            
+            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
+                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
+
+            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
+
             return new Maven30ArtifactResolver( repositorySystem, aetherRepositories, session );
         }
 

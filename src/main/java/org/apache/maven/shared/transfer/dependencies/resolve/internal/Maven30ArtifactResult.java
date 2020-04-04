@@ -26,12 +26,11 @@ import org.sonatype.aether.resolution.ArtifactResult;
 
 /**
  * {@link org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult} wrapper for {@link ArtifactResult}
- * 
+ *
  * @author Robert Scholte
  * @since 3.0
  */
-class Maven30ArtifactResult
-    implements org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult
+class Maven30ArtifactResult implements org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult
 {
     private final ArtifactResult artifactResult;
 
@@ -48,8 +47,7 @@ class Maven30ArtifactResult
     {
         try
         {
-            return (org.apache.maven.artifact.Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                                                                        Artifact.class, artifactResult.getArtifact() );
+            return Invoker.invoke( RepositoryUtils.class, "toArtifact", Artifact.class, artifactResult.getArtifact() );
         }
         catch ( DependencyResolverException e )
         {

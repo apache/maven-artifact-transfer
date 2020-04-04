@@ -61,7 +61,7 @@ class Maven30ArtifactResolver
                                                                                         throws ArtifactResolverException
     // CHECKSTYLE_ON: LineLength
     {
-        Artifact aetherArtifact = (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
+        Artifact aetherArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
                                                              org.apache.maven.artifact.Artifact.class, mavenArtifact );
 
         return resolveArtifact( aetherArtifact );
@@ -98,11 +98,7 @@ class Maven30ArtifactResolver
 
             return new Maven30ArtifactResult( repositorySystem.resolveArtifact( session, request ) );
         }
-        catch ( ArtifactDescriptorException e )
-        {
-            throw new ArtifactResolverException( e.getMessage(), e );
-        }
-        catch ( ArtifactResolutionException e )
+        catch ( ArtifactDescriptorException | ArtifactResolutionException e )
         {
             throw new ArtifactResolverException( e.getMessage(), e );
         }

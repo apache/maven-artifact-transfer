@@ -37,16 +37,15 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
 /**
- * 
+ *
  */
-class Maven31ArtifactDeployer
-    implements MavenArtifactDeployer
+class Maven31ArtifactDeployer implements MavenArtifactDeployer
 {
 
     private final RepositorySystem repositorySystem;
-    
+
     private final RepositorySystemSession session;
-    
+
     Maven31ArtifactDeployer( RepositorySystem repositorySystem, RepositorySystemSession session )
     {
         super();
@@ -55,16 +54,14 @@ class Maven31ArtifactDeployer
     }
 
     @Override
-    public void deploy( Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
-                            throws ArtifactDeployerException
+    public void deploy( Collection<org.apache.maven.artifact.Artifact> mavenArtifacts ) throws ArtifactDeployerException
     {
         deploy( null, mavenArtifacts );
     }
 
     @Override
     public void deploy( ArtifactRepository remoteRepository,
-                        Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
-                            throws ArtifactDeployerException
+            Collection<org.apache.maven.artifact.Artifact> mavenArtifacts ) throws ArtifactDeployerException
     {
         // prepare request
         DeployRequest request = new DeployRequest();
@@ -79,9 +76,8 @@ class Maven31ArtifactDeployer
         // transform artifacts
         for ( org.apache.maven.artifact.Artifact mavenArtifact : mavenArtifacts )
         {
-            Artifact aetherArtifact =
-                (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                                           org.apache.maven.artifact.Artifact.class, mavenArtifact );
+            Artifact aetherArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
+                    org.apache.maven.artifact.Artifact.class, mavenArtifact );
             request.addArtifact( aetherArtifact );
 
             RemoteRepository aetherRepository;
@@ -105,15 +101,15 @@ class Maven31ArtifactDeployer
                     request.addArtifact( pomArtifact );
                 }
                 else if ( // metadata instanceof SnapshotArtifactRepositoryMetadata ||
-                metadata instanceof ArtifactRepositoryMetadata )
+                        metadata instanceof ArtifactRepositoryMetadata )
                 {
                     // eaten, handled by repo system
                 }
                 else if ( metadata instanceof org.apache.maven.shared.transfer.metadata.ArtifactMetadata )
                 {
-                    org.apache.maven.shared.transfer.metadata.ArtifactMetadata transferMetadata = 
-                                    (org.apache.maven.shared.transfer.metadata.ArtifactMetadata) metadata;
-                    
+                    org.apache.maven.shared.transfer.metadata.ArtifactMetadata transferMetadata =
+                            (org.apache.maven.shared.transfer.metadata.ArtifactMetadata) metadata;
+
                     request.addMetadata( new Maven31MetadataBridge( metadata ).setFile( transferMetadata.getFile() ) );
                 }
             }
@@ -131,13 +127,10 @@ class Maven31ArtifactDeployer
     }
 
     private RemoteRepository getRemoteRepository( RepositorySystemSession session, ArtifactRepository remoteRepository )
-        throws ArtifactDeployerException
+            throws ArtifactDeployerException
     {
-        // CHECKSTYLE_OFF: LineLength
-        RemoteRepository aetherRepo = (RemoteRepository) Invoker.invoke( RepositoryUtils.class, "toRepo",
-                                                                         ArtifactRepository.class,
-                                                                         remoteRepository );
-        // CHECKSTYLE_ON: LineLength
+        RemoteRepository aetherRepo = Invoker.invoke( RepositoryUtils.class, "toRepo", ArtifactRepository.class,
+                remoteRepository );
 
         if ( aetherRepo.getAuthentication() == null || aetherRepo.getProxy() == null )
         {

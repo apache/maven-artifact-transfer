@@ -35,18 +35,17 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
- * 
+ *
  */
 @Component( role = ArtifactDeployer.class )
-class DefaultArtifactDeployer
-    implements ArtifactDeployer, Contextualizable
+class DefaultArtifactDeployer implements ArtifactDeployer, Contextualizable
 {
 
     private PlexusContainer container;
 
     @Override
     public void deploy( ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts )
-        throws ArtifactDeployerException
+            throws ArtifactDeployerException
     {
         validateParameters( request, mavenArtifacts );
 
@@ -62,8 +61,7 @@ class DefaultArtifactDeployer
 
     @Override
     public void deploy( ProjectBuildingRequest request, ArtifactRepository remoteRepository,
-                        Collection<Artifact> mavenArtifacts )
-        throws ArtifactDeployerException
+            Collection<Artifact> mavenArtifacts ) throws ArtifactDeployerException
     {
         validateParameters( request, mavenArtifacts );
         try
@@ -120,33 +118,32 @@ class DefaultArtifactDeployer
      * @param context Plexus context to inject.
      * @throws ContextException if the PlexusContainer could not be located.
      */
-    public void contextualize( Context context )
-        throws ContextException
+    public void contextualize( Context context ) throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
-    
+
     private MavenArtifactDeployer getMavenArtifactDeployer( ProjectBuildingRequest buildingRequest )
-        throws ComponentLookupException, ArtifactDeployerException
+            throws ComponentLookupException, ArtifactDeployerException
     {
         if ( isMaven31() )
         {
-            org.eclipse.aether.RepositorySystem repositorySystem =
-                            container.lookup( org.eclipse.aether.RepositorySystem.class );
-            
-            org.eclipse.aether.RepositorySystemSession session =
-                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-            
+            org.eclipse.aether.RepositorySystem repositorySystem = container.lookup(
+                    org.eclipse.aether.RepositorySystem.class );
+
+            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
+
             return new Maven31ArtifactDeployer( repositorySystem, session );
         }
         else
         {
-            org.sonatype.aether.RepositorySystem repositorySystem =
-                            container.lookup( org.sonatype.aether.RepositorySystem.class );
-            
-            org.sonatype.aether.RepositorySystemSession session =
-                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
-            
+            org.sonatype.aether.RepositorySystem repositorySystem = container.lookup(
+                    org.sonatype.aether.RepositorySystem.class );
+
+            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
+
             return new Maven30ArtifactDeployer( repositorySystem, session );
         }
     }

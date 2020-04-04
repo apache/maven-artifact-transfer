@@ -70,10 +70,9 @@ class Maven31DependencyCollector
     public CollectResult collectDependencies( org.apache.maven.model.Dependency root )
         throws DependencyCollectionException
     {
-        ArtifactTypeRegistry typeRegistry =
-                        (ArtifactTypeRegistry) Invoker
-                            .invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
-                                                               ArtifactHandlerManager.class, artifactHandlerManager );
+        ArtifactTypeRegistry typeRegistry = Invoker
+            .invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
+                                               ArtifactHandlerManager.class, artifactHandlerManager );
 
         CollectRequest request = new CollectRequest();
         request.setRoot( toDependency( root, typeRegistry ) );
@@ -113,10 +112,9 @@ class Maven31DependencyCollector
         CollectRequest request = new CollectRequest();
         request.setRoot( new Dependency( aetherArtifact, null ) );
 
-        ArtifactTypeRegistry typeRegistry =
-                        (ArtifactTypeRegistry) Invoker
-                            .invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
-                                                               ArtifactHandlerManager.class, artifactHandlerManager );
+        ArtifactTypeRegistry typeRegistry = Invoker
+            .invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
+                                               ArtifactHandlerManager.class, artifactHandlerManager );
 
         List<Dependency> aetherDependencies = new ArrayList<Dependency>( root.getDependencies().size() );
         for ( org.apache.maven.model.Dependency mavenDependency : root.getDependencies() )
@@ -163,7 +161,7 @@ class Maven31DependencyCollector
 
         Object[] args = new Object[] { root, typeRegistry };
 
-        return (Dependency) Invoker
+        return Invoker
             .invoke( RepositoryUtils.class, "toDependency", argClasses, args );
     }
 

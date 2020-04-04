@@ -60,9 +60,8 @@ class Maven30ArtifactInstaller
         // transform artifacts
         for ( org.apache.maven.artifact.Artifact mavenArtifact : mavenArtifacts )
         {
-            Artifact mainArtifact =
-                (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                                           org.apache.maven.artifact.Artifact.class, mavenArtifact );
+            Artifact mainArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
+                                       org.apache.maven.artifact.Artifact.class, mavenArtifact );
             request.addArtifact( mainArtifact );
 
             for ( ArtifactMetadata metadata : mavenArtifact.getMetadataList() )

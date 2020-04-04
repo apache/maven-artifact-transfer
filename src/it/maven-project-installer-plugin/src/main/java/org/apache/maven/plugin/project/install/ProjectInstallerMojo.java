@@ -110,17 +110,9 @@ public class ProjectInstallerMojo
             pir.setProject( session.getCurrentProject());
             installer.install( pbr, pir );
         }
-        catch ( ArtifactInstallerException e )
+        catch ( ArtifactInstallerException | IOException | NoFileAssignedException e )
         {
-            throw new MojoExecutionException( "ArtifactInstallerException", e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "IOException", e );
-        }
-        catch ( NoFileAssignedException e )
-        {
-            throw new MojoExecutionException( "NoFileAssignedException", e );
+            throw new MojoExecutionException( e.getClass().getName(), e );
         }
 
     }
