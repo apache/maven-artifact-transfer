@@ -130,7 +130,7 @@ class DefaultProjectInstaller
 
         for ( Artifact attached : attachedArtifacts )
         {
-            LOGGER.debug( "Installing artifact: ", attached.getId() );
+            LOGGER.debug( "Installing artifact: {}", attached.getId() );
             installer.install( buildingRequest, Collections.singletonList( attached ) );
             addMetaDataFilesForArtifact( buildingRequest, attached, metadataFiles );
         }
