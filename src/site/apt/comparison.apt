@@ -62,5 +62,7 @@ Comparison: Dependency vs Artifact vs MavenProject
   * There's no such thing as transitive artifacts. Filtering during resolution is based on DependencyFilters,
     ArtifactFilters can only be applied afterwards, hence are less powerful.
 
+  []
+
   Notice that for historical reasons, Maven internal {{{/ref/current/maven-artifact/apidocs/org/apache/maven/artifact/Artifact.html}Artifact API}}
   mixes dependency and artifact concepts.
