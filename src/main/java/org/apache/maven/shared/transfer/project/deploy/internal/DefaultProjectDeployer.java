@@ -31,7 +31,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
-import org.apache.maven.shared.transfer.project.MavenAetherUtils;
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
@@ -70,8 +69,6 @@ class DefaultProjectDeployer
         throws NoFileAssignedException, IllegalArgumentException, ArtifactDeployerException
     {
         validateParameters( buildingRequest, projectDeployerRequest, artifactRepository );
-
-        MavenAetherUtils.importAetherLibrary();
 
         Artifact artifact = projectDeployerRequest.getProject().getArtifact();
         String packaging = projectDeployerRequest.getProject().getPackaging();
