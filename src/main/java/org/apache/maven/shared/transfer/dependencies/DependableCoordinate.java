@@ -22,7 +22,7 @@ package org.apache.maven.shared.transfer.dependencies;
 /**
  * <p>
  * Represents any instance which may contain Maven Dependencies, both explicit or implicit to (transitively) resolve 
- * and calculate its path for either a local or remote Maven2 repository.
+ * and calculate its path for either a local or remote Maven repository.
  * </p>
  * <p>
  * The version can be a version range. Based on the groupId and artifactId it will be resolved to the actual version.
@@ -31,7 +31,7 @@ package org.apache.maven.shared.transfer.dependencies;
  * The type will be translated to an extension based on the artifact descriptor ({@code pom.xml} matching the groupId,
  * artifactId and version.
  * </p>
- * A MavenProject is not considered a DependableCoordinate because is should never have a versionRange, and it has 
+ * A MavenProject is not considered a DependableCoordinate because it should never have a versionRange, and it has 
  * packaging instead of type.
  * 
  * @author Robert Scholte
