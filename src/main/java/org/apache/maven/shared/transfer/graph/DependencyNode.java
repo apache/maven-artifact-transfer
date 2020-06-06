@@ -25,7 +25,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
- * Represents an dependency node within a Maven project's dependency collector.
+ * Represents a dependency node within a Maven project's dependency collector.
  *
  * @author Pim Moerenhout
  * @since 0.12
@@ -35,17 +35,17 @@ public interface DependencyNode
     /**
      * Gets the child nodes of this node.
      *
-     * @return The child nodes of this node, never {@code null}.
+     * @return the child nodes of this node, never {@code null}
      */
     List<DependencyNode> getChildren();
 
     /**
-     * @return Artifact for this DependencyCollectorNode.
+     * @return artifact for this DependencyCollectorNode
      */
     Artifact getArtifact();
 
     /**
-     * @return Repositories of this DependencyCollectorNode.
+     * @return repositories of this DependencyCollectorNode
      */
     List<ArtifactRepository> getRemoteRepositories();
 
