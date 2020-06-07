@@ -30,6 +30,7 @@ import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -43,6 +44,7 @@ class DefaultArtifactInstaller implements ArtifactInstaller, Contextualizable
 {
     private PlexusContainer container;
 
+    @Requirement
     private RepositoryManager repositoryManager;
 
     @Override
