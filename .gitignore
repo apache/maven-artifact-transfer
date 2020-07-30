@@ -16,3 +16,4 @@ out/
 .java-version
 dependency-reduced-pom.xml
 .checkstyle
+pom.xml.versionsBackup
