@@ -24,10 +24,8 @@ import static org.mockito.Mockito.mock;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
-import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
-import org.apache.maven.shared.transfer.artifact.resolve.internal.DefaultArtifactResolver;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +52,7 @@ public class DefaultArtifactResolverTest
 
     @Test
     public void resolveArtifactWithArtifactShouldFaileWithIAEWhenParameterBuildingRequestIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException
+        throws ArtifactResolverException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter buildingRequest is not allowed to be null." );
@@ -64,7 +62,7 @@ public class DefaultArtifactResolverTest
 
     @Test
     public void resolveArtifactWithArtifactShouldFaileWithIAEWhenArtifactIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException
+        throws ArtifactResolverException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter mavenArtifact is not allowed to be null." );
@@ -76,7 +74,7 @@ public class DefaultArtifactResolverTest
 
     @Test
     public void resolveArtifactWithCoordinateShouldFaileWithIAEWhenParameterBuildingRequestIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException
+        throws ArtifactResolverException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter buildingRequest is not allowed to be null." );
@@ -86,7 +84,7 @@ public class DefaultArtifactResolverTest
 
     @Test
     public void resolveArtifactWithCoordinateShouldFaileWithIAEWhenArtifactIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException
+        throws ArtifactResolverException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter coordinate is not allowed to be null." );

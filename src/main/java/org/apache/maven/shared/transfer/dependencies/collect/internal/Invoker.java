@@ -19,9 +19,9 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
  * under the License.
  */
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Invokes method on objects using reflection.

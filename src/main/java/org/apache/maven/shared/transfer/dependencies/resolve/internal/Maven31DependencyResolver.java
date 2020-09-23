@@ -222,8 +222,7 @@ class Maven31DependencyResolver implements MavenDependencyResolver
                 public Iterator<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> iterator()
                 {
                     // CHECKSTYLE_OFF: LineLength
-                    Collection<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> artResults =
-                            new ArrayList<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult>(
+                    Collection<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> artResults = new ArrayList<>(
                             dependencyResults.getArtifactResults().size() );
                     // CHECKSTYLE_ON: LineLength
 

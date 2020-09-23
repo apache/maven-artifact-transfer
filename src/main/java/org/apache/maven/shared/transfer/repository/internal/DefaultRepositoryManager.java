@@ -159,8 +159,8 @@ class DefaultRepositoryManager
             org.eclipse.aether.RepositorySystem m31RepositorySystem =
                             container.lookup( org.eclipse.aether.RepositorySystem.class );
 
-            org.eclipse.aether.RepositorySystemSession session =
-                (org.eclipse.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
 
             return new Maven31RepositoryManager( m31RepositorySystem, session );
         }
@@ -169,8 +169,8 @@ class DefaultRepositoryManager
             org.sonatype.aether.RepositorySystem m30RepositorySystem =
                 container.lookup( org.sonatype.aether.RepositorySystem.class );
 
-            org.sonatype.aether.RepositorySystemSession session =
-                (org.sonatype.aether.RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
+                    "getRepositorySession" );
             
             if ( isMaven302() )
             {

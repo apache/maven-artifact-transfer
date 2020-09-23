@@ -83,7 +83,7 @@ class DefaultProjectInstaller
 
         ProjectArtifactMetadata metadata;
 
-        Collection<File> metadataFiles = new LinkedHashSet<File>();
+        Collection<File> metadataFiles = new LinkedHashSet<>();
 
         if ( isPomArtifact )
         {
@@ -108,7 +108,7 @@ class DefaultProjectInstaller
             // but not package). We are designing in a proper solution for Maven 2.1
             if ( file != null && file.isFile() )
             {
-                installer.install( buildingRequest, Collections.<Artifact>singletonList( artifact ) );
+                installer.install( buildingRequest, Collections.singletonList( artifact ) );
                 addMetaDataFilesForArtifact( buildingRequest, artifact, metadataFiles );
             }
             else if ( !attachedArtifacts.isEmpty() )

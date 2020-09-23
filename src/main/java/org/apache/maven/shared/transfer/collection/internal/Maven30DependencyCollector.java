@@ -116,7 +116,7 @@ class Maven30DependencyCollector
             .invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
                                                ArtifactHandlerManager.class, artifactHandlerManager );
 
-        List<Dependency> aetherDependencies = new ArrayList<Dependency>( root.getDependencies().size() );
+        List<Dependency> aetherDependencies = new ArrayList<>( root.getDependencies().size() );
         for ( org.apache.maven.model.Dependency mavenDependency : root.getDependencies() )
         {
             aetherDependencies.add( toDependency( mavenDependency, typeRegistry ) );
@@ -125,8 +125,8 @@ class Maven30DependencyCollector
 
         if ( root.getDependencyManagement() != null )
         {
-            List<Dependency> aetherManagerDependencies =
-                new ArrayList<Dependency>( root.getDependencyManagement().getDependencies().size() );
+            List<Dependency> aetherManagerDependencies = new ArrayList<>(
+                    root.getDependencyManagement().getDependencies().size() );
 
             for ( org.apache.maven.model.Dependency mavenDependency : root.getDependencyManagement().getDependencies() )
             {

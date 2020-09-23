@@ -91,7 +91,7 @@ class DefaultProjectDeployer
 
         int retryFailedDeploymentCount = projectDeployerRequest.getRetryFailedDeploymentCount();
 
-        List<Artifact> deployableArtifacts = new ArrayList<Artifact>();
+        List<Artifact> deployableArtifacts = new ArrayList<>();
         if ( isPomArtifact )
         {
             deployableArtifacts.add( artifact );
@@ -118,10 +118,7 @@ class DefaultProjectDeployer
             }
         }
 
-        for ( Artifact attached : attachedArtifacts )
-        {
-            deployableArtifacts.add( attached );
-        }
+        deployableArtifacts.addAll( attachedArtifacts );
 
         deploy( buildingRequest, deployableArtifacts, artifactRepository, retryFailedDeploymentCount );
     }

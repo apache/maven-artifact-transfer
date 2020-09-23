@@ -72,7 +72,7 @@ class Maven31DependencyCollector implements MavenDependencyCollector
 
         Object[] args = new Object[] {mavenDependency, typeRegistry};
 
-        return (Dependency) Invoker.invoke( RepositoryUtils.class, "toDependency", argClasses, args );
+        return Invoker.invoke( RepositoryUtils.class, "toDependency", argClasses, args );
     }
 
     @Override

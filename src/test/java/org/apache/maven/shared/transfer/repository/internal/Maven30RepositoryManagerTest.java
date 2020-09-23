@@ -44,7 +44,7 @@ public class Maven30RepositoryManagerTest extends PlexusTestCase
         repositorySystem = lookup( RepositorySystem.class );
     }
     
-    public void testSetLocalRepositoryBasedirSimple() throws Exception
+    public void testSetLocalRepositoryBasedirSimple()
     {
         DefaultProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest();
         MavenRepositorySystemSession repositorySession = new MavenRepositorySystemSession();
@@ -62,7 +62,7 @@ public class Maven30RepositoryManagerTest extends PlexusTestCase
         
     }
 
-    public void testSetLocalRepositoryBasedirEnhanced() throws Exception
+    public void testSetLocalRepositoryBasedirEnhanced()
     {
         DefaultProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest();
         MavenRepositorySystemSession repositorySession = new MavenRepositorySystemSession();

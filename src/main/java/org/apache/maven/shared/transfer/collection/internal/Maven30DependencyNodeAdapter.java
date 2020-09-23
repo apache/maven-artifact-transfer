@@ -71,7 +71,7 @@ class Maven30DependencyNodeAdapter implements DependencyNode
     public List<ArtifactRepository> getRemoteRepositories()
     {
         List<RemoteRepository> aetherRepositories = dependencyNode.getRepositories();
-        List<ArtifactRepository> mavenRepositories = new ArrayList<ArtifactRepository>( aetherRepositories.size() );
+        List<ArtifactRepository> mavenRepositories = new ArrayList<>( aetherRepositories.size() );
 
         for ( RemoteRepository aetherRepository : aetherRepositories )
         {

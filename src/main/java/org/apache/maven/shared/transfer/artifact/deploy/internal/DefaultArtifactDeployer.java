@@ -95,15 +95,10 @@ class DefaultArtifactDeployer implements ArtifactDeployer, Contextualizable
      */
     private boolean isMaven31()
     {
-        return canFindCoreClass( "org.eclipse.aether.artifact.Artifact" ); // Maven 3.1 specific
-    }
-
-    private boolean canFindCoreClass( String className )
-    {
         try
         {
-            Thread.currentThread().getContextClassLoader().loadClass( className );
-
+            // Maven 3.1 specific
+            Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
             return true;
         }
         catch ( ClassNotFoundException e )

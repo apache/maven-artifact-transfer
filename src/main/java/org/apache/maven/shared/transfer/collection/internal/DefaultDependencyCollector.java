@@ -133,22 +133,17 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
    */
   private boolean isMaven31()
   {
-    return canFindCoreClass( "org.eclipse.aether.artifact.Artifact" ); // Maven 3.1 specific
+      try
+      {
+          // Maven 3.1 specific
+          Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
+          return true;
+      }
+      catch ( ClassNotFoundException e )
+      {
+          return false;
+      }
   }
-
-    private boolean canFindCoreClass( String className )
-    {
-        try
-        {
-            Thread.currentThread().getContextClassLoader().loadClass( className );
-
-            return true;
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return false;
-        }
-    }
 
     /**
      * Injects the Plexus content.

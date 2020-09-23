@@ -194,7 +194,7 @@ public final class CollectRequest
         {
             if ( this.dependencies.isEmpty() )
             {
-                this.dependencies = new ArrayList<Dependency>();
+                this.dependencies = new ArrayList<>();
             }
             this.dependencies.add( dependency );
         }
@@ -243,7 +243,7 @@ public final class CollectRequest
         {
             if ( this.managedDependencies.isEmpty() )
             {
-                this.managedDependencies = new ArrayList<Dependency>();
+                this.managedDependencies = new ArrayList<>();
             }
             this.managedDependencies.add( managedDependency );
         }
@@ -291,7 +291,7 @@ public final class CollectRequest
         {
             if ( this.repositories.isEmpty() )
             {
-                this.repositories = new ArrayList<ArtifactRepository>();
+                this.repositories = new ArrayList<>();
             }
             this.repositories.add( repository );
         }

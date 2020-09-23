@@ -52,7 +52,7 @@ class Maven30CollectorResult implements CollectorResult
     @Override
     public List<ArtifactRepository> getRemoteRepositories()
     {
-        final Set<RemoteRepository> aetherRepositories = new HashSet<RemoteRepository>();
+        final Set<RemoteRepository> aetherRepositories = new HashSet<>();
         
         DependencyVisitor visitor = new DependencyVisitor()
         {
@@ -72,7 +72,7 @@ class Maven30CollectorResult implements CollectorResult
         
         collectResult.getRoot().accept( visitor );
         
-        List<ArtifactRepository> mavenRepositories = new ArrayList<ArtifactRepository>( aetherRepositories.size() );
+        List<ArtifactRepository> mavenRepositories = new ArrayList<>( aetherRepositories.size() );
         
         for ( RemoteRepository aetherRepository : aetherRepositories )
         {

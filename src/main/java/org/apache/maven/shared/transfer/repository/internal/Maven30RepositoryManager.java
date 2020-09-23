@@ -104,7 +104,7 @@ class Maven30RepositoryManager
         RepositorySystemSession session;
         try
         {
-            session = (RepositorySystemSession) Invoker.invoke( buildingRequest, "getRepositorySession" );
+            session = Invoker.invoke( buildingRequest, "getRepositorySession" );
         }
         catch ( RepositoryManagerException e )
         {

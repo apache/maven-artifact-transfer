@@ -50,7 +50,7 @@ public class DefaultDependencyCollectorTest
 
     @Test
     public void collectDependenciesWithDependableCoordinatShouldFailWithIAEWhenParameterBuildingRequestIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException, DependencyCollectorException
+        throws DependencyCollectorException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter buildingRequest is not allowed to be null." );
@@ -60,7 +60,7 @@ public class DefaultDependencyCollectorTest
 
     @Test
     public void collectDependenciesWithDependableCoordinatShouldFailWithIAEWhenParameterRootIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException, DependencyCollectorException
+        throws DependencyCollectorException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter root is not allowed to be null." );
@@ -71,7 +71,7 @@ public class DefaultDependencyCollectorTest
 
     @Test
     public void collectDependenciesWithDependencyShouldFailWithIAEWhenParameterBuildingRequestIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException, DependencyCollectorException
+        throws DependencyCollectorException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter buildingRequest is not allowed to be null." );
@@ -81,7 +81,7 @@ public class DefaultDependencyCollectorTest
 
     @Test
     public void collectDependenciesWithDependencyShouldFailWithIAEWhenParameterRootIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException, DependencyCollectorException
+        throws DependencyCollectorException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter root is not allowed to be null." );
@@ -92,7 +92,7 @@ public class DefaultDependencyCollectorTest
 
     @Test
     public void collectDependenciesWithModelShouldFailWithIAEWhenParameterBuildingRequestIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException, DependencyCollectorException
+        throws DependencyCollectorException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter buildingRequest is not allowed to be null." );
@@ -102,7 +102,7 @@ public class DefaultDependencyCollectorTest
 
     @Test
     public void collectDependenciesWithModelShouldFailWithIAEWhenParameterRootIsNull()
-        throws ArtifactDeployerException, ArtifactResolverException, DependencyCollectorException
+        throws DependencyCollectorException
     {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter root is not allowed to be null." );

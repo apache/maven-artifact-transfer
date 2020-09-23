@@ -71,7 +71,7 @@ class Maven30DependencyNodeAdapter implements DependencyNode
     public List<ArtifactRepository> getRemoteRepositories()
     {
         List<RemoteRepository> aetherRepositories = dependencyNode.getRepositories();
-        List<ArtifactRepository> mavenRepositories = new ArrayList<ArtifactRepository>( aetherRepositories.size() );
+        List<ArtifactRepository> mavenRepositories = new ArrayList<>( aetherRepositories.size() );
 
         for ( RemoteRepository aetherRepository : aetherRepositories )
         {
@@ -152,7 +152,7 @@ class Maven30DependencyNodeAdapter implements DependencyNode
     {
         try
         {
-            return (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
+            return Invoker.invoke( RepositoryUtils.class, "toArtifact",
                 org.sonatype.aether.artifact.Artifact.class, aetherArtifact );
         }
         catch ( DependencyCollectorException e )

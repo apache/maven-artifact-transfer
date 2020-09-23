@@ -22,7 +22,6 @@ package org.apache.maven.shared.transfer.collection.internal;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
-import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
 
 /**
  * Invokes method on objects using reflection.
@@ -72,7 +71,7 @@ final class Invoker
      * @param argClasses the classes of the argument, used to select the right static method
      * @param args the actual arguments to be passed
      * @return the result of the method invocation
-     * @throws DependencyCollectorException if any checked exception occurs
+     * @throws DependencyCollectionException if any checked exception occurs
      */
     public static <T> T invoke( Class<?> objectClazz, String staticMethod, Class<?>[] argClasses, Object[] args )
                     throws DependencyCollectionException
