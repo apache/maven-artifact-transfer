@@ -20,4 +20,4 @@
 // Currently we can only build with JDK8+ based on the usage
 // of takari-plugin-integration-testing within integration
 // tests.
-asfMavenTlpStdBuild( 'jdks' : ["8", "9", "10", "11", "14", "15" ] )
+asfMavenTlpStdBuild( 'jdks' : [ "8", "11", "15" ] )
