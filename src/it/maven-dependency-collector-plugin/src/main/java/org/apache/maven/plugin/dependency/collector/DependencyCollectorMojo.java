@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.artifact.installer;
+package org.apache.maven.plugin.dependency.collector;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,7 +19,16 @@ package org.apache.maven.plugin.artifact.installer;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -28,15 +37,25 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.model.Model;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.collection.DependencyCollector;
-import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.apache.maven.shared.dependency.graph.traversal.SerializingDependencyNodeVisitor;
+import org.apache.maven.shared.transfer.dependencies.collect.CollectorResult;
+import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector;
+import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
+import org.apache.maven.shared.transfer.project.NoFileAssignedException;
+import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
+import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
+import org.apache.maven.shared.transfer.project.install.ProjectInstaller;
 
 /**
- * This mojo is implemented to test the DependencyCollector part of the maven-artifact-transfer shared component.
+ * This mojo is implemented to test the {@link DependencyCollector} part of the maven-artifact-transfer shared component.
+ *
+ * @author Gabriel Belingueres
  */
-@Mojo( name = "dependency-collector", defaultPhase = LifecyclePhase.VERIFY, threadSafe = true )
+@Mojo( name = "dependency-collector", defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true )
 public class DependencyCollectorMojo
     extends AbstractMojo
 {
@@ -50,27 +69,41 @@ public class DependencyCollectorMojo
     @Parameter( defaultValue = "${session}", required = true, readonly = true )
     protected MavenSession session;
 
+    @Parameter( defaultValue = "${project}", required = true, readonly = true )
+    protected MavenProject project;
+
     @Component
-    private DependencyCollector collector;
+    private DependencyCollector dependencyCollector;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
         getLog().info( "Hello from dependency-collector plugin" );
-        collectDependencies( session.getProjectBuildingRequest(), session.getCurrentProject().getModel() );
+
+        ProjectBuildingRequest buildingRequest =
+            new DefaultProjectBuildingRequest( session.getProjectBuildingRequest() );
+        buildingRequest.setProject( project );
+
+        collectDependencies( buildingRequest );
         getLog().info( "Bye bye from dependency-collector plugin" );
     }
 
-    private void collectDependencies( ProjectBuildingRequest projectBuildingRequest, Model model )
-        throws MojoFailureException, MojoExecutionException
+    private void collectDependencies( ProjectBuildingRequest buildingRequest ) throws MojoExecutionException
     {
         try
         {
-            collector.collectDependencies( projectBuildingRequest, model );
+            CollectorResult result = dependencyCollector.collectDependenciesGraph( buildingRequest, project.getModel() );
+            DependencyNode root = result.getDependencyGraphRoot();
+
+            StringWriter writer = new StringWriter();
+            SerializingDependencyNodeVisitor visitor = new SerializingDependencyNodeVisitor( writer );
+            root.accept( visitor );
+
+            getLog().info( writer.toString() );
         }
-        catch ( DependencyCollectionException e )
+        catch ( DependencyCollectorException e )
         {
-            throw new MojoExecutionException( "DependencyCollectionException", e );
+            throw new MojoExecutionException( "DependencyCollectorException", e );
         }
     }
 

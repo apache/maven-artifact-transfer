@@ -41,4 +41,13 @@ interface MavenDependencyCollector
     CollectorResult collectDependencies( Model root )
         throws DependencyCollectorException;
 
+    CollectorResult collectDependenciesGraph( Dependency root )
+        throws DependencyCollectorException;
+
+    CollectorResult collectDependenciesGraph( DependableCoordinate root )
+        throws DependencyCollectorException;
+
+    CollectorResult collectDependenciesGraph( Model root )
+        throws DependencyCollectorException;
+
 }

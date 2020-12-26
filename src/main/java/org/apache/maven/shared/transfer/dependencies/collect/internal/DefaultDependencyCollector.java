@@ -74,6 +74,30 @@ class DefaultDependencyCollector implements DependencyCollector
         return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
     }
 
+    @Override
+    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, Model root )
+            throws DependencyCollectorException
+    {
+        validateBuildingRequest( buildingRequest );
+        return getMavenDependencyCollector( buildingRequest ).collectDependenciesGraph( root );
+    }
+
+    @Override
+    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
+            throws DependencyCollectorException
+    {
+        validateBuildingRequest( buildingRequest );
+        return getMavenDependencyCollector( buildingRequest ).collectDependenciesGraph( root );
+    }
+
+    @Override
+    public CollectorResult collectDependenciesGraph( ProjectBuildingRequest buildingRequest, Dependency root )
+            throws DependencyCollectorException
+    {
+        validateBuildingRequest( buildingRequest );
+        return getMavenDependencyCollector( buildingRequest ).collectDependenciesGraph( root );
+    }
+
     private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
     {
         validateBuildingRequest( buildingRequest );

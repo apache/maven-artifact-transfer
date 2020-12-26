@@ -22,6 +22,7 @@ package org.apache.maven.shared.transfer.dependencies.collect;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 
 /**
  * 
@@ -34,4 +35,9 @@ public interface CollectorResult
      * @return List of {@link ArtifactRepository}
      */
     List<ArtifactRepository> getRemoteRepositories();
+
+    /***
+     * @return the root of the dependency graph
+     */
+    DependencyNode getDependencyGraphRoot();
 }
