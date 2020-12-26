@@ -19,6 +19,7 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
  * under the License.
  */
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -41,6 +42,7 @@ class Maven31ArtifactRepositoryAdapter implements ArtifactRepository
 {
     
     private RemoteRepository remoteRepository;
+    private List<ArtifactRepository> mirroredRepositories = Collections.emptyList();
 
     /**
      * @param remoteRepository {@link RemoteRepository}
@@ -204,6 +206,33 @@ class Maven31ArtifactRepositoryAdapter implements ArtifactRepository
     public Proxy getProxy()
     {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @return the repositories mirrored by the actual one
+     * @since 3.0.3
+     */
+    @Override
+    public List<ArtifactRepository> getMirroredRepositories()
+    {
+        return mirroredRepositories;
+    }
+
+    /**
+     * @param mirroredRepositories the repositories that the actual one mirrors
+     * @since 3.0.3
+     */
+    @Override
+    public void setMirroredRepositories( List<ArtifactRepository> mirroredRepositories )
+    {
+        if ( mirroredRepositories != null )
+        {
+            this.mirroredRepositories = mirroredRepositories;
+        }
+        else
+        {
+            this.mirroredRepositories = Collections.emptyList();
+        }
     }
 
     @Override

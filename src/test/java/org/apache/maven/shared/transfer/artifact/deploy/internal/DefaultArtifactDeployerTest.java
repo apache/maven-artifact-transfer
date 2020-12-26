@@ -19,19 +19,18 @@ package org.apache.maven.shared.transfer.artifact.deploy.internal;
  * under the License.
  */
 
-import static org.mockito.Mockito.mock;
-
-import java.util.Collections;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
-import org.apache.maven.shared.transfer.artifact.deploy.internal.DefaultArtifactDeployer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.Collections;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Check the parameter contracts which have been made based on the interface {@link ArtifactDeployer}.

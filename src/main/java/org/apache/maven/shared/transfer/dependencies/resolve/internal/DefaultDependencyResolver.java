@@ -39,6 +39,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  *
@@ -97,23 +100,6 @@ class DefaultDependencyResolver implements DependencyResolver, Contextualizable
     }
 
     /**
-     * @return true if the current Maven version is Maven 3.1.
-     */
-    private boolean isMaven31()
-    {
-        try
-        {
-            // Maven 3.1 specific
-            Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
-            return true;
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return false;
-        }
-    }
-
-    /**
      * Injects the Plexus content.
      *
      * @param context Plexus context to inject.
@@ -148,35 +134,15 @@ class DefaultDependencyResolver implements DependencyResolver, Contextualizable
     {
         ArtifactHandlerManager artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
 
-        if ( isMaven31() )
-        {
-            org.eclipse.aether.RepositorySystem m31RepositorySystem = container.lookup(
-                    org.eclipse.aether.RepositorySystem.class );
+        RepositorySystem m31RepositorySystem = container.lookup( RepositorySystem.class );
 
-            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
+        RepositorySystemSession session = Invoker.invoke( buildingRequest, "getRepositorySession" );
 
-            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
-                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
+        List<RemoteRepository> aetherRepositories = Invoker.invoke(
+                RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
 
-            return new Maven31DependencyResolver( m31RepositorySystem, artifactHandlerManager, session,
-                    aetherRepositories );
-        }
-        else
-        {
-            org.sonatype.aether.RepositorySystem m30RepositorySystem = container.lookup(
-                    org.sonatype.aether.RepositorySystem.class );
-
-            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
-                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-            return new Maven30DependencyResolver( m30RepositorySystem, artifactHandlerManager, session,
-                    aetherRepositories );
-
-        }
+        return new Maven31DependencyResolver( m31RepositorySystem, artifactHandlerManager, session,
+                aetherRepositories );
     }
 
     private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )

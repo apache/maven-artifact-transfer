@@ -29,7 +29,7 @@
 ${project.name}
 
   The Maven Artifact Transfer Component is a library
-  to install, deploy and resolve artifacts in Maven 3.
+  to install, deploy and resolve artifacts in Maven 3.1+
   
   The {{{./comparison.html} comparison shows}} the differences between
   a dependency, an artifact, and a Maven project.

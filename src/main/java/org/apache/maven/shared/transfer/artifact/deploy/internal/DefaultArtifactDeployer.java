@@ -33,6 +33,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  *
@@ -91,23 +93,6 @@ class DefaultArtifactDeployer implements ArtifactDeployer, Contextualizable
     }
 
     /**
-     * @return true if the current Maven version is Maven 3.1.
-     */
-    private boolean isMaven31()
-    {
-        try
-        {
-            // Maven 3.1 specific
-            Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
-            return true;
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return false;
-        }
-    }
-
-    /**
      * Injects the Plexus content.
      *
      * @param context Plexus context to inject.
@@ -121,25 +106,10 @@ class DefaultArtifactDeployer implements ArtifactDeployer, Contextualizable
     private MavenArtifactDeployer getMavenArtifactDeployer( ProjectBuildingRequest buildingRequest )
             throws ComponentLookupException, ArtifactDeployerException
     {
-        if ( isMaven31() )
-        {
-            org.eclipse.aether.RepositorySystem repositorySystem = container.lookup(
-                    org.eclipse.aether.RepositorySystem.class );
+        RepositorySystem repositorySystem = container.lookup( RepositorySystem.class );
 
-            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
+        RepositorySystemSession session = Invoker.invoke( buildingRequest, "getRepositorySession" );
 
-            return new Maven31ArtifactDeployer( repositorySystem, session );
-        }
-        else
-        {
-            org.sonatype.aether.RepositorySystem repositorySystem = container.lookup(
-                    org.sonatype.aether.RepositorySystem.class );
-
-            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            return new Maven30ArtifactDeployer( repositorySystem, session );
-        }
+        return new Maven31ArtifactDeployer( repositorySystem, session );
     }
 }

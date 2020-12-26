@@ -172,10 +172,7 @@ class Maven31RepositoryManager
             return null;
         }
 
-        Artifact result =
-            new DefaultArtifact( coordinate.getGroupId(), coordinate.getArtifactId(), coordinate.getClassifier(),
-                                 coordinate.getExtension(), coordinate.getVersion() );
-
-        return result;
+        return new DefaultArtifact( coordinate.getGroupId(), coordinate.getArtifactId(), coordinate.getClassifier(),
+                             coordinate.getExtension(), coordinate.getVersion() );
     }
 }

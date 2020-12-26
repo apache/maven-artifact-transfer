@@ -36,6 +36,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * 
@@ -120,68 +122,15 @@ class DefaultRepositoryManager
             throw new IllegalStateException( e.getMessage(), e );
         }
     }
-
-    /**
-     * @return true if the current Maven version is Maven 3.1.
-     */
-    private boolean isMaven31()
-    {
-        return canFindCoreClass( "org.eclipse.aether.artifact.Artifact" ); // Maven 3.1 specific
-    }
-
-    /**
-     * @return true if the current Maven version is Maven 3.0.2
-     */
-    private boolean isMaven302()
-    {
-        return canFindCoreClass( "org.sonatype.aether.spi.localrepo.LocalRepositoryManagerFactory" );
-    }
-
-    private boolean canFindCoreClass( String className )
-    {
-        try
-        {
-            Thread.currentThread().getContextClassLoader().loadClass( className );
-
-            return true;
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return false;
-        }
-    }
     
     private MavenRepositoryManager getMavenRepositoryManager( ProjectBuildingRequest buildingRequest )
         throws ComponentLookupException, RepositoryManagerException
     {
-        if ( isMaven31() )
-        {
-            org.eclipse.aether.RepositorySystem m31RepositorySystem =
-                            container.lookup( org.eclipse.aether.RepositorySystem.class );
+        RepositorySystem m31RepositorySystem = container.lookup( RepositorySystem.class );
 
-            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
+        RepositorySystemSession session = Invoker.invoke( buildingRequest, "getRepositorySession" );
 
-            return new Maven31RepositoryManager( m31RepositorySystem, session );
-        }
-        else
-        {
-            org.sonatype.aether.RepositorySystem m30RepositorySystem =
-                container.lookup( org.sonatype.aether.RepositorySystem.class );
-
-            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-            
-            if ( isMaven302() )
-            {
-                return new Maven302RepositoryManager( m30RepositorySystem, session );
-                
-            }
-            else
-            {
-                return new Maven30RepositoryManager( m30RepositorySystem, session );
-            }
-        }
+        return new Maven31RepositoryManager( m31RepositorySystem, session );
     }
     
     public void contextualize( Context context ) throws ContextException
