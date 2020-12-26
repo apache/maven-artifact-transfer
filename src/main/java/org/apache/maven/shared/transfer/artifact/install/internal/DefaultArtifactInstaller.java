@@ -19,49 +19,36 @@ package org.apache.maven.shared.transfer.artifact.install.internal;
  * under the License.
  */
 
-import java.io.File;
-import java.util.Collection;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
+
+import java.io.File;
+import java.util.Collection;
 
 /**
  *
  */
 @Component( role = ArtifactInstaller.class )
-class DefaultArtifactInstaller implements ArtifactInstaller, Contextualizable
+class DefaultArtifactInstaller implements ArtifactInstaller
 {
-    private PlexusContainer container;
-
     @Requirement
     private RepositoryManager repositoryManager;
+
+    @Requirement
+    private RepositorySystem repositorySystem;
 
     @Override
     public void install( ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts )
             throws ArtifactInstallerException, IllegalArgumentException
     {
         validateParameters( request, mavenArtifacts );
-        try
-        {
-            getMavenArtifactInstaller( request ).install( mavenArtifacts );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ArtifactInstallerException( e.getMessage(), e );
-        }
+        getMavenArtifactInstaller( request ).install( mavenArtifacts );
     }
 
     @Override
@@ -83,14 +70,7 @@ class DefaultArtifactInstaller implements ArtifactInstaller, Contextualizable
         // update local repo in request 
         ProjectBuildingRequest newRequest = repositoryManager.setLocalRepositoryBasedir( request, localRepositry );
 
-        try
-        {
-            getMavenArtifactInstaller( newRequest ).install( mavenArtifacts );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ArtifactInstallerException( e.getMessage(), e );
-        }
+        getMavenArtifactInstaller( newRequest ).install( mavenArtifacts );
     }
 
     private void validateParameters( ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts )
@@ -109,24 +89,8 @@ class DefaultArtifactInstaller implements ArtifactInstaller, Contextualizable
         }
     }
 
-    /**
-     * Injects the Plexus content.
-     *
-     * @param context Plexus context to inject.
-     * @throws ContextException if the PlexusContainer could not be located.
-     */
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
     private MavenArtifactInstaller getMavenArtifactInstaller( ProjectBuildingRequest buildingRequest )
-            throws ComponentLookupException, ArtifactInstallerException
     {
-        RepositorySystem repositorySystem = container.lookup( RepositorySystem.class );
-
-        RepositorySystemSession session = Invoker.invoke( buildingRequest, "getRepositorySession" );
-
-        return new Maven31ArtifactInstaller( repositorySystem, session );
+        return new Maven31ArtifactInstaller( repositorySystem, buildingRequest.getRepositorySession() );
     }
 }

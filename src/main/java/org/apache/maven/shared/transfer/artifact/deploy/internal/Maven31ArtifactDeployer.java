@@ -41,7 +41,6 @@ import org.eclipse.aether.util.artifact.SubArtifact;
  */
 class Maven31ArtifactDeployer implements MavenArtifactDeployer
 {
-
     private final RepositorySystem repositorySystem;
 
     private final RepositorySystemSession session;
@@ -76,8 +75,7 @@ class Maven31ArtifactDeployer implements MavenArtifactDeployer
         // transform artifacts
         for ( org.apache.maven.artifact.Artifact mavenArtifact : mavenArtifacts )
         {
-            Artifact aetherArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                    org.apache.maven.artifact.Artifact.class, mavenArtifact );
+            Artifact aetherArtifact = RepositoryUtils.toArtifact( mavenArtifact );
             request.addArtifact( aetherArtifact );
 
             RemoteRepository aetherRepository;
@@ -129,8 +127,7 @@ class Maven31ArtifactDeployer implements MavenArtifactDeployer
     private RemoteRepository getRemoteRepository( RepositorySystemSession session, ArtifactRepository remoteRepository )
             throws ArtifactDeployerException
     {
-        RemoteRepository aetherRepo = Invoker.invoke( RepositoryUtils.class, "toRepo", ArtifactRepository.class,
-                remoteRepository );
+        RemoteRepository aetherRepo = RepositoryUtils.toRepo( remoteRepository );
 
         if ( aetherRepo.getAuthentication() == null || aetherRepo.getProxy() == null )
         {

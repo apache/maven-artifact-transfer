@@ -19,16 +19,17 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
 import org.apache.maven.shared.transfer.graph.DependencyNode;
 import org.apache.maven.shared.transfer.graph.DependencyVisitor;
 import org.eclipse.aether.repository.RemoteRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import static org.apache.maven.RepositoryUtils.toArtifact;
 
 /**
  * DependencyCollectorNode wrapper around {@link org.eclipse.aether.graph.DependencyNode}
@@ -52,7 +53,7 @@ class Maven31DependencyNodeAdapter implements DependencyNode
     @Override
     public Artifact getArtifact()
     {
-        return getArtifact( dependencyNode.getArtifact() );
+        return toArtifact( dependencyNode.getArtifact() );
     }
 
     @Override
@@ -134,30 +135,6 @@ class Maven31DependencyNodeAdapter implements DependencyNode
         }
 
         Maven31DependencyNodeAdapter other = (Maven31DependencyNodeAdapter) obj;
-        if ( dependencyNode == null )
-        {
-            if ( other.dependencyNode != null )
-            {
-                return false;
-            }
-        }
-        else if ( !dependencyNode.equals( other.dependencyNode ) )
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private Artifact getArtifact( org.eclipse.aether.artifact.Artifact aetherArtifact )
-    {
-        try
-        {
-            return Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                org.eclipse.aether.artifact.Artifact.class, aetherArtifact );
-        }
-        catch ( DependencyCollectorException e )
-        {
-            throw new RuntimeException( e );
-        }
+        return Objects.equals( dependencyNode, other.dependencyNode );
     }
 }

@@ -39,6 +39,8 @@ import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
 
+import static org.apache.maven.RepositoryUtils.toDependency;
+
 /**
  * Maven 3.1+ implementation of the {@link DependencyCollector}
  * 
@@ -70,13 +72,8 @@ class Maven31DependencyCollector
     public CollectResult collectDependencies( org.apache.maven.model.Dependency root )
         throws DependencyCollectionException
     {
-        ArtifactTypeRegistry typeRegistry = Invoker
-            .invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
-                                               ArtifactHandlerManager.class, artifactHandlerManager );
-
         CollectRequest request = new CollectRequest();
-        request.setRoot( toDependency( root, typeRegistry ) );
-
+        request.setRoot( toDependency( root, RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) ) );
         return collectDependencies( request );
     }
 
@@ -112,9 +109,7 @@ class Maven31DependencyCollector
         CollectRequest request = new CollectRequest();
         request.setRoot( new Dependency( aetherArtifact, null ) );
 
-        ArtifactTypeRegistry typeRegistry = Invoker
-            .invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
-                                               ArtifactHandlerManager.class, artifactHandlerManager );
+        ArtifactTypeRegistry typeRegistry = RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager );
 
         List<Dependency> aetherDependencies = new ArrayList<>( root.getDependencies().size() );
         for ( org.apache.maven.model.Dependency mavenDependency : root.getDependencies() )
@@ -153,16 +148,4 @@ class Maven31DependencyCollector
             throw new DependencyCollectionException( e.getMessage(), e );
         }
     }
-
-    private static Dependency toDependency( org.apache.maven.model.Dependency root, ArtifactTypeRegistry typeRegistry )
-                    throws DependencyCollectionException
-    {
-        Class<?>[] argClasses = new Class<?>[] { org.apache.maven.model.Dependency.class, ArtifactTypeRegistry.class };
-
-        Object[] args = new Object[] { root, typeRegistry };
-
-        return Invoker
-            .invoke( RepositoryUtils.class, "toDependency", argClasses, args );
-    }
-
 }

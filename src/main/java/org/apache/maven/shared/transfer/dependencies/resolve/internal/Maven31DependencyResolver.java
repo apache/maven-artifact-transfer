@@ -93,22 +93,11 @@ class Maven31DependencyResolver implements MavenDependencyResolver
         return new Dependency( artifact, null );
     }
 
-    private static Dependency toDependency( org.apache.maven.model.Dependency root, ArtifactTypeRegistry typeRegistry )
-            throws DependencyResolverException
-    {
-        Object[] args = new Object[] {root, typeRegistry};
-
-        return Invoker.invoke( RepositoryUtils.class, "toDependency", ARG_CLASSES, args );
-    }
-
     @Override
-    // CHECKSTYLE_OFF: LineLength
     public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies(
-            DependableCoordinate coordinate, TransformableFilter dependencyFilter )
-        // CHECKSTYLE_ON: LineLength
-            throws DependencyResolverException
+            DependableCoordinate coordinate, TransformableFilter dependencyFilter ) throws DependencyResolverException
     {
-        ArtifactTypeRegistry typeRegistry = createTypeRegistry();
+        ArtifactTypeRegistry typeRegistry = RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager );
 
         Dependency aetherRoot = toDependency( coordinate, typeRegistry );
 
@@ -117,18 +106,9 @@ class Maven31DependencyResolver implements MavenDependencyResolver
         return resolveDependencies( dependencyFilter, request );
     }
 
-    private ArtifactTypeRegistry createTypeRegistry() throws DependencyResolverException
-    {
-        return Invoker.invoke( RepositoryUtils.class, "newArtifactTypeRegistry", ArtifactHandlerManager.class,
-                artifactHandlerManager );
-    }
-
     @Override
-    // CHECKSTYLE_OFF: LineLength
     public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( Model model,
-            TransformableFilter dependencyFilter )
-        // CHECKSTYLE_ON: LineLength
-            throws DependencyResolverException
+            TransformableFilter dependencyFilter ) throws DependencyResolverException
     {
         // Are there examples where packaging and type are NOT in sync
         ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( model.getPackaging() );
@@ -156,36 +136,30 @@ class Maven31DependencyResolver implements MavenDependencyResolver
     /**
      * @param mavenDependencies {@link org.apache.maven.model.Dependency} can be {@code null}.
      * @return List of resolved dependencies.
-     * @throws DependencyResolverException in case of a failure of the typeRegistry error.
      */
-    // CHECKSTYLE_OFF: LineLength
     private List<Dependency> resolveDependencies( Collection<org.apache.maven.model.Dependency> mavenDependencies )
-            throws DependencyResolverException
-    // CHECKSTYLE_ON: LineLength
     {
         if ( mavenDependencies == null )
         {
             return Collections.emptyList();
         }
 
-        ArtifactTypeRegistry typeRegistry = createTypeRegistry();
+        ArtifactTypeRegistry typeRegistry = RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager );
 
         List<Dependency> aetherDependencies = new ArrayList<>( mavenDependencies.size() );
 
         for ( org.apache.maven.model.Dependency mavenDependency : mavenDependencies )
         {
-            aetherDependencies.add( toDependency( mavenDependency, typeRegistry ) );
+            aetherDependencies.add( RepositoryUtils.toDependency( mavenDependency, typeRegistry ) );
         }
 
         return aetherDependencies;
     }
 
     @Override
-    // CHECKSTYLE_OFF: LineLength
     public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies(
             Collection<org.apache.maven.model.Dependency> mavenDependencies,
             Collection<org.apache.maven.model.Dependency> managedMavenDependencies, TransformableFilter filter )
-        // CHECKSTYLE_ON: LineLength
             throws DependencyResolverException
     {
 
@@ -198,10 +172,8 @@ class Maven31DependencyResolver implements MavenDependencyResolver
         return resolveDependencies( filter, request );
     }
 
-    // CHECKSTYLE_OFF: LineLength
     private Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies(
             TransformableFilter dependencyFilter, CollectRequest request ) throws DependencyResolverException
-    // CHECKSTYLE_ON: LineLength
     {
         try
         {

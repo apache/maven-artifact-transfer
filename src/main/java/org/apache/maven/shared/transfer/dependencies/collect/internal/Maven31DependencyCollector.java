@@ -19,9 +19,6 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -39,6 +36,11 @@ import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.apache.maven.RepositoryUtils.toDependency;
 
 /**
  * Maven 3.1+ implementation of the {@link DependencyCollector}
@@ -65,22 +67,11 @@ class Maven31DependencyCollector implements MavenDependencyCollector
         this.aetherRepositories = aetherRepositories;
     }
 
-    private static Dependency toDependency( org.apache.maven.model.Dependency mavenDependency,
-            ArtifactTypeRegistry typeRegistry ) throws DependencyCollectorException
-    {
-        Class<?>[] argClasses = new Class<?>[] {org.apache.maven.model.Dependency.class, ArtifactTypeRegistry.class};
-
-        Object[] args = new Object[] {mavenDependency, typeRegistry};
-
-        return Invoker.invoke( RepositoryUtils.class, "toDependency", argClasses, args );
-    }
-
     @Override
     public CollectorResult collectDependencies( org.apache.maven.model.Dependency root )
             throws DependencyCollectorException
     {
-        ArtifactTypeRegistry typeRegistry = Invoker.invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
-                ArtifactHandlerManager.class, artifactHandlerManager );
+        ArtifactTypeRegistry typeRegistry = RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager );
 
         CollectRequest request = new CollectRequest();
         request.setRoot( toDependency( root, typeRegistry ) );
@@ -118,8 +109,7 @@ class Maven31DependencyCollector implements MavenDependencyCollector
         CollectRequest request = new CollectRequest();
         request.setRoot( new Dependency( aetherArtifact, null ) );
 
-        ArtifactTypeRegistry typeRegistry = Invoker.invoke( RepositoryUtils.class, "newArtifactTypeRegistry",
-                ArtifactHandlerManager.class, artifactHandlerManager );
+        ArtifactTypeRegistry typeRegistry = RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager );
 
         List<Dependency> aetherDependencies = new ArrayList<>( root.getDependencies().size() );
         for ( org.apache.maven.model.Dependency mavenDependency : root.getDependencies() )

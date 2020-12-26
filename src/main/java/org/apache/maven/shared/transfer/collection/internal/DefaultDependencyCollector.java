@@ -19,9 +19,6 @@ package org.apache.maven.shared.transfer.collection.internal;
  * under the License.
  */
 
-import java.util.List;
-import java.util.Objects;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.Dependency;
@@ -31,16 +28,11 @@ import org.apache.maven.shared.transfer.collection.CollectResult;
 import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
 import org.apache.maven.shared.transfer.collection.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
+
+import java.util.Objects;
 
 /**
  * This DependencyCollector passes the request to the proper Maven 3.x implementation
@@ -48,9 +40,13 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @author Robert Scholte
  */
 @Component( role = DependencyCollector.class, hint = "default" )
-class DefaultDependencyCollector implements DependencyCollector, Contextualizable
+class DefaultDependencyCollector implements DependencyCollector
 {
-    private PlexusContainer container;
+    @Requirement
+    ArtifactHandlerManager artifactHandlerManager;
+
+    @Requirement
+    RepositorySystem repositorySystem;
 
     @Override
     public CollectResult collectDependencies( ProjectBuildingRequest buildingRequest, Dependency root )
@@ -58,14 +54,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
     {
         validateParameters( buildingRequest, root );
 
-        try
-        {
-            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyCollectionException( e.getMessage(), e );
-        }
+        return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
     }
 
     @Override
@@ -74,14 +63,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
     {
         validateParameters( buildingRequest, root );
 
-        try
-        {
-            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyCollectionException( e.getMessage(), e );
-        }
+        return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
     }
 
     @Override
@@ -90,14 +72,7 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
     {
         validateParameters( buildingRequest, root );
 
-        try
-        {
-            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyCollectionException( e.getMessage(), e );
-        }
+        return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
     }
 
   private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
@@ -131,31 +106,10 @@ class DefaultDependencyCollector implements DependencyCollector, Contextualizabl
     Objects.requireNonNull( root, "The parameter root is not allowed to be null." );
   }
 
-    /**
-     * Injects the Plexus content.
-     *
-     * @param context Plexus context to inject.
-     * @throws ContextException if the PlexusContainer could not be located.
-     */
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
     private MavenDependencyCollector getMavenDependencyCollector( ProjectBuildingRequest buildingRequest )
-            throws ComponentLookupException, DependencyCollectionException
     {
-        ArtifactHandlerManager artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
-
-        RepositorySystem m31RepositorySystem = container.lookup( RepositorySystem.class );
-
-        RepositorySystemSession session = Invoker.invoke( buildingRequest, "getRepositorySession" );
-
-        List<RemoteRepository> aetherRepositories = Invoker.invoke(
-                RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-        return new Maven31DependencyCollector( m31RepositorySystem, artifactHandlerManager, session,
-                aetherRepositories );
+        return new Maven31DependencyCollector( repositorySystem, artifactHandlerManager,
+                buildingRequest.getRepositorySession(),
+                RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ) );
     }
-
 }

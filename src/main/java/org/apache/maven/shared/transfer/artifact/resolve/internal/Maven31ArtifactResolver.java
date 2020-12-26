@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -56,20 +57,14 @@ class Maven31ArtifactResolver
     }
 
     @Override
-    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact(
+    public ArtifactResult resolveArtifact(
             org.apache.maven.artifact.Artifact mavenArtifact ) throws ArtifactResolverException
     {
-        Artifact aetherArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                org.apache.maven.artifact.Artifact.class, mavenArtifact );
-
-        return resolveArtifact( aetherArtifact );
+        return resolveArtifact( RepositoryUtils.toArtifact( mavenArtifact ) );
     }
 
     @Override
-    // CHECKSTYLE_OFF: LineLength
-    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( ArtifactCoordinate coordinate )
-                                                                                        throws ArtifactResolverException
-    // CHECKSTYLE_ON: LineLength
+    public ArtifactResult resolveArtifact( ArtifactCoordinate coordinate ) throws ArtifactResolverException
     {
         Artifact aetherArtifact =
             new DefaultArtifact( coordinate.getGroupId(), coordinate.getArtifactId(), coordinate.getClassifier(),
@@ -78,10 +73,7 @@ class Maven31ArtifactResolver
         return resolveArtifact( aetherArtifact );
     }
 
-    // CHECKSTYLE_OFF: LineLength
-    private org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( Artifact aetherArtifact )
-                                                                                         throws ArtifactResolverException
-    // CHECKSTYLE_ON: LineLength
+    private ArtifactResult resolveArtifact( Artifact aetherArtifact ) throws ArtifactResolverException
     {
         try
         {

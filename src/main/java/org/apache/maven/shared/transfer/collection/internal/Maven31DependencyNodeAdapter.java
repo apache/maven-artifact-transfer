@@ -19,16 +19,15 @@ package org.apache.maven.shared.transfer.collection.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
 import org.apache.maven.shared.transfer.graph.DependencyNode;
 import org.apache.maven.shared.transfer.graph.DependencyVisitor;
 import org.eclipse.aether.repository.RemoteRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DependencyCollectorNode wrapper around {@link org.eclipse.aether.graph.DependencyNode}
@@ -150,14 +149,6 @@ class Maven31DependencyNodeAdapter implements DependencyNode
 
     private Artifact getArtifact( org.eclipse.aether.artifact.Artifact aetherArtifact )
     {
-        try
-        {
-            return Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                org.eclipse.aether.artifact.Artifact.class, aetherArtifact );
-        }
-        catch ( DependencyCollectionException e )
-        {
-            throw new RuntimeException( e );
-        }
+        return RepositoryUtils.toArtifact( aetherArtifact );
     }
 }

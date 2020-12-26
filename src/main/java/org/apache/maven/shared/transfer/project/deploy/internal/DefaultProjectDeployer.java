@@ -19,11 +19,6 @@ package org.apache.maven.shared.transfer.project.deploy.internal;
  * under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -33,11 +28,15 @@ import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerExceptio
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
-import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This will deploy a whole project into the appropriate remote repository.
@@ -53,9 +52,6 @@ class DefaultProjectDeployer
 
     @Requirement
     private ArtifactDeployer deployer;
-
-    @Requirement
-    private RepositoryManager repositoryManager;
 
     /**
      * {@inheritDoc}

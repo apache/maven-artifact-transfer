@@ -19,8 +19,6 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -28,39 +26,25 @@ import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
-
 
 /**
  *
  */
 @Component( role = ArtifactResolver.class, hint = "default" )
-class DefaultArtifactResolver implements ArtifactResolver, Contextualizable
+class DefaultArtifactResolver implements ArtifactResolver
 {
-    private PlexusContainer container;
+    @Requirement
+    RepositorySystem repositorySystem;
 
     @Override
     public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest, Artifact mavenArtifact )
             throws ArtifactResolverException, IllegalArgumentException
     {
         validateParameters( buildingRequest, mavenArtifact );
-        try
-        {
-            return getMavenArtifactResolver( buildingRequest ).resolveArtifact( mavenArtifact );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ArtifactResolverException( e.getMessage(), e );
-        }
+        return getMavenArtifactResolver( buildingRequest ).resolveArtifact( mavenArtifact );
     }
 
     @Override
@@ -68,14 +52,7 @@ class DefaultArtifactResolver implements ArtifactResolver, Contextualizable
             throws ArtifactResolverException, IllegalArgumentException
     {
         validateParameters( buildingRequest, coordinate );
-        try
-        {
-            return getMavenArtifactResolver( buildingRequest ).resolveArtifact( coordinate );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ArtifactResolverException( e.getMessage(), e );
-        }
+        return getMavenArtifactResolver( buildingRequest ).resolveArtifact( coordinate );
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, Artifact mavenArtifact )
@@ -102,28 +79,10 @@ class DefaultArtifactResolver implements ArtifactResolver, Contextualizable
         }
     }
 
-    /**
-     * Injects the Plexus content.
-     *
-     * @param context Plexus context to inject.
-     * @throws ContextException if the PlexusContainer could not be located.
-     */
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
     private MavenArtifactResolver getMavenArtifactResolver( ProjectBuildingRequest buildingRequest )
-            throws ComponentLookupException, ArtifactResolverException
     {
-        RepositorySystem repositorySystem = container.lookup( RepositorySystem.class );
-
-        List<RemoteRepository> aetherRepositories = Invoker.invoke(
-                RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-        RepositorySystemSession session = Invoker.invoke( buildingRequest, "getRepositorySession" );
-
-        return new Maven31ArtifactResolver( repositorySystem, aetherRepositories, session );
-
+        return new Maven31ArtifactResolver( repositorySystem,
+                RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ),
+                buildingRequest.getRepositorySession() );
     }
 }
