@@ -19,42 +19,11 @@ package org.apache.maven.shared.transfer.artifact.deploy.internal;
  * under the License.
  */
 
-import java.util.Collection;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
+import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 
 /**
  * 
  */
-public interface ArtifactDeployerDelegate
+public interface ArtifactDeployerDelegate extends ArtifactDeployer
 {
-
-    /**
-     * @param request {@link ProjectBuildingRequest}
-     * @param mavenArtifacts {@link Artifact}
-     * @throws ArtifactDeployerException in case of an error.
-     * @throws IllegalArgumentException in case of parameter <code>request</code> is <code>null</code> or parameter
-     *             <code>mavenArtifacts</code> is <code>null</code> or <code>mavenArtifacts.isEmpty()</code> is
-     *             <code>true</code>.
-     */
-    void deploy(ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts)
-        throws ArtifactDeployerException;
-
-    /**
-     * @param request the building request
-     * @param remoteRepository the repository to deploy to. If {@code null} the {@code mavenArtifact.getRepository()} is
-     *            used.
-     * @param mavenArtifacts the artifacts to deploy
-     * @throws ArtifactDeployerException in case of an error.
-     * @throws IllegalArgumentException in case of parameter <code>request</code> is <code>null</code> or parameter
-     *             <code>mavenArtifacts</code> is <code>null</code> or <code>mavenArtifacts.isEmpty()</code> is
-     *             <code>true</code>.
-     */
-    void deploy(ProjectBuildingRequest request, ArtifactRepository remoteRepository,
-                Collection<Artifact> mavenArtifacts)
-        throws ArtifactDeployerException;
-
 }
