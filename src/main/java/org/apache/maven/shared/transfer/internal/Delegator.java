@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.dependencies.collect.internal;
+package org.apache.maven.shared.transfer.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +19,24 @@ package org.apache.maven.shared.transfer.dependencies.collect.internal;
  * under the License.
  */
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
-import org.apache.maven.shared.transfer.dependencies.collect.CollectorResult;
-import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
+import java.util.Map;
+import java.util.Objects;
 
 /**
- * 
- * @author Robert Scholte
+ * Delegating helper.
  */
-interface MavenDependencyCollector
+public abstract class Delegator<D>
+    extends ComponentSupport
 {
+    private final Map<String, D> delegates;
 
-    CollectorResult collectDependencies( Dependency root )
-        throws DependencyCollectorException;
+    protected Delegator( final Map<String, D> delegates )
+    {
+        this.delegates = Objects.requireNonNull( delegates );
+    }
 
-    CollectorResult collectDependencies( DependableCoordinate root )
-        throws DependencyCollectorException;
-
-    CollectorResult collectDependencies( Model root )
-        throws DependencyCollectorException;
-
+    protected D selectDelegate()
+    {
+        return delegates.get( Selector.selectedMaven() );
+    }
 }

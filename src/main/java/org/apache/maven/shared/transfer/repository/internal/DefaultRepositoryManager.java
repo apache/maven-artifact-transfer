@@ -20,172 +20,64 @@ package org.apache.maven.shared.transfer.repository.internal;
  */
 
 import java.io.File;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
-import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
+import org.apache.maven.shared.transfer.internal.Delegator;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.apache.maven.shared.transfer.repository.RepositoryManagerException;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
- * 
+ *
  */
-@Component( role = RepositoryManager.class )
+@Singleton
+@Named
 class DefaultRepositoryManager
-    implements RepositoryManager, Contextualizable 
+    extends Delegator<RepositoryManagerDelegate>
+    implements RepositoryManager
 {
-    private PlexusContainer container;
-    
-    @Override
-    public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest, Artifact artifact )
-    {
-        try
-        {
-            return getMavenRepositoryManager( buildingRequest ).getPathForLocalArtifact( artifact );
-        }
-        catch ( ComponentLookupException | RepositoryManagerException e )
-        {
-            throw new IllegalStateException( e.getMessage(), e );
-        }
-    }
+  private final RepositoryManagerDelegate delegate;
 
-    @Override
-    public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest, ArtifactCoordinate coor )
-    {
-        try
-        {
-            return getMavenRepositoryManager( buildingRequest ).getPathForLocalArtifact( coor );
-        }
-        catch ( ComponentLookupException | RepositoryManagerException e )
-        {
-            throw new IllegalStateException( e.getMessage(), e );
-        }
-    }
+  @Inject
+  public DefaultRepositoryManager(final Map<String, RepositoryManagerDelegate> delegates) {
+    super(delegates);
+    this.delegate = selectDelegate();
+  }
 
-    @Override
-    public String getPathForLocalMetadata( ProjectBuildingRequest buildingRequest, ArtifactMetadata metadata )
-    {
-        if ( metadata instanceof ProjectArtifactMetadata )
-        {
-            DefaultArtifactCoordinate pomCoordinate = new DefaultArtifactCoordinate();
-            pomCoordinate.setGroupId( metadata.getGroupId() );
-            pomCoordinate.setArtifactId( metadata.getArtifactId() );
-            pomCoordinate.setVersion( metadata.getBaseVersion() );
-            pomCoordinate.setExtension( "pom" );
-            return getPathForLocalArtifact( buildingRequest, pomCoordinate );
-        }
+  @Override
+  public String getPathForLocalArtifact(final ProjectBuildingRequest buildingRequest,
+                                        final Artifact artifact)
+  {
+    return delegate.getPathForLocalArtifact(buildingRequest, artifact);
+  }
 
-        try
-        {
-            return getMavenRepositoryManager( buildingRequest ).getPathForLocalMetadata( metadata );
-        }
-        catch ( ComponentLookupException | RepositoryManagerException e )
-        {
-            throw new IllegalStateException( e.getMessage(), e );
-        }
-    }
+  @Override
+  public String getPathForLocalArtifact(final ProjectBuildingRequest buildingRequest,
+                                        final ArtifactCoordinate coordinate)
+  {
+    return delegate.getPathForLocalArtifact(buildingRequest, coordinate);
+  }
 
-    @Override
-    public ProjectBuildingRequest setLocalRepositoryBasedir( ProjectBuildingRequest buildingRequest, File basedir )
-    {
-        try
-        {
-            return getMavenRepositoryManager( buildingRequest ).setLocalRepositoryBasedir( buildingRequest, basedir );
-        }
-        catch ( ComponentLookupException | RepositoryManagerException e )
-        {
-            throw new IllegalStateException( e.getMessage(), e );
-        }
-    }
+  @Override
+  public String getPathForLocalMetadata(final ProjectBuildingRequest buildingRequest,
+                                        final ArtifactMetadata metadata)
+  {
+    return delegate.getPathForLocalMetadata(buildingRequest, metadata);
+  }
 
-    @Override
-    public File getLocalRepositoryBasedir( ProjectBuildingRequest buildingRequest )
-    {
-        try
-        {
-            return getMavenRepositoryManager( buildingRequest ).getLocalRepositoryBasedir();
-        }
-        catch ( ComponentLookupException | RepositoryManagerException e )
-        {
-            throw new IllegalStateException( e.getMessage(), e );
-        }
-    }
+  @Override
+  public ProjectBuildingRequest setLocalRepositoryBasedir(final ProjectBuildingRequest request, final File basedir) {
+    return delegate.setLocalRepositoryBasedir(request, basedir);
+  }
 
-    /**
-     * @return true if the current Maven version is Maven 3.1.
-     */
-    private boolean isMaven31()
-    {
-        return canFindCoreClass( "org.eclipse.aether.artifact.Artifact" ); // Maven 3.1 specific
-    }
-
-    /**
-     * @return true if the current Maven version is Maven 3.0.2
-     */
-    private boolean isMaven302()
-    {
-        return canFindCoreClass( "org.sonatype.aether.spi.localrepo.LocalRepositoryManagerFactory" );
-    }
-
-    private boolean canFindCoreClass( String className )
-    {
-        try
-        {
-            Thread.currentThread().getContextClassLoader().loadClass( className );
-
-            return true;
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return false;
-        }
-    }
-    
-    private MavenRepositoryManager getMavenRepositoryManager( ProjectBuildingRequest buildingRequest )
-        throws ComponentLookupException, RepositoryManagerException
-    {
-        if ( isMaven31() )
-        {
-            org.eclipse.aether.RepositorySystem m31RepositorySystem =
-                            container.lookup( org.eclipse.aether.RepositorySystem.class );
-
-            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            return new Maven31RepositoryManager( m31RepositorySystem, session );
-        }
-        else
-        {
-            org.sonatype.aether.RepositorySystem m30RepositorySystem =
-                container.lookup( org.sonatype.aether.RepositorySystem.class );
-
-            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-            
-            if ( isMaven302() )
-            {
-                return new Maven302RepositoryManager( m30RepositorySystem, session );
-                
-            }
-            else
-            {
-                return new Maven30RepositoryManager( m30RepositorySystem, session );
-            }
-        }
-    }
-    
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
+  @Override
+  public File getLocalRepositoryBasedir(final ProjectBuildingRequest request) {
+    return delegate.getLocalRepositoryBasedir(request);
+  }
 }

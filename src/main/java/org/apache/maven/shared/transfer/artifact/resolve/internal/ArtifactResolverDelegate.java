@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.artifact.deploy.internal;
+package org.apache.maven.shared.transfer.artifact.resolve.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,24 +19,11 @@ package org.apache.maven.shared.transfer.artifact.deploy.internal;
  * under the License.
  */
 
-import java.util.Collection;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 
 /**
- * 
- * @author Robert Scholte
  *
  */
-interface MavenArtifactDeployer
+public interface ArtifactResolverDelegate extends ArtifactResolver
 {
-
-    void deploy( Collection<Artifact> mavenArtifacts )
-        throws ArtifactDeployerException;
-
-    void deploy( ArtifactRepository remoteRepository, Collection<Artifact> mavenArtifacts )
-        throws ArtifactDeployerException;
-
 }

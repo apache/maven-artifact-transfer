@@ -28,7 +28,6 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.apache.maven.shared.transfer.artifact.install.internal.Maven30ArtifactInstaller;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;

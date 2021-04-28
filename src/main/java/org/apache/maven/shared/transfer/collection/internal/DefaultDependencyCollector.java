@@ -19,11 +19,13 @@ package org.apache.maven.shared.transfer.collection.internal;
  * under the License.
  */
 
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -31,165 +33,80 @@ import org.apache.maven.shared.transfer.collection.CollectResult;
 import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
 import org.apache.maven.shared.transfer.collection.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.apache.maven.shared.transfer.internal.Delegator;
 
 /**
  * This DependencyCollector passes the request to the proper Maven 3.x implementation
  *
  * @author Robert Scholte
  */
-@Component( role = DependencyCollector.class, hint = "default" )
-class DefaultDependencyCollector implements DependencyCollector, Contextualizable
+@Singleton
+@Named
+class DefaultDependencyCollector
+    extends Delegator<DependencyCollectorDelegate>
+    implements DependencyCollector
 {
-    private PlexusContainer container;
+    private final DependencyCollectorDelegate delegate;
 
-    @Override
-    public CollectResult collectDependencies( ProjectBuildingRequest buildingRequest, Dependency root )
-            throws DependencyCollectionException
+    @Inject
+    public DefaultDependencyCollector(final Map<String, DependencyCollectorDelegate> delegates)
     {
-        validateParameters( buildingRequest, root );
-
-        try
-        {
-            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyCollectionException( e.getMessage(), e );
-        }
+      super(delegates);
+      this.delegate = selectDelegate();
     }
 
     @Override
-    public CollectResult collectDependencies( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
-            throws DependencyCollectionException
+    public CollectResult collectDependencies(final ProjectBuildingRequest buildingRequest, final Dependency root)
+        throws DependencyCollectionException
     {
-        validateParameters( buildingRequest, root );
-
-        try
-        {
-            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyCollectionException( e.getMessage(), e );
-        }
+      validateParameters( buildingRequest, root );
+      return delegate.collectDependencies(buildingRequest, root);
     }
 
     @Override
-    public CollectResult collectDependencies( ProjectBuildingRequest buildingRequest, Model root )
-            throws DependencyCollectionException
+    public CollectResult collectDependencies(final ProjectBuildingRequest buildingRequest,
+                                             final DependableCoordinate root) throws DependencyCollectionException
     {
-        validateParameters( buildingRequest, root );
-
-        try
-        {
-            return getMavenDependencyCollector( buildingRequest ).collectDependencies( root );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyCollectionException( e.getMessage(), e );
-        }
+      validateParameters( buildingRequest, root );
+      return delegate.collectDependencies(buildingRequest, root);
     }
 
-  private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
-  {
-    validateBuildingRequestAndRoot( buildingRequest, root );
-  }
-
-  private void validateParameters( ProjectBuildingRequest buildingRequest, Dependency root )
-  {
-    validateBuildingRequestAndRoot( buildingRequest, root );
-  }
-
-  private void validateParameters( ProjectBuildingRequest buildingRequest, Model root )
-  {
-    validateBuildingRequestAndRoot( buildingRequest, root );
-  }
-
-  private void validateBuildingRequestAndRoot( ProjectBuildingRequest buildingRequest, Object root )
-  {
-    validateBuildingRequest( buildingRequest );
-    validateRoot( root );
-  }
-
-  private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )
-  {
-    Objects.requireNonNull( buildingRequest, "The parameter buildingRequest is not allowed to be null." );
-  }
-
-  private void validateRoot( Object root )
-  {
-    Objects.requireNonNull( root, "The parameter root is not allowed to be null." );
-  }
-
-  /**
-   * @return true if the current Maven version is Maven 3.1.
-   */
-  private boolean isMaven31()
-  {
-      try
-      {
-          // Maven 3.1 specific
-          Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
-          return true;
-      }
-      catch ( ClassNotFoundException e )
-      {
-          return false;
-      }
-  }
-
-    /**
-     * Injects the Plexus content.
-     *
-     * @param context Plexus context to inject.
-     * @throws ContextException if the PlexusContainer could not be located.
-     */
-    public void contextualize( Context context ) throws ContextException
+    @Override
+    public CollectResult collectDependencies(final ProjectBuildingRequest buildingRequest, final Model root)
+        throws DependencyCollectionException
     {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+      validateParameters( buildingRequest, root );
+      return delegate.collectDependencies(buildingRequest, root);
     }
 
-    private MavenDependencyCollector getMavenDependencyCollector( ProjectBuildingRequest buildingRequest )
-            throws ComponentLookupException, DependencyCollectionException
+    private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )
     {
-        ArtifactHandlerManager artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
-
-        if ( isMaven31() )
-        {
-            org.eclipse.aether.RepositorySystem m31RepositorySystem = container.lookup(
-                    org.eclipse.aether.RepositorySystem.class );
-
-            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
-                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-            return new Maven31DependencyCollector( m31RepositorySystem, artifactHandlerManager, session,
-                    aetherRepositories );
-        }
-        else
-        {
-            org.sonatype.aether.RepositorySystem m30RepositorySystem = container.lookup(
-                    org.sonatype.aether.RepositorySystem.class );
-
-            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
-                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-            return new Maven30DependencyCollector( m30RepositorySystem, artifactHandlerManager, session,
-                    aetherRepositories );
-        }
-
+      validateBuildingRequestAndRoot( buildingRequest, root );
     }
 
+    private void validateParameters( ProjectBuildingRequest buildingRequest, Dependency root )
+    {
+      validateBuildingRequestAndRoot( buildingRequest, root );
+    }
+
+    private void validateParameters( ProjectBuildingRequest buildingRequest, Model root )
+    {
+      validateBuildingRequestAndRoot( buildingRequest, root );
+    }
+
+    private void validateBuildingRequestAndRoot( ProjectBuildingRequest buildingRequest, Object root )
+    {
+      validateBuildingRequest( buildingRequest );
+      validateRoot( root );
+    }
+
+    private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )
+    {
+      Objects.requireNonNull( buildingRequest, "The parameter buildingRequest is not allowed to be null." );
+    }
+
+    private void validateRoot( Object root )
+    {
+      Objects.requireNonNull( root, "The parameter root is not allowed to be null." );
+    }
 }

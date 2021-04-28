@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.artifact.resolve.internal;
+package org.apache.maven.shared.transfer.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,20 +19,32 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
-import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * 
- * @author Robert Scholte
- *
+ * Support class for components.
  */
-interface MavenArtifactResolver
+public abstract class ComponentSupport
 {
-    ArtifactResult resolveArtifact( Artifact mavenArtifact ) throws ArtifactResolverException;
+    private static final String GUICE_ENHANCED = "$$EnhancerByGuice$$";
 
-    ArtifactResult resolveArtifact( ArtifactCoordinate coordinate ) throws ArtifactResolverException;
+    public static Logger getLogger( final Class<?> type )
+    {
+        Objects.requireNonNull( type );
+        if (type.getName().contains(GUICE_ENHANCED))
+        {
+            return LoggerFactory.getLogger(type.getSuperclass());
+        }
+        return LoggerFactory.getLogger(type);
+    }
 
+    protected final Logger logger;
+
+    protected ComponentSupport()
+    {
+        this.logger = getLogger( getClass() );
+    }
 }

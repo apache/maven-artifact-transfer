@@ -20,58 +20,52 @@ package org.apache.maven.shared.transfer.artifact.deploy.internal;
  */
 
 import java.util.Collection;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.apache.maven.shared.transfer.internal.Delegator;
 
 /**
  *
  */
-@Component( role = ArtifactDeployer.class )
-class DefaultArtifactDeployer implements ArtifactDeployer, Contextualizable
+@Singleton
+@Named
+public class DefaultArtifactDeployer
+    extends Delegator<ArtifactDeployerDelegate>
+    implements ArtifactDeployer
 {
+    private final ArtifactDeployerDelegate delegate;
 
-    private PlexusContainer container;
-
-    @Override
-    public void deploy( ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts )
-            throws ArtifactDeployerException
+    @Inject
+    public DefaultArtifactDeployer(final Map<String, ArtifactDeployerDelegate> delegates)
     {
-        validateParameters( request, mavenArtifacts );
-
-        try
-        {
-            getMavenArtifactDeployer( request ).deploy( mavenArtifacts );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
+        super(delegates);
+        this.delegate = selectDelegate();
     }
 
     @Override
-    public void deploy( ProjectBuildingRequest request, ArtifactRepository remoteRepository,
-            Collection<Artifact> mavenArtifacts ) throws ArtifactDeployerException
+    public void deploy(final ProjectBuildingRequest request,
+                       final Collection<Artifact> mavenArtifacts) throws ArtifactDeployerException
+    {
+        validateParameters(request, mavenArtifacts);
+        delegate.deploy(request, mavenArtifacts);
+    }
+
+    @Override
+    public void deploy(final ProjectBuildingRequest request,
+                       final ArtifactRepository remoteRepository,
+                       final Collection<Artifact> mavenArtifacts) throws ArtifactDeployerException
     {
         validateParameters( request, mavenArtifacts );
-        try
-        {
-            getMavenArtifactDeployer( request ).deploy( remoteRepository, mavenArtifacts );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ArtifactDeployerException( e.getMessage(), e );
-        }
+        delegate.deploy(request, remoteRepository, mavenArtifacts);
     }
 
     private void validateParameters( ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts )
@@ -87,59 +81,6 @@ class DefaultArtifactDeployer implements ArtifactDeployer, Contextualizable
         if ( mavenArtifacts.isEmpty() )
         {
             throw new IllegalArgumentException( "The collection mavenArtifacts is not allowed to be empty." );
-        }
-    }
-
-    /**
-     * @return true if the current Maven version is Maven 3.1.
-     */
-    private boolean isMaven31()
-    {
-        try
-        {
-            // Maven 3.1 specific
-            Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
-            return true;
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return false;
-        }
-    }
-
-    /**
-     * Injects the Plexus content.
-     *
-     * @param context Plexus context to inject.
-     * @throws ContextException if the PlexusContainer could not be located.
-     */
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    private MavenArtifactDeployer getMavenArtifactDeployer( ProjectBuildingRequest buildingRequest )
-            throws ComponentLookupException, ArtifactDeployerException
-    {
-        if ( isMaven31() )
-        {
-            org.eclipse.aether.RepositorySystem repositorySystem = container.lookup(
-                    org.eclipse.aether.RepositorySystem.class );
-
-            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            return new Maven31ArtifactDeployer( repositorySystem, session );
-        }
-        else
-        {
-            org.sonatype.aether.RepositorySystem repositorySystem = container.lookup(
-                    org.sonatype.aether.RepositorySystem.class );
-
-            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            return new Maven30ArtifactDeployer( repositorySystem, session );
         }
     }
 }

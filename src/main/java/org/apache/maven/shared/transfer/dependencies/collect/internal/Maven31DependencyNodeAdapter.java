@@ -150,14 +150,6 @@ class Maven31DependencyNodeAdapter implements DependencyNode
 
     private Artifact getArtifact( org.eclipse.aether.artifact.Artifact aetherArtifact )
     {
-        try
-        {
-            return Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                org.eclipse.aether.artifact.Artifact.class, aetherArtifact );
-        }
-        catch ( DependencyCollectorException e )
-        {
-            throw new RuntimeException( e );
-        }
+        return RepositoryUtils.toArtifact(aetherArtifact);
     }
 }

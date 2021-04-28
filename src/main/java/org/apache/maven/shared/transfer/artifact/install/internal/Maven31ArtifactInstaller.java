@@ -19,13 +19,22 @@ package org.apache.maven.shared.transfer.artifact.install.internal;
  * under the License.
  */
 
+import java.io.File;
 import java.util.Collection;
+import java.util.Objects;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
+import org.apache.maven.shared.transfer.internal.ComponentSupport;
+import org.apache.maven.shared.transfer.internal.Selector;
 import org.apache.maven.shared.transfer.metadata.internal.Maven31MetadataBridge;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -37,23 +46,25 @@ import org.eclipse.aether.util.artifact.SubArtifact;
 /**
  * 
  */
-class Maven31ArtifactInstaller
-    implements MavenArtifactInstaller
+@Singleton
+@Named(Selector.MAVEN_3_1)
+public class Maven31ArtifactInstaller
+    extends ComponentSupport
+    implements ArtifactInstallerDelegate
 {
     private final RepositorySystem repositorySystem;
 
-    private final RepositorySystemSession session;
-    
-    Maven31ArtifactInstaller( RepositorySystem repositorySystem,
-                                     RepositorySystemSession session )
+    @Inject
+    public Maven31ArtifactInstaller( RepositorySystem repositorySystem )
     {
-        this.repositorySystem = repositorySystem;
-        this.session = session;
+        this.repositorySystem = Objects.requireNonNull( repositorySystem );
     }
 
+
     @Override
-    public void install( Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
-                             throws ArtifactInstallerException
+    public void install(ProjectBuildingRequest buildingRequest,
+                        Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
+        throws ArtifactInstallerException
     {
         // prepare installRequest
         InstallRequest request = new InstallRequest();
@@ -61,8 +72,7 @@ class Maven31ArtifactInstaller
         // transform artifacts
         for ( org.apache.maven.artifact.Artifact mavenArtifact : mavenArtifacts )
         {
-            Artifact mainArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                                       org.apache.maven.artifact.Artifact.class, mavenArtifact );
+            Artifact mainArtifact = RepositoryUtils.toArtifact(mavenArtifact);
             request.addArtifact( mainArtifact );
 
             for ( ArtifactMetadata metadata : mavenArtifact.getMetadataList() )
@@ -91,11 +101,20 @@ class Maven31ArtifactInstaller
         // install
         try
         {
-            repositorySystem.install( session, request );
+            repositorySystem.install( buildingRequest.getRepositorySession(), request );
         }
         catch ( InstallationException e )
         {
             throw new ArtifactInstallerException( e.getMessage(), e );
         }
+    }
+
+    @Override
+    public void install(final ProjectBuildingRequest request,
+                        final File localRepository,
+                        final Collection<org.apache.maven.artifact.Artifact> mavenArtifacts)
+        throws ArtifactInstallerException
+    {
+        throw new UnsupportedOperationException("how did we get here?");
     }
 }

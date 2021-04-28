@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.collection.internal;
+package org.apache.maven.shared.transfer.dependencies.resolve.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,25 +19,11 @@ package org.apache.maven.shared.transfer.collection.internal;
  * under the License.
  */
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
-import org.apache.maven.shared.transfer.collection.CollectResult;
-import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
+import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 
 /**
  * @author Robert Scholte
  */
-interface MavenDependencyCollector
+public interface DependencyResolverDelegate extends DependencyResolver
 {
-
-  CollectResult collectDependencies( Dependency root )
-      throws DependencyCollectionException;
-
-  CollectResult collectDependencies( DependableCoordinate root )
-      throws DependencyCollectionException;
-
-  CollectResult collectDependencies( Model root )
-      throws DependencyCollectionException;
-
 }

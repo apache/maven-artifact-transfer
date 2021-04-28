@@ -23,6 +23,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -30,6 +35,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
+import org.apache.maven.shared.transfer.internal.ComponentSupport;
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
@@ -45,17 +51,23 @@ import org.slf4j.LoggerFactory;
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a> Most of the code is
  *         taken from maven-deploy-plugin.
  */
-@Component( role = ProjectDeployer.class )
+@Singleton
+@Named
 class DefaultProjectDeployer
+    extends ComponentSupport
     implements ProjectDeployer
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectDeployer.class );
+    private final ArtifactDeployer deployer;
 
-    @Requirement
-    private ArtifactDeployer deployer;
+    private final RepositoryManager repositoryManager;
 
-    @Requirement
-    private RepositoryManager repositoryManager;
+    @Inject
+    public DefaultProjectDeployer(final ArtifactDeployer deployer,
+                                  final RepositoryManager repositoryManager)
+    {
+        this.deployer = Objects.requireNonNull( deployer );
+        this.repositoryManager = Objects.requireNonNull( repositoryManager );
+    }
 
     /**
      * {@inheritDoc}
@@ -155,7 +167,7 @@ class DefaultProjectDeployer
             {
                 if ( count > 0 )
                 {
-                    LOGGER.info( "Retrying deployment attempt " + ( count + 1 ) + " of "
+                    logger.info( "Retrying deployment attempt " + ( count + 1 ) + " of "
                         + retryFailedDeploymentCounter );
                 }
 
@@ -167,8 +179,8 @@ class DefaultProjectDeployer
             {
                 if ( count + 1 < retryFailedDeploymentCounter )
                 {
-                    LOGGER.warn( "Encountered issue during deployment: " + e.getLocalizedMessage() );
-                    LOGGER.debug( e.getMessage() );
+                    logger.warn( "Encountered issue during deployment: " + e.getLocalizedMessage() );
+                    logger.debug( e.getMessage() );
                 }
                 if ( exception == null )
                 {

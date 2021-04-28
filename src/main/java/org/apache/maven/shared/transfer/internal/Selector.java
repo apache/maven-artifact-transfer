@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.repository.internal;
+package org.apache.maven.shared.transfer.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,37 +19,36 @@ package org.apache.maven.shared.transfer.repository.internal;
  * under the License.
  */
 
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.LocalRepository;
-
 /**
- * 
+ * Maven version selector helper.
  */
-class Maven302RepositoryManager
-    extends Maven30RepositoryManager
+public final class Selector
 {
-    Maven302RepositoryManager( RepositorySystem repositorySystem, RepositorySystemSession session )
+    public static final String MAVEN_3_0 = "maven-3.0";
+
+    public static final String MAVEN_3_1 = "maven-3.1";
+
+    public static final String MAVEN_4_0 = "maven-4.0";
+
+    public static String selectedMaven()
     {
-        super( repositorySystem, session );
+        return MAVEN_3_1; // TODO: add logic here. Maven3.0 should fail with meaningful error as "not supported"
     }
 
     /**
-     * Aether-1.9+ (i.e. M3.0.2+) expects "default", not "enhanced" as repositoryType
+     * Returns {@code true} if the current Maven version is Maven 3.1.
      */
-    @Override
-    protected String resolveRepositoryType( LocalRepository localRepository )
+    private static boolean isMaven31()
     {
-        String repositoryType;
-        if ( "enhanced".equals( localRepository.getContentType() ) )
+        try
         {
-            repositoryType = "default";
+            // Maven 3.1 specific
+            Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
+            return true;
         }
-        else
+        catch ( ClassNotFoundException e )
         {
-            // this should be "simple"
-            repositoryType = localRepository.getContentType();
+            return false;
         }
-        return repositoryType;
     }
 }

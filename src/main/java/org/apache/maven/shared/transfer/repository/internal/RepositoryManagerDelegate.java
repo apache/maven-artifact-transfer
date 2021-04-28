@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.artifact.install.internal;
+package org.apache.maven.shared.transfer.repository.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,18 +19,11 @@ package org.apache.maven.shared.transfer.artifact.install.internal;
  * under the License.
  */
 
-import java.util.Collection;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
 
 /**
  * 
- * @author Robert Scholte
- *
  */
-interface MavenArtifactInstaller
+public interface RepositoryManagerDelegate extends RepositoryManager
 {
-    void install( Collection<Artifact> mavenArtifacts )
-        throws ArtifactInstallerException;
 }

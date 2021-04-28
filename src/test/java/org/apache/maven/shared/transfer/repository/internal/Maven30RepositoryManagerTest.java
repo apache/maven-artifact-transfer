@@ -24,7 +24,6 @@ import java.io.File;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.apache.maven.shared.transfer.repository.internal.Maven30RepositoryManager;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.impl.internal.EnhancedLocalRepositoryManager;

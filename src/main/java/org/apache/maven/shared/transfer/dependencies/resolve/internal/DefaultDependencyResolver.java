@@ -20,10 +20,12 @@ package org.apache.maven.shared.transfer.dependencies.resolve.internal;
  */
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
-import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -32,96 +34,55 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.apache.maven.shared.transfer.internal.Delegator;
 
 /**
  *
  */
-@Component( role = DependencyResolver.class, hint = "default" )
-class DefaultDependencyResolver implements DependencyResolver, Contextualizable
+@Singleton
+@Named
+public class DefaultDependencyResolver
+    extends Delegator<DependencyResolverDelegate>
+    implements DependencyResolver
 {
-    private PlexusContainer container;
+    private final DependencyResolverDelegate delegate;
 
-    @Override
-    public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-            Collection<Dependency> coordinates, Collection<Dependency> managedDependencies, TransformableFilter filter )
-            throws DependencyResolverException
+    @Inject
+    public DefaultDependencyResolver(final Map<String, DependencyResolverDelegate> delegates)
     {
-        validateBuildingRequest( buildingRequest );
-
-        try
-        {
-            return getMavenDependencyResolver( buildingRequest ).resolveDependencies( coordinates, managedDependencies,
-                    filter );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyResolverException( e.getMessage(), e );
-        }
+        super(delegates);
+        this.delegate = selectDelegate();
     }
 
     @Override
-    public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
-            DependableCoordinate coordinate, TransformableFilter filter ) throws DependencyResolverException
+    public Iterable<ArtifactResult> resolveDependencies(final ProjectBuildingRequest buildingRequest,
+                                                        final DependableCoordinate coordinate,
+                                                        final TransformableFilter filter)
+        throws DependencyResolverException
     {
         validateParameters( buildingRequest, coordinate );
-        try
-        {
-            return getMavenDependencyResolver( buildingRequest ).resolveDependencies( coordinate, filter );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyResolverException( e.getMessage(), e );
-        }
+        return delegate.resolveDependencies(buildingRequest, coordinate, filter);
     }
 
     @Override
-    public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest, Model model,
-            TransformableFilter filter ) throws DependencyResolverException
+    public Iterable<ArtifactResult> resolveDependencies(final ProjectBuildingRequest buildingRequest,
+                                                        final Model model,
+                                                        final TransformableFilter filter)
+        throws DependencyResolverException
     {
         validateParameters( buildingRequest, model );
-        try
-        {
-            return getMavenDependencyResolver( buildingRequest ).resolveDependencies( model, filter );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new DependencyResolverException( e.getMessage(), e );
-        }
+        return delegate.resolveDependencies(buildingRequest, model, filter);
     }
 
-    /**
-     * @return true if the current Maven version is Maven 3.1.
-     */
-    private boolean isMaven31()
+    @Override
+    public Iterable<ArtifactResult> resolveDependencies(final ProjectBuildingRequest buildingRequest,
+                                                        final Collection<Dependency> dependencies,
+                                                        final Collection<Dependency> managedDependencies,
+                                                        final TransformableFilter filter)
+        throws DependencyResolverException
     {
-        try
-        {
-            // Maven 3.1 specific
-            Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
-            return true;
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return false;
-        }
-    }
-
-    /**
-     * Injects the Plexus content.
-     *
-     * @param context Plexus context to inject.
-     * @throws ContextException if the PlexusContainer could not be located.
-     */
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+        validateBuildingRequest( buildingRequest );
+        return delegate.resolveDependencies(buildingRequest, dependencies, managedDependencies, filter);
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate coordinate )
@@ -141,42 +102,6 @@ class DefaultDependencyResolver implements DependencyResolver, Contextualizable
             throw new IllegalArgumentException( "The parameter model is not allowed to be null." );
         }
 
-    }
-
-    private MavenDependencyResolver getMavenDependencyResolver( ProjectBuildingRequest buildingRequest )
-            throws ComponentLookupException, DependencyResolverException
-    {
-        ArtifactHandlerManager artifactHandlerManager = container.lookup( ArtifactHandlerManager.class );
-
-        if ( isMaven31() )
-        {
-            org.eclipse.aether.RepositorySystem m31RepositorySystem = container.lookup(
-                    org.eclipse.aether.RepositorySystem.class );
-
-            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
-                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-            return new Maven31DependencyResolver( m31RepositorySystem, artifactHandlerManager, session,
-                    aetherRepositories );
-        }
-        else
-        {
-            org.sonatype.aether.RepositorySystem m30RepositorySystem = container.lookup(
-                    org.sonatype.aether.RepositorySystem.class );
-
-            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
-                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-            return new Maven30DependencyResolver( m30RepositorySystem, artifactHandlerManager, session,
-                    aetherRepositories );
-
-        }
     }
 
     private void validateBuildingRequest( ProjectBuildingRequest buildingRequest )

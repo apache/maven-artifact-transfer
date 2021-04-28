@@ -31,7 +31,7 @@
   <version>0.13.2-SNAPSHOT</version>
 
   <name>Apache Maven Artifact Transfer</name>
-  <description>An API to install, deploy and resolving artifacts with Maven 3</description>
+  <description>An API to install, deploy and resolving artifacts with Maven 3.1+</description>
 
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-artifact-transfer.git</connection>
@@ -57,6 +57,9 @@
   <properties>
     <javaVersion>7</javaVersion>
     <project.build.outputTimestamp>2020-12-22T10:32:11Z</project.build.outputTimestamp>
+    <mavenVersion>3.1.0</mavenVersion>
+    <sisuVersion>0.3.4</sisuVersion>
+    <guiceVersion>3.2.6</guiceVersion>
   </properties>
 
   <build>
@@ -76,20 +79,23 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
-            <showDeprecation>true</showDeprecation>
-            <compilerArgs>
-              <arg>-Xlint:deprecation</arg>
-              <arg>-Xlint:unchecked</arg>
-            </compilerArgs>
+              <forceJavacCompilerUse>true</forceJavacCompilerUse>
+              <showDeprecation>true</showDeprecation>
+              <compilerArgs>
+                <arg>-Xlint:deprecation</arg>
+                <arg>-Xlint:unchecked</arg>
+              </compilerArgs>
           </configuration>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
+        <version>0.3.4</version>
         <executions>
           <execution>
             <goals>
-              <goal>generate-metadata</goal>
+              <goal>main-index</goal>
+              <goal>test-index</goal>
             </goals>
           </execution>
         </executions>
@@ -165,17 +171,24 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>3.0</version>
+      <version>${mavenVersion}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>org.eclipse.sisu.plexus</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehause.plexus</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>3.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
+      <version>${mavenVersion}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -189,24 +202,29 @@
       <version>3.3.0</version>
     </dependency>
 
-    <!-- Maven 3.0.x -->
+    <!-- DI -->
     <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-api</artifactId>
-      <version>1.7</version>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-util</artifactId>
-      <version>1.7</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-impl</artifactId>
-      <version>1.7</version>
-      <scope>test</scope>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+      <version>${guiceVersion}</version>
+      <classifier>no_aop</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>aopalliance</groupId>
+          <artifactId>aopalliance</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>jsr305</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Maven 3.1.x and above -->
@@ -239,7 +257,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
 

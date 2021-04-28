@@ -19,60 +19,54 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
  * under the License.
  */
 
-import java.util.List;
+import java.util.Map;
 
-import org.apache.maven.RepositoryUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-
+import org.apache.maven.shared.transfer.internal.Delegator;
 
 /**
  *
  */
-@Component( role = ArtifactResolver.class, hint = "default" )
-class DefaultArtifactResolver implements ArtifactResolver, Contextualizable
+@Singleton
+@Named
+public class DefaultArtifactResolver
+    extends Delegator<ArtifactResolverDelegate>
+    implements ArtifactResolver
 {
-    private PlexusContainer container;
+    private ArtifactResolverDelegate delegate;
 
-    @Override
-    public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest, Artifact mavenArtifact )
-            throws ArtifactResolverException, IllegalArgumentException
+    @Inject
+    public DefaultArtifactResolver(final Map<String, ArtifactResolverDelegate> delegates)
     {
-        validateParameters( buildingRequest, mavenArtifact );
-        try
-        {
-            return getMavenArtifactResolver( buildingRequest ).resolveArtifact( mavenArtifact );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ArtifactResolverException( e.getMessage(), e );
-        }
+        super(delegates);
+        this.delegate = selectDelegate();
     }
 
     @Override
-    public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest, ArtifactCoordinate coordinate )
-            throws ArtifactResolverException, IllegalArgumentException
+    public ArtifactResult resolveArtifact(final ProjectBuildingRequest buildingRequest,
+                                          final Artifact mavenArtifact)
+        throws ArtifactResolverException, IllegalArgumentException
+    {
+        validateParameters( buildingRequest, mavenArtifact );
+        return delegate.resolveArtifact(buildingRequest, mavenArtifact);
+    }
+
+    @Override
+    public ArtifactResult resolveArtifact(final ProjectBuildingRequest buildingRequest,
+                                          final ArtifactCoordinate coordinate)
+        throws ArtifactResolverException, IllegalArgumentException
     {
         validateParameters( buildingRequest, coordinate );
-        try
-        {
-            return getMavenArtifactResolver( buildingRequest ).resolveArtifact( coordinate );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new ArtifactResolverException( e.getMessage(), e );
-        }
+        return delegate.resolveArtifact(buildingRequest, coordinate);
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, Artifact mavenArtifact )
@@ -97,67 +91,5 @@ class DefaultArtifactResolver implements ArtifactResolver, Contextualizable
         {
             throw new IllegalArgumentException( "The parameter coordinate is not allowed to be null." );
         }
-    }
-
-    /**
-     * @return true if the current Maven version is Maven 3.1.
-     */
-    private boolean isMaven31()
-    {
-        try
-        {
-            // Maven 3.1 specific
-            Thread.currentThread().getContextClassLoader().loadClass( "org.eclipse.aether.artifact.Artifact" );
-            return true;
-        }
-        catch ( ClassNotFoundException e )
-        {
-            return false;
-        }
-    }
-
-    /**
-     * Injects the Plexus content.
-     *
-     * @param context Plexus context to inject.
-     * @throws ContextException if the PlexusContainer could not be located.
-     */
-    public void contextualize( Context context ) throws ContextException
-    {
-        container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    private MavenArtifactResolver getMavenArtifactResolver( ProjectBuildingRequest buildingRequest )
-            throws ComponentLookupException, ArtifactResolverException
-    {
-        if ( isMaven31() )
-        {
-            org.eclipse.aether.RepositorySystem repositorySystem = container.lookup(
-                    org.eclipse.aether.RepositorySystem.class );
-
-            List<org.eclipse.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
-                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-            org.eclipse.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            return new Maven31ArtifactResolver( repositorySystem, aetherRepositories, session );
-
-        }
-        else
-        {
-            org.sonatype.aether.RepositorySystem repositorySystem = container.lookup(
-                    org.sonatype.aether.RepositorySystem.class );
-
-            List<org.sonatype.aether.repository.RemoteRepository> aetherRepositories = Invoker.invoke(
-                    RepositoryUtils.class, "toRepos", List.class, buildingRequest.getRemoteRepositories() );
-
-            org.sonatype.aether.RepositorySystemSession session = Invoker.invoke( buildingRequest,
-                    "getRepositorySession" );
-
-            return new Maven30ArtifactResolver( repositorySystem, aetherRepositories, session );
-        }
-
-
     }
 }
