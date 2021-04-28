@@ -23,13 +23,12 @@ import java.io.File;
 
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.impl.internal.EnhancedLocalRepositoryManager;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
+import org.eclipse.aether.RepositorySystem;
 
-public class Maven30RepositoryManagerTest extends PlexusTestCase
+import org.sonatype.guice.bean.containers.InjectedTestCase;
+
+public class Maven31RepositoryManagerTest
+    extends InjectedTestCase
 {
 
     private final File localRepo = new File( "target/tests/local-repo" );

@@ -23,16 +23,18 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.sonatype.guice.bean.containers.InjectedTestCase;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 
-public class Maven30ArtifactInstallerTest extends PlexusTestCase
+public class Maven31ArtifactInstallerTest
+    extends InjectedTestCase
 {
     private final File localRepo = new File( "target/tests/local-repo" );
     
@@ -48,7 +50,7 @@ public class Maven30ArtifactInstallerTest extends PlexusTestCase
     public void testInstall() throws Exception
     {
         DefaultProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest();
-        MavenRepositorySystemSession repositorySession = new MavenRepositorySystemSession();
+        RepositorySystemSession repositorySession = MavenRepositorySystemUtils.newSession();
         repositorySession.setLocalRepositoryManager( new SimpleLocalRepositoryManager( localRepo ) );
         buildingRequest.setRepositorySession( repositorySession );
         
@@ -66,11 +68,11 @@ public class Maven30ArtifactInstallerTest extends PlexusTestCase
         
         Collection<Artifact> mavenArtifacts = Arrays.<Artifact>asList( artifact, artifactWithClassifier );
         
-        MavenArtifactInstaller installer = new Maven30ArtifactInstaller( repositorySystem, repositorySession );
-        installer.install( mavenArtifacts );
+        ArtifactInstallerDelegate installer = new Maven31ArtifactInstaller( repositorySystem );
+        installer.install( buildingRequest, mavenArtifacts );
         
         assertTrue( new File( localRepo, "GROUPID/ARTIFACTID/VERSION/ARTIFACTID-VERSION.EXTENSION" ).exists() );
         assertTrue( new File( localRepo, "GROUPID/ARTIFACTID/VERSION/ARTIFACTID-VERSION-CLASSIFIER.EXTENSION" ).exists() );
-        assertTrue( new File( localRepo, "GROUPID/ARTIFACTID/maven-metadata-local.xml" ).exists() ); //??
+        assertTrue( new File( localRepo, "GROUPID/ARTIFACTID/maven-metadata-local.xml" ).exists() );
     }
 }
