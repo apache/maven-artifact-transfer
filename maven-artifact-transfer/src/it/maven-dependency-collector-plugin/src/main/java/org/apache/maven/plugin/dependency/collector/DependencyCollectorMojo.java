@@ -30,6 +30,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.collection.DependencyCollector;
+import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
 
 /**
  * This mojo is implemented to test the DependencyCollector part of the maven-artifact-transfer shared component.

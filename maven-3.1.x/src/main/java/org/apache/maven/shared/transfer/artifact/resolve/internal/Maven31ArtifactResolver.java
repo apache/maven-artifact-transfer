@@ -28,7 +28,6 @@ import org.apache.maven.shared.transfer.support.Selector;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
@@ -38,7 +37,6 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -52,14 +50,10 @@ public class Maven31ArtifactResolver
 {
     private final RepositorySystem repositorySystem;
 
-    private final List<RemoteRepository> aetherRepositories;
-
     @Inject
-    public Maven31ArtifactResolver( RepositorySystem repositorySystem,
-                                    List<RemoteRepository> aetherRepositories )
+    public Maven31ArtifactResolver( RepositorySystem repositorySystem )
     {
         this.repositorySystem = Objects.requireNonNull( repositorySystem );
-        this.aetherRepositories = Objects.requireNonNull( aetherRepositories );
     }
 
     @Override
@@ -91,13 +85,14 @@ public class Maven31ArtifactResolver
         {
             // use descriptor to respect relocation
             ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest( aetherArtifact,
-                    aetherRepositories, null );
+                    RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ), null );
 
             ArtifactDescriptorResult descriptorResult = repositorySystem.readArtifactDescriptor(
                     buildingRequest.getRepositorySession(),
                     descriptorRequest );
 
-            ArtifactRequest request = new ArtifactRequest( descriptorResult.getArtifact(), aetherRepositories, null );
+            ArtifactRequest request = new ArtifactRequest( descriptorResult.getArtifact(),
+                    RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ), null );
 
             return new Maven31ArtifactResult(
                     repositorySystem.resolveArtifact( buildingRequest.getRepositorySession(), request ) );

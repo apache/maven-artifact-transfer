@@ -40,7 +40,6 @@ import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
@@ -69,16 +68,12 @@ public class Maven31DependencyResolver
 
     private final ArtifactHandlerManager artifactHandlerManager;
 
-    private final List<RemoteRepository> aetherRepositories;
-
     @Inject
     public Maven31DependencyResolver( RepositorySystem repositorySystem,
-                                      ArtifactHandlerManager artifactHandlerManager,
-                                      List<RemoteRepository> aetherRepositories )
+                                      ArtifactHandlerManager artifactHandlerManager )
     {
         this.repositorySystem = Objects.requireNonNull( repositorySystem );
         this.artifactHandlerManager = Objects.requireNonNull( artifactHandlerManager );
-        this.aetherRepositories = Objects.requireNonNull( aetherRepositories );
     }
 
     /**
@@ -117,7 +112,8 @@ public class Maven31DependencyResolver
 
         Dependency aetherRoot = toDependency( coordinate, typeRegistry );
 
-        CollectRequest request = new CollectRequest( aetherRoot, aetherRepositories );
+        CollectRequest request = new CollectRequest( aetherRoot,
+                RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ) );
 
         return resolveDependencies( buildingRequest, dependencyFilter, request );
     }
@@ -143,7 +139,8 @@ public class Maven31DependencyResolver
 
         Dependency aetherRoot = new Dependency( aetherArtifact, null );
 
-        CollectRequest request = new CollectRequest( aetherRoot, aetherRepositories );
+        CollectRequest request = new CollectRequest( aetherRoot,
+                RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ) );
 
         request.setDependencies( resolveDependencies( model.getDependencies() ) );
 
@@ -190,7 +187,8 @@ public class Maven31DependencyResolver
 
         List<Dependency> aetherManagedDependencies = resolveDependencies( managedMavenDependencies );
 
-        CollectRequest request = new CollectRequest( aetherDeps, aetherManagedDependencies, aetherRepositories );
+        CollectRequest request = new CollectRequest( aetherDeps,
+                aetherManagedDependencies, RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ) );
 
         return resolveDependencies( buildingRequest, filter, request );
     }

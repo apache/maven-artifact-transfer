@@ -27,7 +27,6 @@ import org.apache.maven.shared.transfer.support.DelegateSupport;
 import org.apache.maven.shared.transfer.support.Selector;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.ArtifactDescriptorException;
 import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
 import org.sonatype.aether.resolution.ArtifactDescriptorResult;
@@ -38,7 +37,6 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -46,17 +44,16 @@ import java.util.Objects;
  */
 @Singleton
 @Named( Selector.MAVEN_3_0_X )
-public class Maven30ArtifactResolver extends DelegateSupport implements ArtifactResolverDelegate
+public class Maven30ArtifactResolver
+        extends DelegateSupport
+        implements ArtifactResolverDelegate
 {
     private final RepositorySystem repositorySystem;
 
-    private final List<RemoteRepository> aetherRepositories;
-
     @Inject
-    public Maven30ArtifactResolver( RepositorySystem repositorySystem, List<RemoteRepository> aetherRepositories )
+    public Maven30ArtifactResolver( RepositorySystem repositorySystem )
     {
         this.repositorySystem = Objects.requireNonNull( repositorySystem );
-        this.aetherRepositories = Objects.requireNonNull( aetherRepositories );
     }
 
     @Override
@@ -88,13 +85,16 @@ public class Maven30ArtifactResolver extends DelegateSupport implements Artifact
         {
             // use descriptor to respect relocation
             ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest( aetherArtifact,
-                    aetherRepositories, null );
+                    RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ),
+                    null );
 
             ArtifactDescriptorResult descriptorResult = repositorySystem.readArtifactDescriptor(
                     buildingRequest.getRepositorySession(),
                     descriptorRequest );
 
-            ArtifactRequest request = new ArtifactRequest( descriptorResult.getArtifact(), aetherRepositories, null );
+            ArtifactRequest request = new ArtifactRequest( descriptorResult.getArtifact(),
+                    RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ),
+                    null );
 
             return new Maven30ArtifactResult( repositorySystem.resolveArtifact(
                     buildingRequest.getRepositorySession(), request ) );

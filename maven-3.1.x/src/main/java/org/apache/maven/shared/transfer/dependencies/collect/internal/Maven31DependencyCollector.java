@@ -36,7 +36,6 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.repository.RemoteRepository;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -58,16 +57,12 @@ public class Maven31DependencyCollector
 
     private final ArtifactHandlerManager artifactHandlerManager;
 
-    private final List<RemoteRepository> aetherRepositories;
-
     @Inject
     public Maven31DependencyCollector( RepositorySystem repositorySystem,
-                                       ArtifactHandlerManager artifactHandlerManager,
-                                       List<RemoteRepository> aetherRepositories )
+                                       ArtifactHandlerManager artifactHandlerManager )
     {
         this.repositorySystem = Objects.requireNonNull( repositorySystem );
         this.artifactHandlerManager = Objects.requireNonNull( artifactHandlerManager );
-        this.aetherRepositories = Objects.requireNonNull( aetherRepositories );
     }
 
     private static Dependency toDependency( org.apache.maven.model.Dependency mavenDependency,
@@ -152,7 +147,7 @@ public class Maven31DependencyCollector
                                                  CollectRequest request )
             throws DependencyCollectorException
     {
-        request.setRepositories( aetherRepositories );
+        request.setRepositories( RepositoryUtils.toRepos( buildingRequest.getRemoteRepositories() ) );
 
         try
         {
