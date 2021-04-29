@@ -19,11 +19,6 @@ package org.apache.maven.shared.transfer.project.deploy.internal;
  * under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -33,29 +28,33 @@ import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerExceptio
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
-import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.maven.shared.transfer.support.ComponentSupport;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * This will deploy a whole project into the appropriate remote repository.
- * 
- * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a> Most of the code is
- *         taken from maven-deploy-plugin.
+ *
  */
-@Component( role = ProjectDeployer.class )
-class DefaultProjectDeployer
-    implements ProjectDeployer
+@Singleton
+@Named
+public class DefaultProjectDeployer
+        extends ComponentSupport
+        implements ProjectDeployer
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectDeployer.class );
+    private final ArtifactDeployer deployer;
 
-    @Requirement
-    private ArtifactDeployer deployer;
-
-    @Requirement
-    private RepositoryManager repositoryManager;
+    @Inject
+    public DefaultProjectDeployer( ArtifactDeployer deployer )
+    {
+        this.deployer = Objects.requireNonNull( deployer );
+    }
 
     /**
      * {@inheritDoc}
@@ -155,7 +154,7 @@ class DefaultProjectDeployer
             {
                 if ( count > 0 )
                 {
-                    LOGGER.info( "Retrying deployment attempt " + ( count + 1 ) + " of "
+                    logger.info( "Retrying deployment attempt " + ( count + 1 ) + " of "
                         + retryFailedDeploymentCounter );
                 }
 
@@ -167,8 +166,8 @@ class DefaultProjectDeployer
             {
                 if ( count + 1 < retryFailedDeploymentCounter )
                 {
-                    LOGGER.warn( "Encountered issue during deployment: " + e.getLocalizedMessage() );
-                    LOGGER.debug( e.getMessage() );
+                    logger.warn( "Encountered issue during deployment: " + e.getLocalizedMessage() );
+                    logger.debug( e.getMessage() );
                 }
                 if ( exception == null )
                 {

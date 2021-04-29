@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.artifact.resolve.internal;
+package org.apache.maven.shared.transfer.dependencies.resolve.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,30 +19,11 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
  * under the License.
  */
 
-import org.apache.maven.RepositoryUtils;
-import org.sonatype.aether.resolution.ArtifactResult;
+import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 
 /**
- * {@link org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult} wrapper for {@link ArtifactResult}
- *
- * @author Robert Scholte
- * @since 3.0
+ * To be implemented by provider specific implementation.
  */
-class Maven30ArtifactResult implements org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult
+public interface DependencyResolverDelegate extends DependencyResolver
 {
-    private final ArtifactResult artifactResult;
-
-    /**
-     * @param artifactResult {@link ArtifactResult}
-     */
-    Maven30ArtifactResult( ArtifactResult artifactResult )
-    {
-        this.artifactResult = artifactResult;
-    }
-
-    @Override
-    public org.apache.maven.artifact.Artifact getArtifact()
-    {
-        return RepositoryUtils.toArtifact( artifactResult.getArtifact() );
-    }
 }

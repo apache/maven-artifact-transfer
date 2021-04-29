@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.PlexusTestCase;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
@@ -36,7 +37,7 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultArtifactResolverTest
+public class DefaultArtifactResolverTest extends PlexusTestCase
 {
 
     @Rule
@@ -45,13 +46,13 @@ public class DefaultArtifactResolverTest
     private ArtifactResolver dap;
 
     @Before
-    public void setUp()
+    public void lookUp() throws Exception
     {
-        dap = new DefaultArtifactResolver();
+        dap = lookup( ArtifactResolver.class );
     }
 
     @Test
-    public void resolveArtifactWithArtifactShouldFaileWithIAEWhenParameterBuildingRequestIsNull()
+    public void testResolveArtifactWithArtifactShouldFaileWithIAEWhenParameterBuildingRequestIsNull()
         throws ArtifactResolverException
     {
         thrown.expect( IllegalArgumentException.class );
@@ -61,7 +62,7 @@ public class DefaultArtifactResolverTest
     }
 
     @Test
-    public void resolveArtifactWithArtifactShouldFaileWithIAEWhenArtifactIsNull()
+    public void testRresolveArtifactWithArtifactShouldFaileWithIAEWhenArtifactIsNull()
         throws ArtifactResolverException
     {
         thrown.expect( IllegalArgumentException.class );
@@ -73,7 +74,7 @@ public class DefaultArtifactResolverTest
     }
 
     @Test
-    public void resolveArtifactWithCoordinateShouldFaileWithIAEWhenParameterBuildingRequestIsNull()
+    public void testRresolveArtifactWithCoordinateShouldFaileWithIAEWhenParameterBuildingRequestIsNull()
         throws ArtifactResolverException
     {
         thrown.expect( IllegalArgumentException.class );
@@ -83,7 +84,7 @@ public class DefaultArtifactResolverTest
     }
 
     @Test
-    public void resolveArtifactWithCoordinateShouldFaileWithIAEWhenArtifactIsNull()
+    public void testRresolveArtifactWithCoordinateShouldFaileWithIAEWhenArtifactIsNull()
         throws ArtifactResolverException
     {
         thrown.expect( IllegalArgumentException.class );

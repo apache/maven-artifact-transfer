@@ -23,10 +23,10 @@ import static org.mockito.Mockito.mock;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.PlexusTestCase;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
-import org.apache.maven.shared.transfer.dependencies.resolve.internal.DefaultDependencyResolver;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultDependencyResolverTest
+public class DefaultDependencyResolverTest extends PlexusTestCase
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -45,9 +45,9 @@ public class DefaultDependencyResolverTest
     private DependencyResolver dr;
 
     @Before
-    public void setUp()
+    public void lookup() throws Exception
     {
-        dr = new DefaultDependencyResolver();
+        dr = lookup( DependencyResolver.class );
     }
 
     @Test

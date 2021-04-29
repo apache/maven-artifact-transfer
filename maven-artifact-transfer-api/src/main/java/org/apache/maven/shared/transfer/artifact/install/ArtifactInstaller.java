@@ -30,7 +30,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
  */
 public interface ArtifactInstaller
 {
-
     /**
      * @param request {@link ProjectBuildingRequest}
      * @param mavenArtifacts {@link Artifact} (no null or empty collection allowed.)

@@ -20,8 +20,6 @@ package org.apache.maven.shared.transfer.dependencies.resolve.internal;
  */
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
-import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.resolution.ArtifactResult;
 
 /**
@@ -45,13 +43,6 @@ class Maven30ArtifactResult implements org.apache.maven.shared.transfer.artifact
     @Override
     public org.apache.maven.artifact.Artifact getArtifact()
     {
-        try
-        {
-            return Invoker.invoke( RepositoryUtils.class, "toArtifact", Artifact.class, artifactResult.getArtifact() );
-        }
-        catch ( DependencyResolverException e )
-        {
-            throw new RuntimeException( e );
-        }
+        return RepositoryUtils.toArtifact( artifactResult.getArtifact() );
     }
 }

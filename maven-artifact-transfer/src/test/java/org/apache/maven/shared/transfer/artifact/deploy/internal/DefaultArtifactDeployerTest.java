@@ -25,9 +25,9 @@ import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.PlexusTestCase;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
-import org.apache.maven.shared.transfer.artifact.deploy.internal.DefaultArtifactDeployer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultArtifactDeployerTest
+public class DefaultArtifactDeployerTest extends PlexusTestCase
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -46,13 +46,13 @@ public class DefaultArtifactDeployerTest
     private ArtifactDeployer dap;
     
     @Before
-    public void setUp()
+    public void lookUp() throws Exception
     {
-        dap = new DefaultArtifactDeployer();
+        dap = lookup( ArtifactDeployer.class );
     }
 
     @Test
-    public void deployShouldReturnIllegalArgumentExceptionForFirstParameterWithNull()
+    public void testDeployShouldReturnIllegalArgumentExceptionForFirstParameterWithNull()
         throws ArtifactDeployerException
     {
         thrown.expect( IllegalArgumentException.class );
@@ -61,7 +61,7 @@ public class DefaultArtifactDeployerTest
     }
 
     @Test
-    public void deployShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
+    public void testDeployShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
         throws ArtifactDeployerException
     {
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
@@ -72,7 +72,7 @@ public class DefaultArtifactDeployerTest
     }
 
     @Test
-    public void deployShouldReturnIllegalArgumentExceptionForSecondParameterWithEmpty()
+    public void testDeployShouldReturnIllegalArgumentExceptionForSecondParameterWithEmpty()
         throws ArtifactDeployerException
     {
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
@@ -84,7 +84,7 @@ public class DefaultArtifactDeployerTest
 
 
     @Test
-    public void deploy3ParametersShouldReturnIllegalArgumentExceptionForFirstParameterWithNull()
+    public void testDeploy3ParametersShouldReturnIllegalArgumentExceptionForFirstParameterWithNull()
         throws ArtifactDeployerException
     {
         thrown.expect( IllegalArgumentException.class );
@@ -93,7 +93,7 @@ public class DefaultArtifactDeployerTest
     }
 
     @Test
-    public void deploy3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
+    public void testDeploy3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
         throws ArtifactDeployerException
     {
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
@@ -104,7 +104,7 @@ public class DefaultArtifactDeployerTest
     }
 
     @Test
-    public void deploy3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterWithEmpty()
+    public void testDeploy3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterWithEmpty()
         throws ArtifactDeployerException
     {
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );

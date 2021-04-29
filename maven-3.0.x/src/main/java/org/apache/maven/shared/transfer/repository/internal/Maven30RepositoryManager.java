@@ -19,14 +19,12 @@ package org.apache.maven.shared.transfer.repository.internal;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
-import org.apache.maven.shared.transfer.repository.RepositoryManagerException;
+import org.apache.maven.shared.transfer.support.DelegateSupport;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -39,77 +37,71 @@ import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.File;
+import java.util.Objects;
+
 /**
- * 
+ *
  */
-class Maven30RepositoryManager
-    implements MavenRepositoryManager
+@Singleton
+@Named
+public class Maven30RepositoryManager
+        extends DelegateSupport
+        implements RepositoryManagerDelegate
 {
     private final RepositorySystem repositorySystem;
 
-    private final RepositorySystemSession session;
-    
-    Maven30RepositoryManager( RepositorySystem repositorySystem, RepositorySystemSession session )
+    @Inject
+    public Maven30RepositoryManager( RepositorySystem repositorySystem )
     {
-        this.repositorySystem = repositorySystem;
-        this.session = session;
+        this.repositorySystem = Objects.requireNonNull( repositorySystem );
     }
 
     @Override
-    public String getPathForLocalArtifact( org.apache.maven.artifact.Artifact mavenArtifact )
+    public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest,
+                                           org.apache.maven.artifact.Artifact mavenArtifact )
     {
-        Artifact aetherArtifact;
+        Artifact aetherArtifact = RepositoryUtils.toArtifact( mavenArtifact );
 
-        // LRM.getPathForLocalArtifact() won't throw an Exception, so translate reflection error to RuntimeException
-        try
-        {
-            aetherArtifact = (Artifact) Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                                                        org.apache.maven.artifact.Artifact.class, mavenArtifact );
-        }
-        catch ( RepositoryManagerException e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
-
-        return session.getLocalRepositoryManager().getPathForLocalArtifact( aetherArtifact );
+        return buildingRequest.getRepositorySession().getLocalRepositoryManager().getPathForLocalArtifact(
+                aetherArtifact );
     }
 
     @Override
-    public String getPathForLocalArtifact( ArtifactCoordinate coordinate )
+    public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest,
+                                           ArtifactCoordinate coordinate )
     {
         Artifact aetherArtifact = toArtifact( coordinate );
 
         // LRM.getPathForLocalArtifact() won't throw an Exception, so translate reflection error to RuntimeException
 
-        return session.getLocalRepositoryManager().getPathForLocalArtifact( aetherArtifact );
+        return buildingRequest.getRepositorySession().getLocalRepositoryManager().getPathForLocalArtifact(
+                aetherArtifact );
     }
 
     @Override
-    public String getPathForLocalMetadata( ArtifactMetadata metadata )
+    public String getPathForLocalMetadata( ProjectBuildingRequest buildingRequest,
+                                           ArtifactMetadata metadata )
     {
-        Metadata aetherMetadata =
-            new DefaultMetadata( metadata.getGroupId(),
-                                 metadata.storedInGroupDirectory() ? null : metadata.getArtifactId(),
-                                 metadata.storedInArtifactVersionDirectory() ? metadata.getBaseVersion() : null,
-                                 "maven-metadata.xml", Nature.RELEASE_OR_SNAPSHOT );
+        Metadata aetherMetadata = new DefaultMetadata( metadata.getGroupId(),
+                metadata.storedInGroupDirectory() ? null : metadata.getArtifactId(),
+                metadata.storedInArtifactVersionDirectory() ? metadata.getBaseVersion() : null, "maven-metadata.xml",
+                Nature.RELEASE_OR_SNAPSHOT );
 
-        return session.getLocalRepositoryManager().getPathForLocalMetadata( aetherMetadata );
+        return buildingRequest.getRepositorySession().getLocalRepositoryManager().getPathForLocalMetadata(
+                aetherMetadata );
     }
-    
+
     @Override
-    public ProjectBuildingRequest setLocalRepositoryBasedir( ProjectBuildingRequest buildingRequest, File basedir )
+    public ProjectBuildingRequest setLocalRepositoryBasedir( ProjectBuildingRequest buildingRequest,
+                                                             File basedir )
     {
         ProjectBuildingRequest newRequest = new DefaultProjectBuildingRequest( buildingRequest );
 
-        RepositorySystemSession session;
-        try
-        {
-            session = Invoker.invoke( buildingRequest, "getRepositorySession" );
-        }
-        catch ( RepositoryManagerException e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
+        RepositorySystemSession session = buildingRequest.getRepositorySession();
 
         // "clone" session and replace localRepository
         DefaultRepositorySystemSession newSession = new DefaultRepositorySystemSession( session );
@@ -120,27 +112,20 @@ class Maven30RepositoryManager
         // keep same repositoryType
         String repositoryType = resolveRepositoryType( session.getLocalRepository() );
 
-        LocalRepositoryManager localRepositoryManager =
-            repositorySystem.newLocalRepositoryManager( new LocalRepository( basedir, repositoryType ) );
+        LocalRepositoryManager localRepositoryManager = repositorySystem.newLocalRepositoryManager(
+                new LocalRepository( basedir, repositoryType ) );
 
         newSession.setLocalRepositoryManager( localRepositoryManager );
 
-        try
-        {
-            Invoker.invoke( newRequest, "setRepositorySession", RepositorySystemSession.class, newSession );
-        }
-        catch ( RepositoryManagerException e )
-        {
-            throw new RuntimeException( e.getMessage(), e );
-        }
+        newRequest.setRepositorySession( newSession );
 
         return newRequest;
     }
 
     @Override
-    public File getLocalRepositoryBasedir()
+    public File getLocalRepositoryBasedir( ProjectBuildingRequest buildingRequest )
     {
-        return session.getLocalRepository().getBasedir();
+        return buildingRequest.getRepositorySession().getLocalRepository().getBasedir();
     }
 
     /**
@@ -163,9 +148,8 @@ class Maven30RepositoryManager
             return null;
         }
 
-        Artifact result =
-            new DefaultArtifact( coordinate.getGroupId(), coordinate.getArtifactId(), coordinate.getClassifier(),
-                                 coordinate.getExtension(), coordinate.getVersion() );
+        Artifact result = new DefaultArtifact( coordinate.getGroupId(), coordinate.getArtifactId(),
+                coordinate.getClassifier(), coordinate.getExtension(), coordinate.getVersion() );
 
         return result;
     }

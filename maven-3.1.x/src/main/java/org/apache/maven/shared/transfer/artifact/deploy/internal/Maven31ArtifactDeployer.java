@@ -19,15 +19,16 @@ package org.apache.maven.shared.transfer.artifact.deploy.internal;
  * under the License.
  */
 
-import java.util.Collection;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.transfer.metadata.internal.Maven31MetadataBridge;
+import org.apache.maven.shared.transfer.support.DelegateSupport;
+import org.apache.maven.shared.transfer.support.Selector;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -36,32 +37,42 @@ import org.eclipse.aether.deployment.DeploymentException;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.Objects;
+
 /**
  *
  */
-class Maven31ArtifactDeployer implements MavenArtifactDeployer
+@Singleton
+@Named( Selector.MAVEN_3_1_X )
+public class Maven31ArtifactDeployer
+        extends DelegateSupport
+        implements ArtifactDeployerDelegate
 {
-
     private final RepositorySystem repositorySystem;
 
-    private final RepositorySystemSession session;
-
-    Maven31ArtifactDeployer( RepositorySystem repositorySystem, RepositorySystemSession session )
+    @Inject
+    public Maven31ArtifactDeployer( RepositorySystem repositorySystem )
     {
-        super();
-        this.repositorySystem = repositorySystem;
-        this.session = session;
+        this.repositorySystem = Objects.requireNonNull( repositorySystem );
     }
 
     @Override
-    public void deploy( Collection<org.apache.maven.artifact.Artifact> mavenArtifacts ) throws ArtifactDeployerException
+    public void deploy( ProjectBuildingRequest buildingRequest,
+                        Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
+            throws ArtifactDeployerException
     {
-        deploy( null, mavenArtifacts );
+        deploy( buildingRequest, null, mavenArtifacts );
     }
 
     @Override
-    public void deploy( ArtifactRepository remoteRepository,
-            Collection<org.apache.maven.artifact.Artifact> mavenArtifacts ) throws ArtifactDeployerException
+    public void deploy( ProjectBuildingRequest buildingRequest,
+                        ArtifactRepository remoteRepository,
+                        Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
+            throws ArtifactDeployerException
     {
         // prepare request
         DeployRequest request = new DeployRequest();
@@ -70,20 +81,20 @@ class Maven31ArtifactDeployer implements MavenArtifactDeployer
 
         if ( remoteRepository != null )
         {
-            defaultRepository = getRemoteRepository( session, remoteRepository );
+            defaultRepository = getRemoteRepository( buildingRequest.getRepositorySession(), remoteRepository );
         }
 
         // transform artifacts
         for ( org.apache.maven.artifact.Artifact mavenArtifact : mavenArtifacts )
         {
-            Artifact aetherArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                    org.apache.maven.artifact.Artifact.class, mavenArtifact );
+            Artifact aetherArtifact = RepositoryUtils.toArtifact( mavenArtifact );
             request.addArtifact( aetherArtifact );
 
             RemoteRepository aetherRepository;
             if ( remoteRepository == null )
             {
-                aetherRepository = getRemoteRepository( session, mavenArtifact.getRepository() );
+                aetherRepository = getRemoteRepository( buildingRequest.getRepositorySession(),
+                        mavenArtifact.getRepository() );
             }
             else
             {
@@ -118,7 +129,7 @@ class Maven31ArtifactDeployer implements MavenArtifactDeployer
         // deploy
         try
         {
-            repositorySystem.deploy( session, request );
+            repositorySystem.deploy( buildingRequest.getRepositorySession(), request );
         }
         catch ( DeploymentException e )
         {
@@ -126,11 +137,10 @@ class Maven31ArtifactDeployer implements MavenArtifactDeployer
         }
     }
 
-    private RemoteRepository getRemoteRepository( RepositorySystemSession session, ArtifactRepository remoteRepository )
-            throws ArtifactDeployerException
+    private RemoteRepository getRemoteRepository( RepositorySystemSession session,
+                                                  ArtifactRepository remoteRepository )
     {
-        RemoteRepository aetherRepo = Invoker.invoke( RepositoryUtils.class, "toRepo", ArtifactRepository.class,
-                remoteRepository );
+        RemoteRepository aetherRepo = RepositoryUtils.toRepo( remoteRepository );
 
         if ( aetherRepo.getAuthentication() == null || aetherRepo.getProxy() == null )
         {

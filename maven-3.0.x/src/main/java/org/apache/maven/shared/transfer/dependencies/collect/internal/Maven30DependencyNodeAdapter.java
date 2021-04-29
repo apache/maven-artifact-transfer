@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
 import org.apache.maven.shared.transfer.graph.DependencyNode;
 import org.apache.maven.shared.transfer.graph.DependencyVisitor;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -150,14 +149,6 @@ class Maven30DependencyNodeAdapter implements DependencyNode
 
     private Artifact getArtifact( org.sonatype.aether.artifact.Artifact aetherArtifact )
     {
-        try
-        {
-            return Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                org.sonatype.aether.artifact.Artifact.class, aetherArtifact );
-        }
-        catch ( DependencyCollectorException e )
-        {
-            throw new RuntimeException( e );
-        }
+        return RepositoryUtils.toArtifact( aetherArtifact );
     }
 }

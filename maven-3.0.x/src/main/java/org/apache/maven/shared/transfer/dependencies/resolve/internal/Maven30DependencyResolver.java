@@ -19,23 +19,19 @@ package org.apache.maven.shared.transfer.dependencies.resolve.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.artifact.filter.resolve.TransformableFilter;
 import org.apache.maven.shared.artifact.filter.resolve.transform.SonatypeAetherFilterTransformer;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
+import org.apache.maven.shared.transfer.support.DelegateSupport;
+import org.apache.maven.shared.transfer.support.Selector;
 import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.artifact.ArtifactType;
 import org.sonatype.aether.artifact.ArtifactTypeRegistry;
@@ -49,33 +45,46 @@ import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.DefaultArtifactType;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+
 /**
  *
  */
-class Maven30DependencyResolver implements MavenDependencyResolver
+@Singleton
+@Named( Selector.MAVEN_3_0_X )
+public class Maven30DependencyResolver
+        extends DelegateSupport
+        implements DependencyResolverDelegate
 {
-    private static final Class<?>[] ARG_CLASSES = new Class<?>[] {org.apache.maven.model.Dependency.class,
-            ArtifactTypeRegistry.class};
     private final RepositorySystem repositorySystem;
+
     private final ArtifactHandlerManager artifactHandlerManager;
-    private final RepositorySystemSession session;
+
     private final List<RemoteRepository> aetherRepositories;
 
-    Maven30DependencyResolver( RepositorySystem repositorySystem, ArtifactHandlerManager artifactHandlerManager,
-            RepositorySystemSession session, List<RemoteRepository> aetherRepositories )
+    @Inject
+    public Maven30DependencyResolver( RepositorySystem repositorySystem,
+                                      ArtifactHandlerManager artifactHandlerManager,
+                                      List<RemoteRepository> aetherRepositories )
     {
-        super();
-        this.repositorySystem = repositorySystem;
-        this.artifactHandlerManager = artifactHandlerManager;
-        this.session = session;
-        this.aetherRepositories = aetherRepositories;
+        this.repositorySystem = Objects.requireNonNull( repositorySystem );
+        this.artifactHandlerManager = Objects.requireNonNull( artifactHandlerManager );
+        this.aetherRepositories = Objects.requireNonNull( aetherRepositories );
     }
 
     /**
      * Based on RepositoryUtils#toDependency(org.apache.maven.model.Dependency, ArtifactTypeRegistry)
      *
      * @param coordinate  {@link DependableCoordinate}
-     * @param stereotypes {@link org.eclipse.aether.artifact.ArtifactTypeRegistry
+     * @param stereotypes {@link org.sonatype.aether.artifact.ArtifactTypeRegistry
      * @return as Aether Dependency
      */
     private static Dependency toDependency( DependableCoordinate coordinate, ArtifactTypeRegistry stereotypes )
@@ -93,19 +102,16 @@ class Maven30DependencyResolver implements MavenDependencyResolver
     }
 
     private static Dependency toDependency( org.apache.maven.model.Dependency mavenDependency,
-            ArtifactTypeRegistry typeRegistry ) throws DependencyResolverException
+                                            ArtifactTypeRegistry typeRegistry )
     {
-        Object[] args = new Object[] {mavenDependency, typeRegistry};
-
-        return Invoker.invoke( RepositoryUtils.class, "toDependency", ARG_CLASSES, args );
+        return RepositoryUtils.toDependency( mavenDependency, typeRegistry );
     }
 
     @Override
-    // CHECKSTYLE_OFF: LineLength
     public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies(
-            DependableCoordinate coordinate, TransformableFilter dependencyFilter )
-        // CHECKSTYLE_ON: LineLength
-            throws DependencyResolverException
+            ProjectBuildingRequest buildingRequest,
+            DependableCoordinate coordinate,
+            TransformableFilter dependencyFilter ) throws DependencyResolverException
     {
         ArtifactTypeRegistry typeRegistry = createTypeRegistry();
 
@@ -113,21 +119,19 @@ class Maven30DependencyResolver implements MavenDependencyResolver
 
         CollectRequest request = new CollectRequest( aetherRoot, aetherRepositories );
 
-        return resolveDependencies( dependencyFilter, request );
+        return resolveDependencies( buildingRequest, dependencyFilter, request );
     }
 
-    private ArtifactTypeRegistry createTypeRegistry() throws DependencyResolverException
+    private ArtifactTypeRegistry createTypeRegistry()
     {
-        return Invoker.invoke( RepositoryUtils.class, "newArtifactTypeRegistry", ArtifactHandlerManager.class,
-                artifactHandlerManager );
+        return RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager );
     }
 
     @Override
-    // CHECKSTYLE_OFF: LineLength
-    public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies( Model model,
-            TransformableFilter dependencyFilter )
-        // CHECKSTYLE_ON: LineLength
-            throws DependencyResolverException
+    public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies(
+            ProjectBuildingRequest buildingRequest,
+            Model model,
+            TransformableFilter dependencyFilter ) throws DependencyResolverException
     {
         // Are there examples where packaging and type are NOT in sync
         ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( model.getPackaging() );
@@ -149,7 +153,7 @@ class Maven30DependencyResolver implements MavenDependencyResolver
             request.setManagedDependencies( resolveDependencies( mavenDependencyManagement.getDependencies() ) );
         }
 
-        return resolveDependencies( dependencyFilter, request );
+        return resolveDependencies( buildingRequest, dependencyFilter, request );
     }
 
     /**
@@ -157,10 +161,7 @@ class Maven30DependencyResolver implements MavenDependencyResolver
      * @return List of resolved dependencies.
      * @throws DependencyResolverException in case of a failure of the typeRegistry error.
      */
-    // CHECKSTYLE_OFF: LineLength
     private List<Dependency> resolveDependencies( Collection<org.apache.maven.model.Dependency> mavenDependencies )
-            throws DependencyResolverException
-    // CHECKSTYLE_ON: LineLength
     {
         if ( mavenDependencies == null )
         {
@@ -180,14 +181,12 @@ class Maven30DependencyResolver implements MavenDependencyResolver
     }
 
     @Override
-    // CHECKSTYLE_OFF: LineLength
     public Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies(
+            ProjectBuildingRequest buildingRequest,
             Collection<org.apache.maven.model.Dependency> mavenDependencies,
-            Collection<org.apache.maven.model.Dependency> managedMavenDependencies, TransformableFilter filter )
-        // CHECKSTYLE_ON: LineLength
-            throws DependencyResolverException
+            Collection<org.apache.maven.model.Dependency> managedMavenDependencies,
+            TransformableFilter filter ) throws DependencyResolverException
     {
-
         List<Dependency> aetherDependencies = resolveDependencies( mavenDependencies );
 
         List<Dependency> aetherManagedDependencies = resolveDependencies( managedMavenDependencies );
@@ -195,13 +194,13 @@ class Maven30DependencyResolver implements MavenDependencyResolver
         CollectRequest request = new CollectRequest( aetherDependencies, aetherManagedDependencies,
                 aetherRepositories );
 
-        return resolveDependencies( filter, request );
+        return resolveDependencies( buildingRequest, filter, request );
     }
 
-    // CHECKSTYLE_OFF: LineLength
     private Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> resolveDependencies(
-            TransformableFilter dependencyFilter, CollectRequest request ) throws DependencyResolverException
-    // CHECKSTYLE_ON :LineLength
+            ProjectBuildingRequest buildingRequest,
+            TransformableFilter dependencyFilter,
+            CollectRequest request ) throws DependencyResolverException
     {
         try
         {
@@ -211,8 +210,8 @@ class Maven30DependencyResolver implements MavenDependencyResolver
                 depFilter = dependencyFilter.transform( new SonatypeAetherFilterTransformer() );
             }
 
-            final List<ArtifactResult> dependencyResults = repositorySystem.resolveDependencies( session, request,
-                    depFilter );
+            final List<ArtifactResult> dependencyResults = repositorySystem.resolveDependencies(
+                    buildingRequest.getRepositorySession(), request, depFilter );
 
             // Keep it lazy! Often artifactsResults aren't used, so transforming up front is too expensive
             return new Iterable<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult>()
@@ -221,8 +220,7 @@ class Maven30DependencyResolver implements MavenDependencyResolver
                 public Iterator<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> iterator()
                 {
                     // CHECKSTYLE_OFF: LineLength
-                    Collection<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> artResults =
-                            new ArrayList<>(
+                    Collection<org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult> artResults = new ArrayList<>(
                             dependencyResults.size() );
                     // CHECKSTYLE_ON: LineLength
 

@@ -44,10 +44,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
-import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
-import org.apache.maven.shared.transfer.metadata.ArtifactMetadata;
-import org.apache.maven.shared.transfer.repository.RepositoryManager;
 
 /**
  * This mojo is implemented to test the ArtifactDeployer part of the maven-artifact-transfer shared component.

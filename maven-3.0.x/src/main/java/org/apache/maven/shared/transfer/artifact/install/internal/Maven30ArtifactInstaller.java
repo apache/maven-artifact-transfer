@@ -19,49 +19,77 @@ package org.apache.maven.shared.transfer.artifact.install.internal;
  * under the License.
  */
 
-import java.util.Collection;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
 import org.apache.maven.shared.transfer.metadata.internal.Maven30MetadataBridge;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
+import org.apache.maven.shared.transfer.support.DelegateSupport;
+import org.apache.maven.shared.transfer.support.Selector;
 import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.File;
+import java.util.Collection;
+import java.util.Objects;
+
 /**
- * 
+ *
  */
-class Maven30ArtifactInstaller
-    implements MavenArtifactInstaller
+@Singleton
+@Named( Selector.MAVEN_3_0_X )
+public class Maven30ArtifactInstaller
+        extends DelegateSupport
+        implements ArtifactInstallerDelegate
 {
     private final RepositorySystem repositorySystem;
-    
-    private final RepositorySystemSession session; 
-    
-    Maven30ArtifactInstaller( RepositorySystem repositorySystem, RepositorySystemSession session )
+
+    private final RepositoryManager repositoryManager;
+
+    @Inject
+    public Maven30ArtifactInstaller( RepositorySystem repositorySystem,
+                                     RepositoryManager repositoryManager )
     {
-        this.repositorySystem = repositorySystem;
-        this.session = session;
+        this.repositorySystem = Objects.requireNonNull( repositorySystem );
+        this.repositoryManager = Objects.requireNonNull( repositoryManager );
     }
 
     @Override
-    public void install( Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
-        throws ArtifactInstallerException
+    public void install( ProjectBuildingRequest buildingRequest,
+                         Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
+            throws ArtifactInstallerException
     {
+        install( buildingRequest, null, mavenArtifacts );
+    }
+
+    @Override
+    public void install( ProjectBuildingRequest buildingRequest,
+                         File localRepository,
+                         Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
+            throws ArtifactInstallerException
+    {
+        ProjectBuildingRequest currentBuildingRequest = buildingRequest;
+        if ( localRepository != null )
+        {
+            // update local repo in request
+            currentBuildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, localRepository );
+        }
         // prepare installRequest
         InstallRequest request = new InstallRequest();
 
         // transform artifacts
         for ( org.apache.maven.artifact.Artifact mavenArtifact : mavenArtifacts )
         {
-            Artifact mainArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                                       org.apache.maven.artifact.Artifact.class, mavenArtifact );
+            Artifact mainArtifact = RepositoryUtils.toArtifact( mavenArtifact );
             request.addArtifact( mainArtifact );
 
             for ( ArtifactMetadata metadata : mavenArtifact.getMetadataList() )
@@ -73,29 +101,24 @@ class Maven30ArtifactInstaller
                     request.addArtifact( pomArtifact );
                 }
                 else if ( // metadata instanceof SnapshotArtifactRepositoryMetadata ||
-                metadata instanceof ArtifactRepositoryMetadata )
+                        metadata instanceof ArtifactRepositoryMetadata )
                 {
                     // eaten, handled by repo system
                 }
                 else if ( metadata instanceof org.apache.maven.shared.transfer.metadata.ArtifactMetadata )
                 {
                     org.apache.maven.shared.transfer.metadata.ArtifactMetadata transferMedata =
-                                    ( org.apache.maven.shared.transfer.metadata.ArtifactMetadata ) metadata;
-                    
+                            (org.apache.maven.shared.transfer.metadata.ArtifactMetadata) metadata;
+
                     request.addMetadata( new Maven30MetadataBridge( metadata ).setFile( transferMedata.getFile() ) );
                 }
             }
         }
 
-//        if ( localRepository != null )
-//        {
-//            buildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, localRepository );
-//        }
-        
         // install
         try
         {
-            repositorySystem.install( session, request );
+            repositorySystem.install( currentBuildingRequest.getRepositorySession(), request );
         }
         catch ( InstallationException e )
         {

@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.artifact.resolve.internal;
+package org.apache.maven.shared.transfer.support;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,30 +19,32 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
  * under the License.
  */
 
-import org.apache.maven.RepositoryUtils;
-import org.sonatype.aether.resolution.ArtifactResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
- * {@link org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult} wrapper for {@link ArtifactResult}
- *
- * @author Robert Scholte
- * @since 3.0
+ * Support class for components.
  */
-class Maven30ArtifactResult implements org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult
+public abstract class ComponentSupport
 {
-    private final ArtifactResult artifactResult;
+    private static final String GUICE_ENHANCED = "$$EnhancerByGuice$$";
 
-    /**
-     * @param artifactResult {@link ArtifactResult}
-     */
-    Maven30ArtifactResult( ArtifactResult artifactResult )
+    public static Logger getLogger( final Class<?> type )
     {
-        this.artifactResult = artifactResult;
+        Objects.requireNonNull( type );
+        if ( type.getName().contains( GUICE_ENHANCED ) )
+        {
+            return LoggerFactory.getLogger( type.getSuperclass() );
+        }
+        return LoggerFactory.getLogger( type );
     }
 
-    @Override
-    public org.apache.maven.artifact.Artifact getArtifact()
+    protected final Logger logger;
+
+    protected ComponentSupport()
     {
-        return RepositoryUtils.toArtifact( artifactResult.getArtifact() );
+        this.logger = getLogger( getClass() );
     }
 }

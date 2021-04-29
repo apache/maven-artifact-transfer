@@ -22,6 +22,7 @@ package org.apache.maven.shared.transfer.collection.internal;
 import static org.mockito.Mockito.mock;
 
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.PlexusTestCase;
 import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
 import org.apache.maven.shared.transfer.collection.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
@@ -30,21 +31,22 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DefaultDependencyCollectorTest {
-
+public class DefaultDependencyCollectorTest extends PlexusTestCase
+{
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
   private DependencyCollector dc;
 
   @Before
-  public void setUp() {
-    dc = new org.apache.maven.shared.transfer.collection.internal.DefaultDependencyCollector();
+  public void lookup() throws Exception {
+    dc = lookup( DependencyCollector.class );
   }
 
   @Test
   public void collectDependenciesWithDependencyShouldFailWithNPEWhenParameterBuildingRequestIsNull()
-      throws DependencyCollectionException {
+      throws DependencyCollectionException
+  {
     thrown.expect( NullPointerException.class );
     thrown.expectMessage( "The parameter buildingRequest is not allowed to be null." );
 

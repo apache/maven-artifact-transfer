@@ -24,10 +24,11 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.PlexusTestCase;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.install.ProjectInstaller;
-import org.apache.maven.shared.transfer.project.install.internal.DefaultProjectInstaller;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,18 +38,24 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultProjectInstallerTest
+public class DefaultProjectInstallerTest extends PlexusTestCase
 {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
+    private ProjectInstaller dpi;
+
+    @Before
+    public void lookup() throws Exception
+    {
+        dpi = lookup( ProjectInstaller.class );
+    }
+
     @Test
     public void installShouldFailWithIAEWhileBuildingRequestIsNull()
         throws IOException, ArtifactInstallerException, NoFileAssignedException
     {
-        ProjectInstaller dpi = new DefaultProjectInstaller();
-
         expectedException.expect( IllegalArgumentException.class );
         expectedException.expectMessage( "The parameter buildingRequest is not allowed to be null." );
 
@@ -59,8 +66,6 @@ public class DefaultProjectInstallerTest
     public void installShouldFailWithIAEWhileProjectInstallerRequestIsNull()
         throws IOException, ArtifactInstallerException, NoFileAssignedException
     {
-        ProjectInstaller dpi = new DefaultProjectInstaller();
-
         expectedException.expect( IllegalArgumentException.class );
         expectedException.expectMessage( "The parameter installerRequest is not allowed to be null." );
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );

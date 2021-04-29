@@ -21,7 +21,6 @@ package org.apache.maven.shared.transfer.dependencies;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.maven.shared.transfer.dependencies.DefaultDependableCoordinate;
 import org.junit.Test;
 
 public class DefaultDependableCoordinateTest

@@ -19,13 +19,6 @@ package org.apache.maven.shared.transfer.project.install.internal;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.project.MavenProject;
@@ -38,28 +31,38 @@ import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.install.ProjectInstaller;
 import org.apache.maven.shared.transfer.project.install.ProjectInstallerRequest;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.maven.shared.transfer.support.ComponentSupport;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * This will install a whole project into the appropriate repository.
- * 
- * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
+ *
  */
-@Component( role = ProjectInstaller.class )
-class DefaultProjectInstaller
-    implements ProjectInstaller
+@Singleton
+@Named
+public class DefaultProjectInstaller
+        extends ComponentSupport
+        implements ProjectInstaller
 {
+    private final ArtifactInstaller installer;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectInstaller.class );
+    private final RepositoryManager repositoryManager;
 
-    @Requirement
-    private ArtifactInstaller installer;
-
-    @Requirement
-    private RepositoryManager repositoryManager;
+    @Inject
+    public DefaultProjectInstaller( ArtifactInstaller installer, RepositoryManager repositoryManager )
+    {
+        this.installer = Objects.requireNonNull( installer );
+        this.repositoryManager = Objects.requireNonNull(  repositoryManager );
+    }
 
     /**
      * {@inheritDoc}
@@ -126,7 +129,7 @@ class DefaultProjectInstaller
 
         for ( Artifact attached : attachedArtifacts )
         {
-            LOGGER.debug( "Installing artifact: {}", attached.getId() );
+            logger.debug( "Installing artifact: {}", attached.getId() );
             installer.install( buildingRequest, Collections.singletonList( attached ) );
             addMetaDataFilesForArtifact( buildingRequest, attached, metadataFiles );
         }

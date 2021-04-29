@@ -22,11 +22,12 @@ package org.apache.maven.shared.transfer.project.deploy.internal;
 import static org.mockito.Mockito.mock;
 
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.PlexusTestCase;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
-import org.apache.maven.shared.transfer.project.deploy.internal.DefaultProjectDeployer;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,17 +37,23 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultProjectDeployerTest
+public class DefaultProjectDeployerTest extends PlexusTestCase
 {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
+    private ProjectDeployer dpi;
+
+    @Before
+    public void lookup() throws Exception
+    {
+        dpi = lookup( ProjectDeployer.class );
+    }
 
     @Test
     public void deployShouldFailWithIAEWhileBuildingRequestIsNull()
         throws IllegalArgumentException, NoFileAssignedException, ArtifactDeployerException
     {
-        ProjectDeployer dpi = new DefaultProjectDeployer();
-
         expectedException.expect( IllegalArgumentException.class );
         expectedException.expectMessage( "The parameter buildingRequest is not allowed to be null." );
 
@@ -57,8 +64,6 @@ public class DefaultProjectDeployerTest
     public void deployShouldFailWithIAEWhileProjectDeployerRequestIsNull()
         throws IllegalArgumentException, NoFileAssignedException, ArtifactDeployerException
     {
-        ProjectDeployer dpi = new DefaultProjectDeployer();
-
         expectedException.expect( IllegalArgumentException.class );
         expectedException.expectMessage( "The parameter projectDeployerRequest is not allowed to be null." );
 
@@ -70,8 +75,6 @@ public class DefaultProjectDeployerTest
     public void deployShouldFailWithIAEWhileArtifactRepositoryIsNull()
         throws IllegalArgumentException, NoFileAssignedException, ArtifactDeployerException
     {
-        ProjectDeployer dpi = new DefaultProjectDeployer();
-
         expectedException.expect( IllegalArgumentException.class );
         expectedException.expectMessage( "The parameter artifactRepository is not allowed to be null." );
 

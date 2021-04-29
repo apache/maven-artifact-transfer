@@ -19,15 +19,16 @@ package org.apache.maven.shared.transfer.artifact.deploy.internal;
  * under the License.
  */
 
-import java.util.Collection;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.transfer.metadata.internal.Maven30MetadataBridge;
+import org.apache.maven.shared.transfer.support.DelegateSupport;
+import org.apache.maven.shared.transfer.support.Selector;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -36,34 +37,42 @@ import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.Objects;
+
 /**
- * 
+ *
  */
-class Maven30ArtifactDeployer
-    implements MavenArtifactDeployer
+@Singleton
+@Named( Selector.MAVEN_3_0_X )
+public class Maven30ArtifactDeployer
+        extends DelegateSupport
+        implements ArtifactDeployerDelegate
 {
-
     private final RepositorySystem repositorySystem;
-    
-    private final RepositorySystemSession session;
-    
-    Maven30ArtifactDeployer( RepositorySystem repositorySystem, RepositorySystemSession session )
+
+    @Inject
+    public Maven30ArtifactDeployer( RepositorySystem repositorySystem )
     {
-        this.repositorySystem = repositorySystem;
-        this.session = session;
+        this.repositorySystem = Objects.requireNonNull( repositorySystem );
     }
 
     @Override
-    public void deploy( Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
-                            throws ArtifactDeployerException
-    {
-        deploy( null, mavenArtifacts );
-    }
-
-    @Override
-    public void deploy( ArtifactRepository remoteRepository,
+    public void deploy( ProjectBuildingRequest buildingRequest,
                         Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
-                            throws ArtifactDeployerException
+            throws ArtifactDeployerException
+    {
+        deploy( buildingRequest, null, mavenArtifacts );
+    }
+
+    @Override
+    public void deploy( ProjectBuildingRequest buildingRequest,
+                        ArtifactRepository remoteRepository,
+                        Collection<org.apache.maven.artifact.Artifact> mavenArtifacts )
+            throws ArtifactDeployerException
     {
         // prepare request
         DeployRequest request = new DeployRequest();
@@ -72,20 +81,20 @@ class Maven30ArtifactDeployer
 
         if ( remoteRepository != null )
         {
-            defaultRepository = getRemoteRepository( session, remoteRepository );
+            defaultRepository = getRemoteRepository( buildingRequest.getRepositorySession(), remoteRepository );
         }
 
         // transform artifacts
         for ( org.apache.maven.artifact.Artifact mavenArtifact : mavenArtifacts )
         {
-            Artifact aetherArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                                       org.apache.maven.artifact.Artifact.class, mavenArtifact );
+            Artifact aetherArtifact = RepositoryUtils.toArtifact( mavenArtifact );
             request.addArtifact( aetherArtifact );
 
             RemoteRepository aetherRepository;
             if ( remoteRepository == null )
             {
-                aetherRepository = getRemoteRepository( session, mavenArtifact.getRepository() );
+                aetherRepository = getRemoteRepository( buildingRequest.getRepositorySession(),
+                        mavenArtifact.getRepository() );
             }
             else
             {
@@ -103,15 +112,15 @@ class Maven30ArtifactDeployer
                     request.addArtifact( pomArtifact );
                 }
                 else if ( // metadata instanceof SnapshotArtifactRepositoryMetadata ||
-                metadata instanceof ArtifactRepositoryMetadata )
+                        metadata instanceof ArtifactRepositoryMetadata )
                 {
                     // eaten, handled by repo system
                 }
                 else if ( metadata instanceof org.apache.maven.shared.transfer.metadata.ArtifactMetadata )
                 {
                     org.apache.maven.shared.transfer.metadata.ArtifactMetadata transferMedata =
-                                    ( org.apache.maven.shared.transfer.metadata.ArtifactMetadata ) metadata;
-                    
+                            (org.apache.maven.shared.transfer.metadata.ArtifactMetadata) metadata;
+
                     request.addMetadata( new Maven30MetadataBridge( metadata ).setFile( transferMedata.getFile() ) );
                 }
             }
@@ -120,7 +129,7 @@ class Maven30ArtifactDeployer
         // deploy
         try
         {
-            repositorySystem.deploy( session, request );
+            repositorySystem.deploy( buildingRequest.getRepositorySession(), request );
         }
         catch ( DeploymentException e )
         {
@@ -128,12 +137,10 @@ class Maven30ArtifactDeployer
         }
     }
 
-    private RemoteRepository getRemoteRepository( RepositorySystemSession session, ArtifactRepository remoteRepository )
-        throws ArtifactDeployerException
+    private RemoteRepository getRemoteRepository( RepositorySystemSession session,
+                                                  ArtifactRepository remoteRepository )
     {
-        RemoteRepository aetherRepo = Invoker.invoke( RepositoryUtils.class, "toRepo",
-                                                                         ArtifactRepository.class,
-                                                                         remoteRepository );
+        RemoteRepository aetherRepo = RepositoryUtils.toRepo( remoteRepository );
 
         if ( aetherRepo.getAuthentication() == null )
         {

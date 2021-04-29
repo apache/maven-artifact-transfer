@@ -32,7 +32,7 @@
   <artifactId>maven-artifact-transfer-parent</artifactId>
   <version>2.0.0-SNAPSHOT</version>
 
-  <name>Apache Maven Artifact Transfer</name>
+  <name>Apache Maven Artifact Transfer Parent</name>
   <description>An API to install, deploy and resolving artifacts with supported versions of Maven</description>
 
   <scm>
@@ -61,6 +61,7 @@
     <project.build.outputTimestamp>2020-12-22T10:32:11Z</project.build.outputTimestamp>
     <sisu.version>0.3.4</sisu.version>
     <guice.version>3.2.6</guice.version>
+    <maven.baseVersion>3.1.0</maven.baseVersion>
   </properties>
 
   <modules>
@@ -95,6 +96,11 @@
       </dependency>
 
       <!-- general deps -->
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.3.0</version>
+      </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>

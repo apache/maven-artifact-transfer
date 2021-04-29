@@ -1,4 +1,4 @@
-package org.apache.maven.shared.transfer.artifact.resolve.internal;
+package org.apache.maven.shared.transfer.support;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,30 +19,25 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
  * under the License.
  */
 
-import org.apache.maven.RepositoryUtils;
-import org.sonatype.aether.resolution.ArtifactResult;
+import java.util.Map;
+import java.util.Objects;
 
 /**
- * {@link org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult} wrapper for {@link ArtifactResult}
+ * Support class for delegators.
  *
- * @author Robert Scholte
- * @since 3.0
+ * @param <D></D> the delegator type.
  */
-class Maven30ArtifactResult implements org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult
+public abstract class DelegatorSupport<D> extends ComponentSupport
 {
-    private final ArtifactResult artifactResult;
+    protected D delegate;
 
-    /**
-     * @param artifactResult {@link ArtifactResult}
-     */
-    Maven30ArtifactResult( ArtifactResult artifactResult )
+    protected DelegatorSupport( final Map<String, D> delegates )
     {
-        this.artifactResult = artifactResult;
-    }
-
-    @Override
-    public org.apache.maven.artifact.Artifact getArtifact()
-    {
-        return RepositoryUtils.toArtifact( artifactResult.getArtifact() );
+        Objects.requireNonNull( delegates, "Null delegates for " + getClass() );
+        if ( delegates.isEmpty() )
+        {
+            throw new IllegalStateException( "No delegates found for " + getClass() );
+        }
+        this.delegate = Selector.selectDelegate( delegates );
     }
 }

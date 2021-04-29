@@ -19,13 +19,13 @@ package org.apache.maven.shared.transfer.artifact.resolve.internal;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+import org.apache.maven.shared.transfer.support.DelegateSupport;
+import org.apache.maven.shared.transfer.support.Selector;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -35,71 +35,76 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.List;
+import java.util.Objects;
+
 /**
- * 
+ *
  */
-class Maven31ArtifactResolver
-    implements MavenArtifactResolver
+@Singleton
+@Named( Selector.MAVEN_3_1_X )
+public class Maven31ArtifactResolver
+        extends DelegateSupport
+        implements ArtifactResolverDelegate
 {
     private final RepositorySystem repositorySystem;
-    
-    private final List<RemoteRepository> aetherRepositories;
-    
-    private final RepositorySystemSession session;
 
-    Maven31ArtifactResolver( RepositorySystem repositorySystem, List<RemoteRepository> aetherRepositories,
-                                    RepositorySystemSession session )
+    private final List<RemoteRepository> aetherRepositories;
+
+    @Inject
+    public Maven31ArtifactResolver( RepositorySystem repositorySystem,
+                                    List<RemoteRepository> aetherRepositories )
     {
-        this.repositorySystem = repositorySystem;
-        this.aetherRepositories = aetherRepositories;
-        this.session = session;
+        this.repositorySystem = Objects.requireNonNull( repositorySystem );
+        this.aetherRepositories = Objects.requireNonNull( aetherRepositories );
     }
 
     @Override
     public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact(
+            ProjectBuildingRequest buildingRequest,
             org.apache.maven.artifact.Artifact mavenArtifact ) throws ArtifactResolverException
     {
-        Artifact aetherArtifact = Invoker.invoke( RepositoryUtils.class, "toArtifact",
-                org.apache.maven.artifact.Artifact.class, mavenArtifact );
+        Artifact aetherArtifact = RepositoryUtils.toArtifact( mavenArtifact );
 
-        return resolveArtifact( aetherArtifact );
+        return resolveArtifact( buildingRequest, aetherArtifact );
     }
 
     @Override
-    // CHECKSTYLE_OFF: LineLength
-    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( ArtifactCoordinate coordinate )
-                                                                                        throws ArtifactResolverException
-    // CHECKSTYLE_ON: LineLength
+    public org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact(
+            ProjectBuildingRequest buildingRequest,
+            ArtifactCoordinate coordinate ) throws ArtifactResolverException
     {
-        Artifact aetherArtifact =
-            new DefaultArtifact( coordinate.getGroupId(), coordinate.getArtifactId(), coordinate.getClassifier(),
-                                 coordinate.getExtension(), coordinate.getVersion() );
+        Artifact aetherArtifact = new DefaultArtifact( coordinate.getGroupId(), coordinate.getArtifactId(),
+                coordinate.getClassifier(), coordinate.getExtension(), coordinate.getVersion() );
 
-        return resolveArtifact( aetherArtifact );
+        return resolveArtifact( buildingRequest, aetherArtifact );
     }
 
-    // CHECKSTYLE_OFF: LineLength
-    private org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact( Artifact aetherArtifact )
-                                                                                         throws ArtifactResolverException
-    // CHECKSTYLE_ON: LineLength
+    private org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult resolveArtifact(
+            ProjectBuildingRequest buildingRequest,
+            Artifact aetherArtifact ) throws ArtifactResolverException
     {
         try
         {
             // use descriptor to respect relocation
-            ArtifactDescriptorRequest descriptorRequest =
-                new ArtifactDescriptorRequest( aetherArtifact, aetherRepositories, null );
+            ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest( aetherArtifact,
+                    aetherRepositories, null );
 
-            ArtifactDescriptorResult descriptorResult =
-                repositorySystem.readArtifactDescriptor( session, descriptorRequest );
+            ArtifactDescriptorResult descriptorResult = repositorySystem.readArtifactDescriptor(
+                    buildingRequest.getRepositorySession(),
+                    descriptorRequest );
 
             ArtifactRequest request = new ArtifactRequest( descriptorResult.getArtifact(), aetherRepositories, null );
 
-            return new Maven31ArtifactResult( repositorySystem.resolveArtifact( session, request ) );
+            return new Maven31ArtifactResult(
+                    repositorySystem.resolveArtifact( buildingRequest.getRepositorySession(), request ) );
         }
         catch ( ArtifactDescriptorException | ArtifactResolutionException e )
         {
             throw new ArtifactResolverException( e.getMessage(), e );
         }
     }
-
 }

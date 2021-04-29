@@ -20,18 +20,24 @@ package org.apache.maven.shared.transfer.repository.internal;
  */
 
 import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.LocalRepository;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
- * 
+ *
  */
-class Maven302RepositoryManager
-    extends Maven30RepositoryManager
+@Singleton
+@Named( "maven-3.0.2" )
+public class Maven302RepositoryManager
+        extends Maven30RepositoryManager
 {
-    Maven302RepositoryManager( RepositorySystem repositorySystem, RepositorySystemSession session )
+    @Inject
+    public Maven302RepositoryManager( RepositorySystem repositorySystem )
     {
-        super( repositorySystem, session );
+        super( repositorySystem );
     }
 
     /**

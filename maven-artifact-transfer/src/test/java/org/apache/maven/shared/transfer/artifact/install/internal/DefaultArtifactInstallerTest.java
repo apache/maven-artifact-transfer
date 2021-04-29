@@ -28,9 +28,10 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.PlexusTestCase;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
-import org.apache.maven.shared.transfer.artifact.install.internal.DefaultArtifactInstaller;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -40,27 +41,31 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultArtifactInstallerTest
+public class DefaultArtifactInstallerTest extends PlexusTestCase
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    @Test
-    public void installShouldReturnIllegalArgumentExceptionForFirstParameterWithNull() throws IllegalArgumentException, ArtifactInstallerException
-    {
-        DefaultArtifactInstaller dai = new DefaultArtifactInstaller();
+    private ArtifactInstaller dai;
 
+    @Before
+    public void lookUp() throws Exception
+    {
+        dai = lookup( ArtifactInstaller.class );
+    }
+
+    @Test
+    public void testInstallShouldReturnIllegalArgumentExceptionForFirstParameterWithNull() throws IllegalArgumentException, ArtifactInstallerException
+    {
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter request is not allowed to be null." );
         dai.install( null, Collections.<Artifact>emptyList() );
     }
 
     @Test
-    public void installShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
+    public void testInstallShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
         throws ArtifactInstallerException
     {
-        DefaultArtifactInstaller dai = new DefaultArtifactInstaller();
-
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter mavenArtifacts is not allowed to be null." );
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
@@ -68,11 +73,9 @@ public class DefaultArtifactInstallerTest
     }
 
     @Test
-    public void installShouldReturnIllegalArgumentExceptionForSecondParameterWithEmpty()
+    public void testInstallShouldReturnIllegalArgumentExceptionForSecondParameterWithEmpty()
         throws ArtifactInstallerException
     {
-        DefaultArtifactInstaller dai = new DefaultArtifactInstaller();
-
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The collection mavenArtifacts is not allowed to be empty." );
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
@@ -80,11 +83,9 @@ public class DefaultArtifactInstallerTest
     }
 
     @Test
-    public void installWith3ParametersShouldReturnIllegalArgumentExceptionForFirstParameterWithNull()
+    public void testInstallWith3ParametersShouldReturnIllegalArgumentExceptionForFirstParameterWithNull()
         throws ArtifactInstallerException
     {
-        DefaultArtifactInstaller dai = new DefaultArtifactInstaller();
-
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter request is not allowed to be null." );
         File localRepository = mock( File.class );
@@ -92,11 +93,9 @@ public class DefaultArtifactInstallerTest
     }
 
     @Test
-    public void installWith3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
+    public void testInstallWith3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterWithNull()
         throws ArtifactInstallerException
     {
-        DefaultArtifactInstaller dai = new DefaultArtifactInstaller();
-
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter localRepository is not allowed to be null." );
 
@@ -106,11 +105,9 @@ public class DefaultArtifactInstallerTest
     }
 
     @Test
-    public void installWith3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterNotADirectory()
+    public void testInstallWith3ParametersShouldReturnIllegalArgumentExceptionForSecondParameterNotADirectory()
         throws ArtifactInstallerException
     {
-        DefaultArtifactInstaller dai = new DefaultArtifactInstaller();
-
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter localRepository must be a directory." );
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
@@ -122,16 +119,13 @@ public class DefaultArtifactInstallerTest
     }
 
     @Test
-    public void installWith3ParametersShouldReturnIllegalArgumentExceptionForThirdParameterWithNull()
+    public void testInstallWith3ParametersShouldReturnIllegalArgumentExceptionForThirdParameterWithNull()
         throws ArtifactInstallerException
     {
-        DefaultArtifactInstaller dai = new DefaultArtifactInstaller();
-
         thrown.expect( IllegalArgumentException.class );
         thrown.expectMessage( "The parameter mavenArtifacts is not allowed to be null." );
         ProjectBuildingRequest pbr = mock( ProjectBuildingRequest.class );
         File localRepository = mock( File.class );
         dai.install( pbr, localRepository, null );
     }
-
 }

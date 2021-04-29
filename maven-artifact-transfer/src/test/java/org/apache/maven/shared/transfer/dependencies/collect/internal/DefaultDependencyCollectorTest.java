@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.shared.transfer.PlexusTestCase;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
@@ -32,7 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DefaultDependencyCollectorTest
+public class DefaultDependencyCollectorTest extends PlexusTestCase
 {
 
     @Rule
@@ -41,9 +42,9 @@ public class DefaultDependencyCollectorTest
     private DependencyCollector dc;
 
     @Before
-    public void setUp()
+    public void lookUp() throws Exception
     {
-        dc = new DefaultDependencyCollector();
+        dc = lookup( DependencyCollector.class );
     }
 
     @Test

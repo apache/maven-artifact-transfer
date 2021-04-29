@@ -28,7 +28,8 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.apache.maven.shared.transfer.artifact.install.internal.Maven30ArtifactInstaller;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
+import org.apache.maven.shared.transfer.repository.internal.Maven30RepositoryManager;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
@@ -52,6 +53,8 @@ public class Maven30ArtifactInstallerTest extends PlexusTestCase
         MavenRepositorySystemSession repositorySession = new MavenRepositorySystemSession();
         repositorySession.setLocalRepositoryManager( new SimpleLocalRepositoryManager( localRepo ) );
         buildingRequest.setRepositorySession( repositorySession );
+
+        RepositoryManager repositoryManager = new Maven30RepositoryManager( repositorySystem );
         
         DefaultArtifactHandler artifactHandler = new DefaultArtifactHandler();
         artifactHandler.setExtension( "EXTENSION" );
@@ -67,8 +70,8 @@ public class Maven30ArtifactInstallerTest extends PlexusTestCase
         
         Collection<Artifact> mavenArtifacts = Arrays.<Artifact>asList( artifact, artifactWithClassifier );
         
-        MavenArtifactInstaller installer = new Maven30ArtifactInstaller( repositorySystem, repositorySession );
-        installer.install( mavenArtifacts );
+        ArtifactInstallerDelegate installer = new Maven30ArtifactInstaller( repositorySystem, repositoryManager );
+        installer.install( buildingRequest, mavenArtifacts );
         
         assertTrue( new File( localRepo, "GROUPID/ARTIFACTID/VERSION/ARTIFACTID-VERSION.EXTENSION" ).exists() );
         assertTrue( new File( localRepo, "GROUPID/ARTIFACTID/VERSION/ARTIFACTID-VERSION-CLASSIFIER.EXTENSION" ).exists() );

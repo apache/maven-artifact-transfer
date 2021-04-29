@@ -21,7 +21,6 @@ package org.apache.maven.shared.transfer.artifact;
 
 import static org.junit.Assert.*;
 
-import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
 import org.junit.Test;
 
 public class DefaultArtifactCoordinateTest
