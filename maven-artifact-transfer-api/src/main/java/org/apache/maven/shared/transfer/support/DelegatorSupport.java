@@ -25,11 +25,11 @@ import java.util.Objects;
 /**
  * Support class for delegators.
  *
- * @param <D></D> the delegator type.
+ * @param <D> the delegator type.
  */
 public abstract class DelegatorSupport<D> extends ComponentSupport
 {
-    protected D delegate;
+    protected final D delegate;
 
     protected DelegatorSupport( final Map<String, D> delegates )
     {
@@ -38,6 +38,7 @@ public abstract class DelegatorSupport<D> extends ComponentSupport
         {
             throw new IllegalStateException( "No delegates found for " + getClass() );
         }
-        this.delegate = Selector.selectDelegate( delegates );
+        this.delegate = Objects.requireNonNull( Selector.selectDelegate( delegates ),
+                "Could not select delegate keyed as " + Selector.RUNTIME + " from delegates " + delegates );
     }
 }

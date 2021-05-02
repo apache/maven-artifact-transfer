@@ -31,17 +31,15 @@ public final class Selector
 
     public static final String MAVEN_3_1_X = "maven-3.1.x";
 
-    private static final String RUNTIME = detectRuntime();
+    public static final String RUNTIME = detectRuntime();
 
     /**
-     * Selects delegate from the passed in map.
+     * Selects delegate from the passed in map, may return {@code null} if not fit delegate not found..
      */
     public static <D> D selectDelegate( final Map<String, D> delegates )
     {
         Objects.requireNonNull( delegates, "Null delegates" );
-        D delegate = delegates.get( RUNTIME );
-        return Objects.requireNonNull( delegate,
-                "Could not select delegate keyed as " + RUNTIME + " from delegates " + delegates );
+        return delegates.get( RUNTIME );
     }
 
     /**
