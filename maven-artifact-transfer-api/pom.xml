@@ -34,8 +34,9 @@
     <apiMaven.version>3.0</apiMaven.version>
   </properties>
 
+  <!-- This module must work in CP of Maven 3.0.x AND Maven 3.1.x -->
+
   <dependencies>
-    <!-- Maven 3.0.x: all provided -->
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
