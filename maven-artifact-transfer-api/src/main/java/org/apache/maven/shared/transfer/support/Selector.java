@@ -34,7 +34,7 @@ public final class Selector
     public static final String RUNTIME = detectRuntime();
 
     /**
-     * Selects delegate from the passed in map, may return {@code null} if not fit delegate not found..
+     * Selects delegate from the passed in map, may return {@code null} if no fit delegate not found.
      */
     public static <D> D selectDelegate( final Map<String, D> delegates )
     {
