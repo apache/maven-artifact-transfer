@@ -24,28 +24,23 @@ import static org.mockito.Mockito.mock;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.PlexusTestCase;
+import org.apache.maven.shared.transfer.TestUtils;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DefaultDependencyCollectorTest extends PlexusTestCase
+public class DefaultDependencyCollectorTest
 {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private DependencyCollector dc;
-
-    @Before
-    public void lookUp() throws Exception
-    {
-        dc = lookup( DependencyCollector.class );
-    }
+    private DependencyCollector dc = new DefaultDependencyCollector(
+            TestUtils.delegateMap( DependencyCollectorDelegate.class )
+    );
 
     @Test
     public void collectDependenciesWithDependableCoordinatShouldFailWithIAEWhenParameterBuildingRequestIsNull()

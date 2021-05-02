@@ -25,10 +25,9 @@ import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.PlexusTestCase;
+import org.apache.maven.shared.transfer.TestUtils;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,19 +37,15 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultArtifactDeployerTest extends PlexusTestCase
+public class DefaultArtifactDeployerTest
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
     
-    private ArtifactDeployer dap;
+    private ArtifactDeployer dap = new DefaultArtifactDeployer(
+            TestUtils.delegateMap( ArtifactDeployerDelegate.class )
+    );
     
-    @Before
-    public void lookUp() throws Exception
-    {
-        dap = lookup( ArtifactDeployer.class );
-    }
-
     @Test
     public void testDeployShouldReturnIllegalArgumentExceptionForFirstParameterWithNull()
         throws ArtifactDeployerException

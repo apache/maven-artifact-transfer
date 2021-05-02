@@ -28,10 +28,9 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.PlexusTestCase;
+import org.apache.maven.shared.transfer.TestUtils;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -41,18 +40,14 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultArtifactInstallerTest extends PlexusTestCase
+public class DefaultArtifactInstallerTest
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private ArtifactInstaller dai;
-
-    @Before
-    public void lookUp() throws Exception
-    {
-        dai = lookup( ArtifactInstaller.class );
-    }
+    private ArtifactInstaller dai = new DefaultArtifactInstaller(
+            TestUtils.delegateMap( ArtifactInstallerDelegate.class )
+    );
 
     @Test
     public void testInstallShouldReturnIllegalArgumentExceptionForFirstParameterWithNull() throws IllegalArgumentException, ArtifactInstallerException

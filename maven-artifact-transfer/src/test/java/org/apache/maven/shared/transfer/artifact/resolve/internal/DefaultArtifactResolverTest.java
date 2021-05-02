@@ -23,11 +23,10 @@ import static org.mockito.Mockito.mock;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.PlexusTestCase;
+import org.apache.maven.shared.transfer.TestUtils;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,19 +36,15 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultArtifactResolverTest extends PlexusTestCase
+public class DefaultArtifactResolverTest
 {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private ArtifactResolver dap;
-
-    @Before
-    public void lookUp() throws Exception
-    {
-        dap = lookup( ArtifactResolver.class );
-    }
+    private ArtifactResolver dap = new DefaultArtifactResolver(
+            TestUtils.delegateMap( ArtifactResolverDelegate.class )
+    );
 
     @Test
     public void testResolveArtifactWithArtifactShouldFaileWithIAEWhenParameterBuildingRequestIsNull()

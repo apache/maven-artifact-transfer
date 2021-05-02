@@ -22,12 +22,11 @@ package org.apache.maven.shared.transfer.project.deploy.internal;
 import static org.mockito.Mockito.mock;
 
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.PlexusTestCase;
+import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
 import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,18 +36,12 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultProjectDeployerTest extends PlexusTestCase
+public class DefaultProjectDeployerTest
 {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private ProjectDeployer dpi;
-
-    @Before
-    public void lookup() throws Exception
-    {
-        dpi = lookup( ProjectDeployer.class );
-    }
+    private ProjectDeployer dpi = new DefaultProjectDeployer( mock( ArtifactDeployer.class ) );
 
     @Test
     public void deployShouldFailWithIAEWhileBuildingRequestIsNull()

@@ -22,26 +22,22 @@ package org.apache.maven.shared.transfer.collection.internal;
 import static org.mockito.Mockito.mock;
 
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.PlexusTestCase;
+import org.apache.maven.shared.transfer.TestUtils;
 import org.apache.maven.shared.transfer.collection.DependencyCollectionException;
 import org.apache.maven.shared.transfer.collection.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class DefaultDependencyCollectorTest extends PlexusTestCase
+public class DefaultDependencyCollectorTest
 {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private DependencyCollector dc;
-
-  @Before
-  public void lookup() throws Exception {
-    dc = lookup( DependencyCollector.class );
-  }
+  private DependencyCollector dc = new DefaultDependencyCollector(
+          TestUtils.delegateMap( DependencyCollectorDelegate.class )
+  );
 
   @Test
   public void collectDependenciesWithDependencyShouldFailWithNPEWhenParameterBuildingRequestIsNull()

@@ -23,11 +23,10 @@ import static org.mockito.Mockito.mock;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.shared.transfer.PlexusTestCase;
+import org.apache.maven.shared.transfer.TestUtils;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,18 +36,14 @@ import org.junit.rules.ExpectedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmabaise@apache.org</a>
  */
-public class DefaultDependencyResolverTest extends PlexusTestCase
+public class DefaultDependencyResolverTest
 {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private DependencyResolver dr;
-
-    @Before
-    public void lookup() throws Exception
-    {
-        dr = lookup( DependencyResolver.class );
-    }
+    private DependencyResolver dr = new DefaultDependencyResolver(
+            TestUtils.delegateMap( DependencyResolverDelegate.class )
+    );
 
     @Test
     public void resolveDependenciesWithDependableCoordinatShouldFailWithIAEWhenParameterBuildingRequestIsNull()
