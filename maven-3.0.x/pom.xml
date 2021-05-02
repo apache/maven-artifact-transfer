@@ -31,8 +31,8 @@
   <name>Apache Maven Artifact Transfer Maven 3.0.x provider</name>
 
   <properties>
-    <maven30x.version>3.0</maven30x.version>
-    <sonatypeAether.version>1.7</sonatypeAether.version>
+    <maven30x.version>3.0.5</maven30x.version>
+    <sonatypeAether.version>1.13.1</sonatypeAether.version>
   </properties>
 
   <dependencies>

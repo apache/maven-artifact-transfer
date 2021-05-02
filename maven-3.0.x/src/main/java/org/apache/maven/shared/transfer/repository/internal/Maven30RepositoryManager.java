@@ -37,24 +37,18 @@ import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.File;
 import java.util.Objects;
 
 /**
  *
  */
-@Singleton
-@Named
-public class Maven30RepositoryManager
+public abstract class Maven30RepositoryManager
         extends DelegateSupport
         implements RepositoryManagerDelegate
 {
     private final RepositorySystem repositorySystem;
 
-    @Inject
     public Maven30RepositoryManager( RepositorySystem repositorySystem )
     {
         this.repositorySystem = Objects.requireNonNull( repositorySystem );

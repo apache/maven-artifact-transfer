@@ -19,6 +19,7 @@ package org.apache.maven.shared.transfer.repository.internal;
  * under the License.
  */
 
+import org.apache.maven.shared.transfer.support.Selector;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.repository.LocalRepository;
 
@@ -30,7 +31,7 @@ import javax.inject.Singleton;
  *
  */
 @Singleton
-@Named( "maven-3.0.2" )
+@Named( Selector.MAVEN_3_0_X )
 public class Maven302RepositoryManager
         extends Maven30RepositoryManager
 {

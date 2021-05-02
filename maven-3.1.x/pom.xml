@@ -31,7 +31,7 @@
   <name>Apache Maven Artifact Transfer Maven 3.1.x provider</name>
 
   <properties>
-    <maven31x.version>3.1.0</maven31x.version>
+    <maven31x.version>3.1.1</maven31x.version>
     <eclipseAether.version>0.9.0.M2</eclipseAether.version>
   </properties>
 
