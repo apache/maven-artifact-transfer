@@ -27,47 +27,54 @@ import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolver;
 import org.apache.maven.shared.transfer.dependencies.resolve.DependencyResolverException;
-import org.apache.maven.shared.transfer.support.DelegatorSupport;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
+
+import static org.apache.maven.shared.transfer.support.Selector.selectDelegate;
 
 /**
  *
  */
-@Singleton
-@Named
+@Component( role = DependencyResolver.class, hint = "default" )
 public class DefaultDependencyResolver
-        extends DelegatorSupport<DependencyResolverDelegate>
         implements DependencyResolver
 {
-    @Inject
-    public DefaultDependencyResolver( Map<String, DependencyResolverDelegate> delegates )
+    @Requirement( role = DependencyResolverDelegate.class )
+    private Map<String, DependencyResolverDelegate> delegates;
+
+    public DefaultDependencyResolver()
     {
-        super( delegates );
     }
 
+    public DefaultDependencyResolver( Map<String, DependencyResolverDelegate> delegates )
+    {
+        this.delegates = delegates;
+    }
+
+    @Override
     public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
                                                          DependableCoordinate coordinate,
                                                          TransformableFilter filter )
             throws DependencyResolverException
     {
         validateParameters( buildingRequest, coordinate );
-        return delegate.resolveDependencies( buildingRequest, coordinate, filter );
+        return selectDelegate( delegates ).resolveDependencies( buildingRequest, coordinate, filter );
     }
 
+    @Override
     public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
                                                          Model model,
                                                          TransformableFilter filter )
             throws DependencyResolverException
     {
         validateParameters( buildingRequest, model );
-        return delegate.resolveDependencies( buildingRequest, model, filter );
+        return selectDelegate( delegates ).resolveDependencies( buildingRequest, model, filter );
     }
 
+    @Override
     public Iterable<ArtifactResult> resolveDependencies( ProjectBuildingRequest buildingRequest,
                                                          Collection<Dependency> dependencies,
                                                          Collection<Dependency> managedDependencies,
@@ -75,7 +82,8 @@ public class DefaultDependencyResolver
             throws DependencyResolverException
     {
         validateBuildingRequest( buildingRequest );
-        return delegate.resolveDependencies( buildingRequest, dependencies, managedDependencies, filter );
+        return selectDelegate( delegates ).resolveDependencies(
+                buildingRequest, dependencies, managedDependencies, filter );
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate coordinate )

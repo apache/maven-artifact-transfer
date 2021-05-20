@@ -24,42 +24,48 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployer;
 import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerException;
-import org.apache.maven.shared.transfer.support.DelegatorSupport;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
+
+import static org.apache.maven.shared.transfer.support.Selector.selectDelegate;
 
 /**
  *
  */
-@Singleton
-@Named
+@Component( role = ArtifactDeployer.class, hint = "default" )
 public class DefaultArtifactDeployer
-        extends DelegatorSupport<ArtifactDeployerDelegate>
         implements ArtifactDeployer
 {
-    @Inject
-    public DefaultArtifactDeployer( Map<String, ArtifactDeployerDelegate> delegates )
+    @Requirement( role = ArtifactDeployerDelegate.class )
+    private Map<String, ArtifactDeployerDelegate> delegates;
+
+    public DefaultArtifactDeployer()
     {
-        super( delegates );
     }
 
+    public DefaultArtifactDeployer( Map<String, ArtifactDeployerDelegate> delegates )
+    {
+        this.delegates = delegates;
+    }
+
+    @Override
     public void deploy( ProjectBuildingRequest request,
                         Collection<Artifact> mavenArtifacts ) throws ArtifactDeployerException
     {
         validateParameters( request, mavenArtifacts );
-        delegate.deploy( request, mavenArtifacts );
+        selectDelegate( delegates ).deploy( request, mavenArtifacts );
     }
 
+    @Override
     public void deploy( ProjectBuildingRequest request,
                         ArtifactRepository remoteRepository,
                         Collection<Artifact> mavenArtifacts ) throws ArtifactDeployerException
     {
         validateParameters( request, mavenArtifacts );
-        delegate.deploy( request, remoteRepository, mavenArtifacts );
+        selectDelegate( delegates ).deploy( request, remoteRepository, mavenArtifacts );
     }
 
     private void validateParameters( ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts )

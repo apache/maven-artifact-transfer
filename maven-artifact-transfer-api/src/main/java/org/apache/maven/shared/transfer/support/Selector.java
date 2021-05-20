@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Selector that detects "runtime" Maven version and tells {@link DelegatorSupport} which delegate should choose.
+ * Selector that detects "runtime" Maven version and tells which delegate should use.
  */
 public final class Selector
 {
@@ -38,6 +38,7 @@ public final class Selector
      */
     public static <D> D selectDelegate( final Map<String, D> delegates )
     {
+        System.out.println( " ### delegates: " + delegates.keySet() );
         Objects.requireNonNull( delegates, "Null delegates" );
         return delegates.get( RUNTIME );
     }
@@ -58,14 +59,17 @@ public final class Selector
         {
             // skip
         }
-        try
+        if ( runtime == null )
         {
-            Trap.MAVEN_3_1_X.check();
-            runtime = MAVEN_3_1_X;
-        }
-        catch ( Trap.TrapException e )
-        {
-            // skip
+            try
+            {
+                Trap.MAVEN_3_1_X.check();
+                runtime = MAVEN_3_1_X;
+            }
+            catch ( Trap.TrapException e )
+            {
+                // skip
+            }
         }
 
         if ( runtime == null )
@@ -73,6 +77,7 @@ public final class Selector
             // if here, die
             throw new IllegalStateException( "Could not determine runtime" );
         }
+        System.out.println( " ####   RUNTIME " + runtime );
         return runtime;
     }
 }

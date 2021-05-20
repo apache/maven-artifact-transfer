@@ -25,6 +25,8 @@ import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.maven.shared.transfer.support.DelegateSupport;
 import org.apache.maven.shared.transfer.support.Selector;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.resolution.ArtifactDescriptorException;
@@ -34,23 +36,23 @@ import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Objects;
 
 /**
  *
  */
-@Singleton
-@Named( Selector.MAVEN_3_0_X )
+@Component( role = ArtifactResolverDelegate.class, hint = Selector.MAVEN_3_0_X )
 public class Maven30ArtifactResolver
         extends DelegateSupport
         implements ArtifactResolverDelegate
 {
-    private final RepositorySystem repositorySystem;
+    @Requirement
+    private RepositorySystem repositorySystem;
 
-    @Inject
+    public Maven30ArtifactResolver()
+    {
+    }
+
     public Maven30ArtifactResolver( RepositorySystem repositorySystem )
     {
         this.repositorySystem = Objects.requireNonNull( repositorySystem );

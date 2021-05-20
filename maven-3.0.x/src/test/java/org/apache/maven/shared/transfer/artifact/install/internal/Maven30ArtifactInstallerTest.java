@@ -29,7 +29,7 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.apache.maven.shared.transfer.repository.internal.Maven302RepositoryManager;
+import org.apache.maven.shared.transfer.repository.internal.Maven30RepositoryManager;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
@@ -54,7 +54,7 @@ public class Maven30ArtifactInstallerTest extends PlexusTestCase
         repositorySession.setLocalRepositoryManager( new SimpleLocalRepositoryManager( localRepo ) );
         buildingRequest.setRepositorySession( repositorySession );
 
-        RepositoryManager repositoryManager = new Maven302RepositoryManager( repositorySystem );
+        RepositoryManager repositoryManager = new Maven30RepositoryManager( repositorySystem );
         
         DefaultArtifactHandler artifactHandler = new DefaultArtifactHandler();
         artifactHandler.setExtension( "EXTENSION" );

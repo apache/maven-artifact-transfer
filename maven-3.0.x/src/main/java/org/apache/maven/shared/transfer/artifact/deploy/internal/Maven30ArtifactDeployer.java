@@ -29,6 +29,8 @@ import org.apache.maven.shared.transfer.artifact.deploy.ArtifactDeployerExceptio
 import org.apache.maven.shared.transfer.metadata.internal.Maven30MetadataBridge;
 import org.apache.maven.shared.transfer.support.DelegateSupport;
 import org.apache.maven.shared.transfer.support.Selector;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -37,24 +39,24 @@ import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Objects;
 
 /**
  *
  */
-@Singleton
-@Named( Selector.MAVEN_3_0_X )
+@Component( role = ArtifactDeployerDelegate.class, hint = Selector.MAVEN_3_0_X )
 public class Maven30ArtifactDeployer
         extends DelegateSupport
         implements ArtifactDeployerDelegate
 {
-    private final RepositorySystem repositorySystem;
+    @Requirement
+    private RepositorySystem repositorySystem;
 
-    @Inject
+    public Maven30ArtifactDeployer()
+    {
+    }
+
     public Maven30ArtifactDeployer( RepositorySystem repositorySystem )
     {
         this.repositorySystem = Objects.requireNonNull( repositorySystem );

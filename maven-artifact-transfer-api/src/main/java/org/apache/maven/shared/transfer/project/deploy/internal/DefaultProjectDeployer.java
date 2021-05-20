@@ -29,10 +29,9 @@ import org.apache.maven.shared.transfer.project.NoFileAssignedException;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployer;
 import org.apache.maven.shared.transfer.project.deploy.ProjectDeployerRequest;
 import org.apache.maven.shared.transfer.support.ComponentSupport;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,15 +41,18 @@ import java.util.Objects;
 /**
  *
  */
-@Singleton
-@Named
+@Component( role = ProjectDeployer.class, hint = "default" )
 public class DefaultProjectDeployer
         extends ComponentSupport
         implements ProjectDeployer
 {
-    private final ArtifactDeployer deployer;
+    @Requirement
+    private ArtifactDeployer deployer;
 
-    @Inject
+    public DefaultProjectDeployer()
+    {
+    }
+
     public DefaultProjectDeployer( ArtifactDeployer deployer )
     {
         this.deployer = Objects.requireNonNull( deployer );
@@ -59,6 +61,7 @@ public class DefaultProjectDeployer
     /**
      * {@inheritDoc}
      */
+    @Override
     public void deploy( ProjectBuildingRequest buildingRequest, ProjectDeployerRequest projectDeployerRequest,
                         ArtifactRepository artifactRepository )
         throws NoFileAssignedException, IllegalArgumentException, ArtifactDeployerException
@@ -180,5 +183,4 @@ public class DefaultProjectDeployer
             throw exception;
         }
     }
-
 }

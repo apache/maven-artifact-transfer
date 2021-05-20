@@ -32,10 +32,9 @@ import org.apache.maven.shared.transfer.project.install.ProjectInstaller;
 import org.apache.maven.shared.transfer.project.install.ProjectInstallerRequest;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.apache.maven.shared.transfer.support.ComponentSupport;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -47,17 +46,21 @@ import java.util.Objects;
 /**
  *
  */
-@Singleton
-@Named
+@Component( role = ProjectInstaller.class, hint = "default" )
 public class DefaultProjectInstaller
         extends ComponentSupport
         implements ProjectInstaller
 {
-    private final ArtifactInstaller installer;
+    @Requirement
+    private ArtifactInstaller installer;
 
-    private final RepositoryManager repositoryManager;
+    @Requirement
+    private RepositoryManager repositoryManager;
 
-    @Inject
+    public DefaultProjectInstaller()
+    {
+    }
+
     public DefaultProjectInstaller( ArtifactInstaller installer, RepositoryManager repositoryManager )
     {
         this.installer = Objects.requireNonNull( installer );
@@ -175,5 +178,4 @@ public class DefaultProjectInstaller
         String path = repositoryManager.getPathForLocalMetadata( buildingRequest, metadata );
         return new File( repositoryManager.getLocalRepositoryBasedir( buildingRequest ), path );
     }
-
 }

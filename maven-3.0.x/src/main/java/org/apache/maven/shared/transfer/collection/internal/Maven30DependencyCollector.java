@@ -29,6 +29,8 @@ import org.apache.maven.shared.transfer.collection.DependencyCollectionException
 import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.support.DelegateSupport;
 import org.apache.maven.shared.transfer.support.Selector;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.artifact.ArtifactTypeRegistry;
@@ -36,9 +38,6 @@ import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,17 +45,21 @@ import java.util.Objects;
 /**
  *
  */
-@Singleton
-@Named( Selector.MAVEN_3_0_X )
+@Component( role = DependencyCollectorDelegate.class, hint = Selector.MAVEN_3_0_X )
 public class Maven30DependencyCollector
         extends DelegateSupport
         implements DependencyCollectorDelegate
 {
-    private final RepositorySystem repositorySystem;
+    @Requirement
+    private RepositorySystem repositorySystem;
 
-    private final ArtifactHandlerManager artifactHandlerManager;
+    @Requirement
+    private ArtifactHandlerManager artifactHandlerManager;
 
-    @Inject
+    public Maven30DependencyCollector()
+    {
+    }
+
     public Maven30DependencyCollector( RepositorySystem repositorySystem,
                                        ArtifactHandlerManager artifactHandlerManager )
     {

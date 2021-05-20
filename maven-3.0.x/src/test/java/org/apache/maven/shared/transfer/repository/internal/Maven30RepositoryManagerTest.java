@@ -52,7 +52,7 @@ public class Maven30RepositoryManagerTest extends PlexusTestCase
         File basedir = new File( "NEW/LOCAL/REPO" );
         
         Maven30RepositoryManager repositoryManager =
-            new Maven302RepositoryManager( repositorySystem  );
+            new Maven30RepositoryManager( repositorySystem  );
         
         ProjectBuildingRequest newBuildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, basedir );
         
@@ -69,7 +69,7 @@ public class Maven30RepositoryManagerTest extends PlexusTestCase
         File basedir = new File( "NEW/LOCAL/REPO" );
         
         Maven30RepositoryManager repositoryManager =
-            new Maven302RepositoryManager( repositorySystem );
+            new Maven30RepositoryManager( repositorySystem );
         
         ProjectBuildingRequest newBuildingRequest = repositoryManager.setLocalRepositoryBasedir( buildingRequest, basedir );
         

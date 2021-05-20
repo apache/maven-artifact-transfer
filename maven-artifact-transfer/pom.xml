@@ -158,8 +158,7 @@
                 <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               </filterProperties>
               <extraArtifacts>
-                <!-- Do we really want to support 3.0.x??? -->
-                <!--extraArtifact>org.apache.maven:apache-maven:3.0.5:tar.gz:bin</extraArtifact-->
+                <extraArtifact>org.apache.maven:apache-maven:3.0.5:tar.gz:bin</extraArtifact>
                 <extraArtifact>org.apache.maven:apache-maven:3.1.1:tar.gz:bin</extraArtifact>
                 <extraArtifact>org.apache.maven:apache-maven:3.2.5:tar.gz:bin</extraArtifact>
                 <extraArtifact>org.apache.maven:apache-maven:3.3.1:tar.gz:bin</extraArtifact>

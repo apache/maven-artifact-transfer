@@ -23,38 +23,44 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
 import org.apache.maven.shared.transfer.artifact.install.ArtifactInstallerException;
-import org.apache.maven.shared.transfer.support.DelegatorSupport;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 
+import static org.apache.maven.shared.transfer.support.Selector.selectDelegate;
+
 /**
  *
  */
-@Singleton
-@Named
+@Component( role = ArtifactInstaller.class, hint = "default" )
 public class DefaultArtifactInstaller
-        extends DelegatorSupport<ArtifactInstallerDelegate>
         implements ArtifactInstaller
 {
-    @Inject
-    public DefaultArtifactInstaller( Map<String, ArtifactInstallerDelegate> delegates )
+    @Requirement( role = ArtifactInstallerDelegate.class )
+    private Map<String, ArtifactInstallerDelegate> delegates;
+
+    public DefaultArtifactInstaller()
     {
-        super( delegates );
     }
 
+    public DefaultArtifactInstaller( Map<String, ArtifactInstallerDelegate> delegates )
+    {
+        this.delegates = delegates;
+    }
+
+    @Override
     public void install( ProjectBuildingRequest request,
                          Collection<Artifact> mavenArtifacts )
             throws ArtifactInstallerException, IllegalArgumentException
     {
         validateParameters( request, mavenArtifacts );
-        delegate.install( request, mavenArtifacts );
+        selectDelegate( delegates ).install( request, mavenArtifacts );
     }
 
+    @Override
     public void install( ProjectBuildingRequest request,
                          File localRepository,
                          Collection<Artifact> mavenArtifacts ) throws ArtifactInstallerException
@@ -68,7 +74,7 @@ public class DefaultArtifactInstaller
         {
             throw new IllegalArgumentException( "The parameter localRepository must be a directory." );
         }
-        delegate.install( request, localRepository, mavenArtifacts );
+        selectDelegate( delegates ).install( request, localRepository, mavenArtifacts );
     }
 
     private void validateParameters( ProjectBuildingRequest request, Collection<Artifact> mavenArtifacts )

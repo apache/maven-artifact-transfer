@@ -26,47 +26,54 @@ import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 import org.apache.maven.shared.transfer.dependencies.collect.CollectorResult;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollector;
 import org.apache.maven.shared.transfer.dependencies.collect.DependencyCollectorException;
-import org.apache.maven.shared.transfer.support.DelegatorSupport;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Map;
+
+import static org.apache.maven.shared.transfer.support.Selector.selectDelegate;
 
 /**
  *
  */
-@Singleton
-@Named
+@Component( role = DependencyCollector.class, hint = "default" )
 public class DefaultDependencyCollector
-        extends DelegatorSupport<DependencyCollectorDelegate>
         implements DependencyCollector
 {
-    @Inject
-    public DefaultDependencyCollector( Map<String, DependencyCollectorDelegate> delegates )
+    @Requirement( role = DependencyCollectorDelegate.class )
+    private Map<String, DependencyCollectorDelegate> delegates;
+
+    public DefaultDependencyCollector()
     {
-        super( delegates );
     }
 
+    public DefaultDependencyCollector( Map<String, DependencyCollectorDelegate> delegates )
+    {
+        this.delegates = delegates;
+    }
+
+    @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest,
                                                 Dependency root ) throws DependencyCollectorException
     {
         validateParameters( buildingRequest, root );
-        return delegate.collectDependencies( buildingRequest, root );
+        return selectDelegate( delegates ).collectDependencies( buildingRequest, root );
     }
 
+    @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest,
                                                 DependableCoordinate root ) throws DependencyCollectorException
     {
         validateParameters( buildingRequest, root );
-        return delegate.collectDependencies( buildingRequest, root );
+        return selectDelegate( delegates ).collectDependencies( buildingRequest, root );
     }
 
+    @Override
     public CollectorResult collectDependencies( ProjectBuildingRequest buildingRequest,
                                                 Model root ) throws DependencyCollectorException
     {
         validateParameters( buildingRequest, root );
-        return delegate.collectDependencies( buildingRequest, root );
+        return selectDelegate( delegates ).collectDependencies( buildingRequest, root );
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, DependableCoordinate root )

@@ -29,15 +29,14 @@ import org.apache.maven.shared.transfer.metadata.internal.Maven30MetadataBridge;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.apache.maven.shared.transfer.support.DelegateSupport;
 import org.apache.maven.shared.transfer.support.Selector;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.File;
 import java.util.Collection;
 import java.util.Objects;
@@ -45,17 +44,21 @@ import java.util.Objects;
 /**
  *
  */
-@Singleton
-@Named( Selector.MAVEN_3_0_X )
+@Component( role = ArtifactInstallerDelegate.class, hint = Selector.MAVEN_3_0_X )
 public class Maven30ArtifactInstaller
         extends DelegateSupport
         implements ArtifactInstallerDelegate
 {
-    private final RepositorySystem repositorySystem;
+    @Requirement
+    private RepositorySystem repositorySystem;
 
-    private final RepositoryManager repositoryManager;
+    @Requirement
+    private RepositoryManager repositoryManager;
 
-    @Inject
+    public Maven30ArtifactInstaller()
+    {
+    }
+
     public Maven30ArtifactInstaller( RepositorySystem repositorySystem,
                                      RepositoryManager repositoryManager )
     {

@@ -25,6 +25,9 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.support.DelegateSupport;
+import org.apache.maven.shared.transfer.support.Selector;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -43,11 +46,17 @@ import java.util.Objects;
 /**
  *
  */
-public abstract class Maven30RepositoryManager
+@Component( role = RepositoryManagerDelegate.class, hint = Selector.MAVEN_3_0_X )
+public class Maven30RepositoryManager
         extends DelegateSupport
         implements RepositoryManagerDelegate
 {
-    private final RepositorySystem repositorySystem;
+    @Requirement
+    private RepositorySystem repositorySystem;
+
+    public Maven30RepositoryManager()
+    {
+    }
 
     public Maven30RepositoryManager( RepositorySystem repositorySystem )
     {
@@ -123,19 +132,28 @@ public abstract class Maven30RepositoryManager
     }
 
     /**
-     * @param localRepository {@link LocalRepository}
-     * @return the resolved type.
+     * Aether-1.9+ (i.e. M3.0.2+) expects "default", not "enhanced" as repositoryType
      */
-    protected String resolveRepositoryType( LocalRepository localRepository )
+    private String resolveRepositoryType( LocalRepository localRepository )
     {
-        return localRepository.getContentType();
+        String repositoryType;
+        if ( "enhanced".equals( localRepository.getContentType() ) )
+        {
+            repositoryType = "default";
+        }
+        else
+        {
+            // this should be "simple"
+            repositoryType = localRepository.getContentType();
+        }
+        return repositoryType;
     }
 
     /**
      * @param coordinate {@link ArtifactCoordinate}
      * @return {@link Artifact}
      */
-    protected Artifact toArtifact( ArtifactCoordinate coordinate )
+    private Artifact toArtifact( ArtifactCoordinate coordinate )
     {
         if ( coordinate == null )
         {

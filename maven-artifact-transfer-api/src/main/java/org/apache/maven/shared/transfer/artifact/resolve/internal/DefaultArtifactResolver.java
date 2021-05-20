@@ -25,42 +25,48 @@ import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResult;
-import org.apache.maven.shared.transfer.support.DelegatorSupport;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.Map;
+
+import static org.apache.maven.shared.transfer.support.Selector.selectDelegate;
 
 /**
  *
  */
-@Singleton
-@Named
+@Component( role = ArtifactResolver.class, hint = "default" )
 public class DefaultArtifactResolver
-        extends DelegatorSupport<ArtifactResolverDelegate>
         implements ArtifactResolver
 {
-    @Inject
-    public DefaultArtifactResolver( Map<String, ArtifactResolverDelegate> delegates )
+    @Requirement( role = ArtifactResolverDelegate.class )
+    private Map<String, ArtifactResolverDelegate> delegates;
+
+    public DefaultArtifactResolver()
     {
-        super( delegates );
     }
 
+    public DefaultArtifactResolver( Map<String, ArtifactResolverDelegate> delegates )
+    {
+        this.delegates = delegates;
+    }
+
+    @Override
     public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest,
                                            Artifact mavenArtifact )
             throws ArtifactResolverException, IllegalArgumentException
     {
         validateParameters( buildingRequest, mavenArtifact );
-        return delegate.resolveArtifact( buildingRequest, mavenArtifact );
+        return selectDelegate( delegates ).resolveArtifact( buildingRequest, mavenArtifact );
     }
 
+    @Override
     public ArtifactResult resolveArtifact( ProjectBuildingRequest buildingRequest,
                                            ArtifactCoordinate coordinate )
             throws ArtifactResolverException, IllegalArgumentException
     {
         validateParameters( buildingRequest, coordinate );
-        return delegate.resolveArtifact( buildingRequest, coordinate );
+        return selectDelegate( delegates ).resolveArtifact( buildingRequest, coordinate );
     }
 
     private void validateParameters( ProjectBuildingRequest buildingRequest, Artifact mavenArtifact )

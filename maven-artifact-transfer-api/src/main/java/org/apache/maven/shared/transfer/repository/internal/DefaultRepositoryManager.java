@@ -26,39 +26,37 @@ import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 import org.apache.maven.shared.transfer.artifact.DefaultArtifactCoordinate;
 import org.apache.maven.shared.transfer.repository.RepositoryManager;
-import org.apache.maven.shared.transfer.support.DelegatorSupport;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.File;
 import java.util.Map;
+
+import static org.apache.maven.shared.transfer.support.Selector.selectDelegate;
 
 /**
  *
  */
-@Singleton
-@Named
+@Component( role = RepositoryManager.class, hint = "default" )
 public class DefaultRepositoryManager
-        extends DelegatorSupport<RepositoryManagerDelegate>
         implements RepositoryManager
 {
-    @Inject
-    public DefaultRepositoryManager( Map<String, RepositoryManagerDelegate> delegates )
-    {
-        super( delegates );
-    }
+    @Requirement( role = RepositoryManagerDelegate.class )
+    private Map<String, RepositoryManagerDelegate> delegate;
 
+    @Override
     public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest, Artifact artifact )
     {
-        return delegate.getPathForLocalArtifact( buildingRequest, artifact );
+        return selectDelegate( delegate ).getPathForLocalArtifact( buildingRequest, artifact );
     }
 
+    @Override
     public String getPathForLocalArtifact( ProjectBuildingRequest buildingRequest, ArtifactCoordinate coordinate )
     {
-        return delegate.getPathForLocalArtifact( buildingRequest, coordinate );
+        return selectDelegate( delegate ).getPathForLocalArtifact( buildingRequest, coordinate );
     }
 
+    @Override
     public String getPathForLocalMetadata( ProjectBuildingRequest buildingRequest, ArtifactMetadata metadata )
     {
         if ( metadata instanceof ProjectArtifactMetadata )
@@ -71,16 +69,18 @@ public class DefaultRepositoryManager
             return getPathForLocalArtifact( buildingRequest, pomCoordinate );
         }
 
-        return delegate.getPathForLocalMetadata( buildingRequest, metadata );
+        return selectDelegate( delegate ).getPathForLocalMetadata( buildingRequest, metadata );
     }
 
+    @Override
     public ProjectBuildingRequest setLocalRepositoryBasedir( ProjectBuildingRequest request, File basedir )
     {
-        return delegate.setLocalRepositoryBasedir( request, basedir );
+        return selectDelegate( delegate ).setLocalRepositoryBasedir( request, basedir );
     }
 
+    @Override
     public File getLocalRepositoryBasedir( ProjectBuildingRequest request )
     {
-        return delegate.getLocalRepositoryBasedir( request );
+        return selectDelegate( delegate ).getLocalRepositoryBasedir( request );
     }
 }
