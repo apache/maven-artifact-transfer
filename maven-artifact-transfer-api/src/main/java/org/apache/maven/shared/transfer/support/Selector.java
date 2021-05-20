@@ -38,7 +38,6 @@ public final class Selector
      */
     public static <D> D selectDelegate( final Map<String, D> delegates )
     {
-        System.out.println( " ### delegates: " + delegates.keySet() );
         Objects.requireNonNull( delegates, "Null delegates" );
         return delegates.get( RUNTIME );
     }
@@ -77,7 +76,6 @@ public final class Selector
             // if here, die
             throw new IllegalStateException( "Could not determine runtime" );
         }
-        System.out.println( " ####   RUNTIME " + runtime );
         return runtime;
     }
 }
