@@ -97,6 +97,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version><!-- TODO remove when parent upgraded to 35 -->
         <executions>
           <execution>
             <phase>package</phase>
