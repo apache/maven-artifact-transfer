@@ -71,7 +71,7 @@
     <!-- maven 3.1.x runtime -->
     <maven31x.version>3.1.1</maven31x.version>
     <maven31xEclipseAether.version>0.9.0.M2</maven31xEclipseAether.version>
-    <maven31xEclipseSisu.version>0.3.4</maven31xEclipseSisu.version>
+    <maven31xEclipseSisu.version>0.3.5</maven31xEclipseSisu.version>
   </properties>
 
   <modules>
