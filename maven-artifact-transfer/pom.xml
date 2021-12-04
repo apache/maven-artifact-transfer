@@ -165,7 +165,7 @@
                 <extraArtifact>org.apache.maven:apache-maven:3.3.9:tar.gz:bin</extraArtifact>
                 <extraArtifact>org.apache.maven:apache-maven:3.5.4:tar.gz:bin</extraArtifact>
                 <extraArtifact>org.apache.maven:apache-maven:3.6.3:tar.gz:bin</extraArtifact>
-                <extraArtifact>org.apache.maven:apache-maven:3.8.1:tar.gz:bin</extraArtifact>
+                <extraArtifact>org.apache.maven:apache-maven:3.8.4:tar.gz:bin</extraArtifact>
               </extraArtifacts>
             </configuration>
             <executions>
