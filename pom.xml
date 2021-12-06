@@ -59,7 +59,7 @@
   <properties>
     <javaVersion>7</javaVersion>
     <project.build.outputTimestamp>2020-12-22T10:32:11Z</project.build.outputTimestamp>
-    <sisu.version>0.3.4</sisu.version>
+    <sisu.version>0.3.5</sisu.version>
     <guice.version>3.2.6</guice.version>
     <maven.baseVersion>3.1.0</maven.baseVersion>
     <artifactFilters.version>3.1.0</artifactFilters.version>
