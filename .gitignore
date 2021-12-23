@@ -17,3 +17,4 @@ out/
 dependency-reduced-pom.xml
 .checkstyle
 pom.xml.versionsBackup
+.factorypath
