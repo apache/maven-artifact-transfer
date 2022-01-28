@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.apache.maven.shared</groupId>
     <artifactId>maven-shared-components</artifactId>
-    <version>34</version>
+    <version>35-SNAPSHOT</version>
     <relativePath>../../pom/maven/maven-shared-components/pom.xml</relativePath>
   </parent>
 
@@ -57,26 +57,26 @@
   </distributionManagement>
 
   <properties>
-    <javaVersion>7</javaVersion>
+    <javaVersion>8</javaVersion>
     <project.build.outputTimestamp>2020-12-22T10:32:11Z</project.build.outputTimestamp>
     <sisu.version>0.3.5</sisu.version>
     <guice.version>3.2.6</guice.version>
     <maven.baseVersion>3.1.0</maven.baseVersion>
-    <artifactFilters.version>3.1.0</artifactFilters.version>
+    <artifactFilters.version>3.2.1-SNAPSHOT</artifactFilters.version>
 
     <!-- maven-3.0.x runtime -->
     <maven30x.version>3.0.5</maven30x.version>
     <maven30xSonatypeAether.version>1.13.1</maven30xSonatypeAether.version>
     <maven30xSonatypeSisu.version>2.3.0</maven30xSonatypeSisu.version>
     <!-- maven 3.1.x runtime -->
-    <maven31x.version>3.1.1</maven31x.version>
-    <maven31xEclipseAether.version>0.9.0.M2</maven31xEclipseAether.version>
+    <maven.version>4.0.0-alpha-1-SNAPSHOT</maven.version>
+    <mavenResolver.version>1.8.0-SNAPSHOT</mavenResolver.version>
+    <maven31xEclipseAether.version>1.1.0</maven31xEclipseAether.version>
     <maven31xEclipseSisu.version>0.3.5</maven31xEclipseSisu.version>
   </properties>
 
   <modules>
     <module>maven-artifact-transfer-api</module>
-    <module>maven-3.0.x</module>
     <module>maven-3.1.x</module>
     <module>maven-artifact-transfer</module>
   </modules>
@@ -217,7 +217,7 @@
           <configuration>
             <signature>
               <groupId>org.codehaus.mojo.signature</groupId>
-              <artifactId>java17</artifactId>
+              <artifactId>java18</artifactId>
               <version>1.0</version>
             </signature>
           </configuration>

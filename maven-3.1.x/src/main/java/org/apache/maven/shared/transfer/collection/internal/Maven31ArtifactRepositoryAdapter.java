@@ -219,6 +219,18 @@ class Maven31ArtifactRepositoryAdapter implements ArtifactRepository
     }
 
     @Override
+    public boolean isBlocked()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setBlocked( boolean blocked )
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
