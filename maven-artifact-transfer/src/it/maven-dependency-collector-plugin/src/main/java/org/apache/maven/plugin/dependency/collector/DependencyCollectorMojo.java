@@ -23,7 +23,6 @@ package org.apache.maven.plugin.artifact.installer;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -54,7 +53,7 @@ public class DependencyCollectorMojo
     private DependencyCollector collector;
 
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+        throws MojoExecutionException
     {
         getLog().info( "Hello from dependency-collector plugin" );
         collectDependencies( session.getProjectBuildingRequest(), session.getCurrentProject().getModel() );
@@ -62,7 +61,7 @@ public class DependencyCollectorMojo
     }
 
     private void collectDependencies( ProjectBuildingRequest projectBuildingRequest, Model model )
-        throws MojoFailureException, MojoExecutionException
+        throws MojoExecutionException
     {
         try
         {

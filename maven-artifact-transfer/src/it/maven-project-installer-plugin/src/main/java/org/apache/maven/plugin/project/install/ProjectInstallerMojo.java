@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -70,7 +69,7 @@ public class ProjectInstallerMojo
     private MavenProjectHelper projectHelper;
 
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+        throws MojoExecutionException
     {
         getLog().info( "Hello from project-installer plugin" );
         installProject( session.getProjectBuildingRequest() );
@@ -86,7 +85,7 @@ public class ProjectInstallerMojo
     }
 
     private void installProject( ProjectBuildingRequest pbr )
-        throws MojoFailureException, MojoExecutionException
+        throws MojoExecutionException
     {
         try
         {
