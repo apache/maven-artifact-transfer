@@ -24,8 +24,8 @@
   <parent>
     <groupId>org.apache.maven.shared</groupId>
     <artifactId>maven-shared-components</artifactId>
-    <version>34</version>
-    <relativePath>../../pom/maven/maven-shared-components/pom.xml</relativePath>
+    <version>37</version>
+    <relativePath/>
   </parent>
 
   <packaging>pom</packaging>
@@ -165,19 +165,6 @@
           </executions>
         </plugin>
         <plugin>
-          <groupId>org.eclipse.sisu</groupId>
-          <artifactId>sisu-maven-plugin</artifactId>
-          <version>${sisu.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>main-index</goal>
-                <goal>test-index</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
@@ -204,7 +191,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>animal-sniffer-maven-plugin</artifactId>
-          <version>1.20</version>
+          <version>1.22</version>
           <executions>
             <execution>
               <id>sniff</id>
