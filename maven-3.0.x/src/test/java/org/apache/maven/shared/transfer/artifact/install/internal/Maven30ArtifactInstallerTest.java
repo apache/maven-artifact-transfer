@@ -20,6 +20,7 @@ package org.apache.maven.shared.transfer.artifact.install.internal;
  */
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -61,7 +62,7 @@ public class Maven30ArtifactInstallerTest extends PlexusTestCase
 
         File artifactsDirectory = new File( "target/tests/artifacts" );
         artifactsDirectory.mkdirs();
-        File tmpFile = File.createTempFile( "test-install", ".jar", artifactsDirectory );
+        File tmpFile = Files.createTempFile( artifactsDirectory.toPath(), "test-install", ".jar" ).toFile();
         
         DefaultArtifact artifact = new DefaultArtifact( "GROUPID", "ARTIFACTID", "VERSION", "compile", "jar", null, artifactHandler );
         artifact.setFile( tmpFile );
