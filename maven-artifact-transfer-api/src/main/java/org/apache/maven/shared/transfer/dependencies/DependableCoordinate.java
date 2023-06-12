@@ -36,6 +36,7 @@ package org.apache.maven.shared.transfer.dependencies;
  * 
  * @author Robert Scholte
  */
+@Deprecated
 public interface DependableCoordinate
 {
     /**

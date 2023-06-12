@@ -26,6 +26,7 @@ import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 /**
  * Resolves the artifact, i.e download the file when required and attach it to the artifact
  */
+@Deprecated
 public interface ArtifactResolver
 {
 

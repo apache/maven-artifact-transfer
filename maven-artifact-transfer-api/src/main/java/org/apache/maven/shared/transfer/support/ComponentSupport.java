@@ -27,6 +27,7 @@ import java.util.Objects;
 /**
  * Support class for components.
  */
+@Deprecated
 public abstract class ComponentSupport
 {
     private static final String GUICE_ENHANCED = "$$EnhancerByGuice$$";

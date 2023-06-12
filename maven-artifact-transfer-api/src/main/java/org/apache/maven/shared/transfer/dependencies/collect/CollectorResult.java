@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * @author Robert Scholte
  *
  */
+@Deprecated
 public interface CollectorResult
 {
     /**

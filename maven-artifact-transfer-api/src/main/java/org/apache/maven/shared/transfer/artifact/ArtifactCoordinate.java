@@ -27,6 +27,7 @@ package org.apache.maven.shared.transfer.artifact;
  * 
  * @author Robert Scholte
  */
+@Deprecated
 public interface ArtifactCoordinate
 {
     /**

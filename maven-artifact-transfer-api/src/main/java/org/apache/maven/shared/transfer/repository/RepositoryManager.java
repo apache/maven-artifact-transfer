@@ -29,6 +29,7 @@ import org.apache.maven.shared.transfer.artifact.ArtifactCoordinate;
 /**
  * 
  */
+@Deprecated
 public interface RepositoryManager
 {
 

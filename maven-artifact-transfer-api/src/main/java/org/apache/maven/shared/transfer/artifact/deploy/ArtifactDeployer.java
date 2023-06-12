@@ -28,6 +28,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 /**
  * 
  */
+@Deprecated
 public interface ArtifactDeployer
 {
 

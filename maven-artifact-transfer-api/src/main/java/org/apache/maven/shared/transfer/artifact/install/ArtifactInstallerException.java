@@ -22,6 +22,7 @@ package org.apache.maven.shared.transfer.artifact.install;
 /**
  * 
  */
+@Deprecated
 public class ArtifactInstallerException
     extends Exception
 {

@@ -29,6 +29,7 @@ import org.apache.maven.shared.transfer.project.NoFileAssignedException;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */
+@Deprecated
 public interface ProjectDeployer
 {
     /**

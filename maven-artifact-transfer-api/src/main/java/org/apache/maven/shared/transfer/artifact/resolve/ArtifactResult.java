@@ -27,6 +27,7 @@ import org.apache.maven.artifact.Artifact;
  * @author Robert Scholte
  * @since 3.0
  */
+@Deprecated
 public interface ArtifactResult
 {
     /**

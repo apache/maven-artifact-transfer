@@ -22,6 +22,7 @@ package org.apache.maven.shared.transfer.dependencies.resolve;
 /**
  * The Exception class in case a resolving does not work.
  */
+@Deprecated
 public class DependencyResolverException
     extends Exception
 {

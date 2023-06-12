@@ -1,5 +1,3 @@
-package org.apache.maven.shared.transfer.artifact.resolve;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,23 +17,5 @@ package org.apache.maven.shared.transfer.artifact.resolve;
  * under the License.
  */
 
-/**
- * 
- */
 @Deprecated
-public class ArtifactResolverException
-    extends Exception
-{
-
-    private static final long serialVersionUID = 7252294837746943917L;
-
-    /**
-     * @param message The message for the exception.
-     * @param e The exception itself.
-     */
-    public ArtifactResolverException( String message, Exception e )
-    {
-        super( message, e );
-    }
-
-}
+package org.apache.maven.shared.transfer.dependencies;

@@ -27,6 +27,7 @@ import java.io.File;
  * @author Robert Scholte
  *
  */
+@Deprecated
 public interface ArtifactMetadata extends org.apache.maven.repository.legacy.metadata.ArtifactMetadata
 {
     File getFile();

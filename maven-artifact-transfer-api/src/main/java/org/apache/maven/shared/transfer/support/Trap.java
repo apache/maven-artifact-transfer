@@ -22,6 +22,7 @@ package org.apache.maven.shared.transfer.support;
 /**
  * Traps does a check (loadClass attempt) to detect runtime environment.
  */
+@Deprecated
 public abstract class Trap
 {
     public abstract void check();

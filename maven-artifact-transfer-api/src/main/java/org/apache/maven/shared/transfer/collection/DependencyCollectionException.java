@@ -23,6 +23,7 @@ package org.apache.maven.shared.transfer.collection;
  * Thrown in case of bad artifact descriptors, version ranges or other issues encountered during calculation of the
  * dependency graph.
  */
+@Deprecated
 public class DependencyCollectionException
     extends Exception
 {
