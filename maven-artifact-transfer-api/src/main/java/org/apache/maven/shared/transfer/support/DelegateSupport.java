@@ -23,6 +23,7 @@ package org.apache.maven.shared.transfer.support;
  * Support class for delegate implementations. They need a specific "trap" to prevent them being loaded if environment
  * is not fit.
  */
+@Deprecated
 public abstract class DelegateSupport extends ComponentSupport
 {
 }

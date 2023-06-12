@@ -26,6 +26,7 @@ package org.apache.maven.shared.transfer.graph;
  * @author Pim Moerenhout
  * @since 0.12
  */
+@Deprecated
 public interface DependencyVisitor
 {
     /**

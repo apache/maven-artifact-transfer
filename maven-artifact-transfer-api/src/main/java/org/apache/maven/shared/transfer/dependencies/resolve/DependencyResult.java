@@ -26,6 +26,7 @@ import java.util.List;
  * @author Robert Scholte
  *
  */
+@Deprecated
 public interface DependencyResult
 {
     /**

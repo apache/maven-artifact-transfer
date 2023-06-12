@@ -14,6 +14,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+Deprecation
+======================
+The [Apache Maven Artifact Transfer](https://maven.apache.org/shared/maven-artifact-transfer/) library has been deprecated.
+Users are encouraged to switch to [Maven Resolver](https://maven.apache.org/resolver/) or the new Maven 4.x API.
+
 Contributing to [Apache Maven Artifact Transfer](https://maven.apache.org/shared/maven-artifact-transfer/)
 ======================
 

@@ -79,6 +79,7 @@ package org.apache.maven.shared.transfer.artifact;
  * @author Robert Scholte
  * @since 3.0
  */
+@Deprecated
 public class DefaultArtifactCoordinate
     implements ArtifactCoordinate
 {

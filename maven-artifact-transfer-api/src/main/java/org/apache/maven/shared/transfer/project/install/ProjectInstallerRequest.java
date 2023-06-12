@@ -24,6 +24,7 @@ import org.apache.maven.project.MavenProject;
 /**
  * @author Robert Scholte
  */
+@Deprecated
 public class ProjectInstallerRequest
 {
     // From InstallMojo

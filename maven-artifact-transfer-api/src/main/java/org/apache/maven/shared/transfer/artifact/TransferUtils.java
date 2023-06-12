@@ -30,6 +30,7 @@ import org.apache.maven.model.ReportPlugin;
  * 
  * @author Robert Scholte
  */
+@Deprecated
 public final class TransferUtils
 {
     private TransferUtils()

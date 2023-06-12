@@ -31,6 +31,7 @@ import org.apache.maven.shared.transfer.dependencies.DependableCoordinate;
 /**
  * @author Robert Scholte
  */
+@Deprecated
 public interface DependencyResolver
 {
     /**

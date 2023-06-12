@@ -30,6 +30,7 @@ import org.apache.maven.shared.transfer.graph.DependencyNode;
  * @see DependencyCollector#collectDependencies(org.apache.maven.project.ProjectBuildingRequest, org.apache.maven.shared.transfer.dependencies.DependableCoordinate)
  * @see DependencyCollector#collectDependencies(org.apache.maven.project.ProjectBuildingRequest, org.apache.maven.model.Model)
  */
+@Deprecated
 public interface CollectResult
 {
   /**

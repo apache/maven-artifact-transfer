@@ -23,6 +23,7 @@ package org.apache.maven.shared.transfer.project;
  * This exception will be thrown if no file has been assigned to artifact.
  * 
  */
+@Deprecated
 public class NoFileAssignedException
     extends Exception
 {

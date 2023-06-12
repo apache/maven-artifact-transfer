@@ -23,6 +23,7 @@ package org.apache.maven.shared.transfer.artifact.deploy;
  * An artifact could not correctly being deployed.
  * 
  */
+@Deprecated
 public class ArtifactDeployerException
     extends Exception
 {

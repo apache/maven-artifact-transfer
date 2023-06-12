@@ -38,6 +38,7 @@ import org.apache.maven.artifact.Artifact;
  * @see DependencyCollector#collectDependencies(org.apache.maven.project.ProjectBuildingRequest, org.apache.maven.shared.transfer.dependencies.DependableCoordinate)
  * @see DependencyCollector#collectDependencies(org.apache.maven.project.ProjectBuildingRequest, org.apache.maven.model.Model)
  */
+@Deprecated
 public final class CollectRequest
 {
 

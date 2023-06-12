@@ -79,6 +79,7 @@ package org.apache.maven.shared.transfer.dependencies;
  * @author Robert Scholte
  * @since 3.0
  */
+@Deprecated
 public class DefaultDependableCoordinate implements DependableCoordinate
 {
     private String groupId;

@@ -22,6 +22,7 @@ package org.apache.maven.shared.transfer.repository;
 /**
  * 
  */
+@Deprecated
 public class RepositoryManagerException
     extends Exception
 {

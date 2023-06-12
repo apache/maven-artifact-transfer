@@ -28,6 +28,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 /**
  * @author Robert Scholte
  */
+@Deprecated
 public interface ArtifactInstaller
 {
     /**

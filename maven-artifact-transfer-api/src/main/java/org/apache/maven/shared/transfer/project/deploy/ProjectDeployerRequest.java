@@ -25,6 +25,7 @@ import org.apache.maven.project.MavenProject;
  * 
  * @author Robert Scholte
  */
+@Deprecated
 public class ProjectDeployerRequest
 {
 

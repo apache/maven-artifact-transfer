@@ -30,6 +30,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * @author Pim Moerenhout
  * @since 0.12
  */
+@Deprecated
 public interface DependencyNode
 {
     /**

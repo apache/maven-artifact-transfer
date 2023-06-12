@@ -23,6 +23,7 @@ package org.apache.maven.shared.transfer.dependencies.collect;
  * 
  * @author Robert Scholte
  */
+@Deprecated
 public class DependencyCollectorException extends Exception
 {
 

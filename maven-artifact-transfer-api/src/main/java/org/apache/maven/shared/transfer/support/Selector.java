@@ -25,6 +25,7 @@ import java.util.Objects;
 /**
  * Selector that detects "runtime" Maven version and tells which delegate should use.
  */
+@Deprecated
 public final class Selector
 {
     public static final String MAVEN_3_0_X = "maven-3.0.x";
