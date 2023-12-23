@@ -31,7 +31,7 @@
   <name>Apache Maven Artifact Transfer API</name>
 
   <properties>
-    <apiMaven.version>3.0</apiMaven.version>
+    <apiMaven.version>3.8.1</apiMaven.version>
   </properties>
 
   <!-- This module must work in CP of Maven 3.0.x AND Maven 3.1.x -->
