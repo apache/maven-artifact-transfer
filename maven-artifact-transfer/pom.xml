@@ -31,7 +31,7 @@
   <name>Apache Maven Artifact Transfer</name>
 
   <properties>
-    <downstreamMaven.version>3.1.1</downstreamMaven.version>
+    <downstreamMaven.version>3.8.1</downstreamMaven.version>
   </properties>
 
   <dependencies>
