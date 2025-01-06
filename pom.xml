@@ -57,7 +57,7 @@
   </distributionManagement>
 
   <properties>
-    <javaVersion>7</javaVersion>
+    <javaVersion>8</javaVersion>
     <checkstyle.violation.ignore>RedundantThrows,NewlineAtEndOfFile,ParameterNumber,MethodLength,FileLength,ModifierOrder,RegexpHeader</checkstyle.violation.ignore>
     <project.build.outputTimestamp>2020-12-22T10:32:11Z</project.build.outputTimestamp>
     <sisu.version>0.3.5</sisu.version>
