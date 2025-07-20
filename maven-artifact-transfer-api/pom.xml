@@ -28,7 +28,7 @@
 
   <artifactId>maven-artifact-transfer-api</artifactId>
 
-  <name>Apache Maven Artifact Transfer API</name>
+  <name>(RETIRED) Apache Maven Artifact Transfer API</name>
 
   <properties>
     <apiMaven.version>3.0</apiMaven.version>

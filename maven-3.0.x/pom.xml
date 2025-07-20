@@ -28,7 +28,7 @@
 
   <artifactId>maven-artifact-transfer-maven-3.0.x</artifactId>
 
-  <name>Apache Maven Artifact Transfer Maven 3.0.x provider</name>
+  <name>(RETIRED) Apache Maven Artifact Transfer Maven 3.0.x provider</name>
 
   <properties>
     <maven30x.version>3.0.5</maven30x.version>
