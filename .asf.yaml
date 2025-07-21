@@ -16,7 +16,7 @@
 #
 # see https://s.apache.org/asfyaml
 github:
-  description: "Apache Maven Artifact Transfer"
+  description: "Apache Maven Artifact Transfer (RETIRED)"
   homepage: https://maven.apache.org/shared/maven-artifact-transfer/
   labels:
     - java
