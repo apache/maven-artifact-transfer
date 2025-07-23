@@ -28,6 +28,8 @@
 
 ${project.name}
 
+  <<<Note:>>> This component is retired. It is no longer maintained.
+
   The Maven Artifact Transfer Component is a library
   to install, deploy and resolve artifacts in Maven 3.
   

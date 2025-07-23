@@ -32,7 +32,7 @@
   <artifactId>maven-artifact-transfer-parent</artifactId>
   <version>2.0.0-SNAPSHOT</version>
 
-  <name>Apache Maven Artifact Transfer Parent</name>
+  <name>(RETIRED) Apache Maven Artifact Transfer Parent</name>
   <description>An API to install, deploy and resolving artifacts with supported versions of Maven</description>
 
   <scm>

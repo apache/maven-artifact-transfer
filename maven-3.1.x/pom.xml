@@ -28,7 +28,7 @@
 
   <artifactId>maven-artifact-transfer-maven-3.1.x</artifactId>
 
-  <name>Apache Maven Artifact Transfer Maven 3.1.x provider</name>
+  <name>(RETIRED) Apache Maven Artifact Transfer Maven 3.1.x provider</name>
 
   <!-- This module uses CP of Maven 3.1.x -->
 
